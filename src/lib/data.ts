@@ -1,6 +1,6 @@
 // Loads the static JSON data. Paths are relative so the same build works from a web server
 // and from a Tauri bundle.
-import type { Catalog, Chapter, PlainChapter, Person, Place, HistEvent, Polity, Basemap, SanzhuanEntry } from './types';
+import type { Catalog, Chapter, PlainChapter, Person, Place, HistEvent, Polity, Basemap, SanzhuanEntry, Territory } from './types';
 
 const cache = new Map<string, Promise<unknown>>();
 
@@ -37,5 +37,6 @@ export const loadPeople = (book: string) =>
 export const loadPlaces = (book: string) => load<Place[]>(`${book}/places.json`);
 export const loadEvents = (book: string) => load<HistEvent[]>(`${book}/events.json`);
 export const loadPolities = (book: string) => load<Record<string, Polity[]>>(`${book}/polities.json`);
+export const loadTerritory = (book: string) => load<Territory>(`${book}/territory.json`).catch(() => null);
 export const loadBasemap = (period: string) => load<Basemap>(`basemap-${period}.json`);
 export const loadSanzhuan = (chapter: string) => load<{ id: string; entries: SanzhuanEntry[] }>(`sanzhuan/${chapter}.json`);

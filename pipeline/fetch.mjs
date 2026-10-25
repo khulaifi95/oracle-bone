@@ -42,6 +42,12 @@ const WIKISOURCE = [
 const NATURAL_EARTH = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/';
 const GEO = ['ne_10m_rivers_lake_centerlines.geojson', 'ne_50m_coastline.geojson', 'ne_50m_lakes.geojson', 'ne_50m_land.geojson'];
 
+// Elevation for drawing borders along the lie of the land: ETOPO 2022's 1′ grid sampled every 3′
+// (0.05°) over the maps' extent, from NOAA's ERDDAP servers.
+const ETOPO = ['https://upwell.pfeg.noaa.gov', 'https://coastwatch.pfeg.noaa.gov'].map(
+	(h) => `${h}/erddap/griddap/etopo180.csv?altitude%5B(20):3:(44)%5D%5B(98):3:(126)%5D`
+);
+
 function pad(n) {
 	return String(n).padStart(3, '0');
 }
@@ -110,6 +116,20 @@ async function naturalEarth() {
 	}
 }
 
+async function elevation() {
+	const file = path.join(CACHE, 'etopo-0.05.csv');
+	if (await exists(file)) return;
+	for (const url of ETOPO) {
+		const text = await get(url).then((r) => r.text(), () => '');
+		if (!text.startsWith('latitude')) continue;
+		await writeFile(file, text);
+		console.log('cached etopo-0.05.csv');
+		return;
+	}
+	throw new Error('ETOPO elevation: no server answered');
+}
+
 await corpus();
 await wikisource();
 await naturalEarth();
+await elevation();

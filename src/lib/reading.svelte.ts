@@ -1,8 +1,8 @@
 // What is being read: the loaded data, and what the current position means
 // (which event it belongs to, what date it is, who and where is mentioned nearby).
-import type { Basemap, BookInfo, Catalog, Chapter, HistEvent, NoteDef, Person, Place, Polity, Script, Side, EditionInfo } from './types';
+import type { Basemap, Territory, BookInfo, Catalog, Chapter, HistEvent, NoteDef, Person, Place, Polity, Script, Side, EditionInfo } from './types';
 import { app } from './state.svelte';
-import { loadBasemap, loadCatalog, loadChapter, loadEvents, loadPeople, loadPlaces, loadPolities } from './data';
+import { loadBasemap, loadCatalog, loadChapter, loadEvents, loadPeople, loadPlaces, loadPolities, loadTerritory } from './data';
 import { eraLabel, monthLabel, julianYear, yearLong } from './dates';
 
 export interface CurrentDate {
@@ -23,6 +23,7 @@ class Reading {
 	events = $state<HistEvent[]>([]);
 	polities = $state<Record<string, Polity[]>>({});
 	basemap = $state<Basemap | null>(null);
+	territory = $state<Territory | null>(null);
 	error = $state<string | null>(null);
 
 	personById = $derived(new Map(this.people.map((p) => [p.id, p])));
@@ -156,12 +157,13 @@ class Reading {
 	async loadBook(id: string) {
 		const b = this.catalog?.books[id];
 		if (!b) throw new Error(`no book ${id}`);
-		const [people, places, events, polities, basemap] = await Promise.all([
+		const [people, places, events, polities, basemap, territory] = await Promise.all([
 			loadPeople(id),
 			loadPlaces(id),
 			loadEvents(id),
 			loadPolities(id),
-			loadBasemap(b.map.period)
+			loadBasemap(b.map.period),
+			loadTerritory(id)
 		]);
 		// commentaries never set take the book's defaults
 		for (const n of b.notes) app.settings.notes[n.k] ??= n.on;
@@ -170,6 +172,7 @@ class Reading {
 		this.events = events;
 		this.polities = polities;
 		this.basemap = basemap;
+		this.territory = territory;
 		this.bookId = id;
 		app.person = null;
 		app.place = null;

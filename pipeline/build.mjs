@@ -5,6 +5,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { loadPlain, PARALLEL_BOOKS, BOOK_NAMES } from './plain.mjs';
 import { buildBasemap } from './geo.mjs';
+import { territoryShapes } from './terrain.mjs';
 import { normChar, toSimplified, toTraditional } from './script.mjs';
 import * as shiji from './books/shiji.mjs';
 import * as sanguozhi from './books/sanguozhi.mjs';
@@ -122,6 +123,8 @@ const SENTENCE = /[^。！？]*[。！？]+[」』”’]*/g;
 
 const catalogBooks = {};
 const periods = new Set();
+/** each book's holdings by year, drawn as shapes once its base map is built */
+const territoryJobs = [];
 for (const B of BOOKS) {
 	const id = B.book.id;
 	const dir = `data/${id}`;
@@ -410,19 +413,18 @@ for (const B of BOOKS) {
 			process.exitCode = 1;
 		}
 	}
-	await write(
-		`${id}/polities.json`,
-		Object.fromEntries(
-			Object.entries(polities).map(([y, list]) => [
-				y,
-				list.map((p) => {
-					const line = territory?.lines[p.name];
-					const holds = line ? places.filter((pl) => holderAt(pl.id, Number(y)) === line).map((pl) => pl.id) : [];
-					return { ...p, t: toTraditional(p.name), ...(p.who ? { whoT: toTraditional(p.who) } : {}), ...(territory ? { holds } : {}) };
-				})
-			])
-		)
+	const politiesOut = Object.fromEntries(
+		Object.entries(polities).map(([y, list]) => [
+			y,
+			list.map((p) => {
+				const line = territory?.lines[p.name];
+				const holds = line ? places.filter((pl) => holderAt(pl.id, Number(y)) === line).map((pl) => pl.id) : [];
+				return { ...p, t: toTraditional(p.name), ...(p.who ? { whoT: toTraditional(p.who) } : {}), ...(territory ? { holds } : {}) };
+			})
+		])
 	);
+	await write(`${id}/polities.json`, politiesOut);
+	if (territory) territoryJobs.push({ id, period: B.book.map.period, places, years: politiesOut });
 
 	catalogBooks[id] = {
 		...B.book,
@@ -445,4 +447,8 @@ for (const period of periods) {
 	const basemap = await buildBasemap(period);
 	for (const k of ['rivers', 'marshes', 'mountains']) for (const x of basemap[k]) x.t = toTraditional(x.name);
 	await write(`basemap-${period}.json`, basemap);
+	for (const job of territoryJobs.filter((j) => j.period === period)) {
+		const years = Object.fromEntries(Object.entries(job.years).map(([y, list]) => [y, list.map((p) => ({ name: p.name, holds: p.holds }))]));
+		await write(`${job.id}/territory.json`, await territoryShapes(basemap, job.places, years));
+	}
 }

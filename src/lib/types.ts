@@ -281,6 +281,17 @@ export interface Polity {
 	side: string;
 }
 
+/** who held what, drawn along the land: shapes for each distinct set of holdings, and the shape of each listed year */
+export interface Territory {
+	shapes: {
+		/** polity name → rings, each a flat list lon, lat, lon, lat… */
+		areas: Record<string, number[][]>;
+		/** where two holders meet, as flat lines */
+		borders: number[][];
+	}[];
+	years: Record<string, number>;
+}
+
 export interface Basemap {
 	bbox: [number, number, number, number];
 	coast: [number, number][][];

@@ -4,7 +4,6 @@
 	import { app } from '#lib/state.svelte.js';
 	import { reading } from '#lib/reading.svelte.js';
 	import { occurrences } from '#lib/find.js';
-	import { Delaunay } from 'd3-delaunay';
 
 	let { wide = false }: { wide?: boolean } = $props();
 
@@ -97,47 +96,33 @@
 		for (const k of polityYears) if (k <= y) best = k;
 		return best == null ? [] : (reading.polities[String(best)] ?? []);
 	});
-	// Territory: each place stands for the land nearer to it than to any other place (its Voronoi
-	// cell), coloured by who held it that year. Cells are cut to the land and to a reach around
-	// the held places, and a line is drawn where neighbouring cells change hands.
-	const REACH = 1.7 * K;
+	// Territory: the land each state held that year, worked out at build time by letting every held
+	// city spread over the terrain (slopes, heights and rivers slow it) until it meets another's
+	// (pipeline/terrain.mjs). States on one side (the eighteen kingdoms of 前206 are mostly 楚's)
+	// take lighter and darker tints of its colour; a dashed line runs where two holders meet.
 	// place → the colour of the side holding it
 	const heldBy = $derived(new Map(polities.flatMap((pol) => (pol.holds ?? []).map((id) => [id, sideColor(pol.side)] as [string, string]))));
-	const cells = $derived.by(() => {
-		const pts = reading.places.map((p) => [px(p.lon), py(p.lat)] as [number, number]);
-		if (pts.length < 3) return null;
-		const d = Delaunay.from(pts);
-		const v = d.voronoi([-REACH, -REACH, W + REACH, H + REACH]);
-		return { d, v, index: new Map(reading.places.map((p, i) => [p.id, i])) };
-	});
 	const territory = $derived.by(() => {
-		if (!cells) return { areas: [], borders: '', reach: [] as [number, number][] };
-		const owner = new Map<number, number>();
-		polities.forEach((pol, k) => (pol.holds ?? []).forEach((id) => cells.index.has(id) && owner.set(cells.index.get(id)!, k)));
-		const areas = polities.map((pol, k) => {
+		const y = reading.date?.ey ?? polityYears[0];
+		let best: number | null = null;
+		for (const k of polityYears) if (k <= y) best = k;
+		const shape = best == null || !reading.territory ? null : reading.territory.shapes[reading.territory.years[String(best)]];
+		if (!shape) return { areas: [], borders: '' };
+		const line = (f: number[], close: boolean) => {
 			let d = '';
-			// two places on one spot share a cell: the second has none
-			for (const [i, o] of owner) if (o === k) d += cells.v.renderCell(i) ?? '';
-			// states on one side (the eighteen kingdoms of 前206 are mostly 楚's) take lighter and darker tints of its colour
-			const n = polities.slice(0, k).filter((x) => x.side === pol.side).length;
-			const fill = `color-mix(in srgb, var(--${pol.side}) ${[100, 62, 82, 45][n % 4]}%, ${n % 2 ? '#fff' : '#000'} )`;
-			return { pol, d, fill };
-		}).filter((a) => a.d);
-		// borders: the shared edge of two neighbouring cells held by different hands
-		let borders = '';
-		const close = (a: number[], b: number[]) => Math.abs(a[0] - b[0]) < 0.01 && Math.abs(a[1] - b[1]) < 0.01;
-		for (const [i, o] of owner)
-			for (const j of cells.d.neighbors(i)) {
-				const oj = owner.get(j);
-				if (oj === o || (oj != null && j < i)) continue;
-				const a = cells.v.cellPolygon(i);
-				const b = cells.v.cellPolygon(j);
-				if (!a || !b) continue;
-				const shared = a.filter((p) => b.some((q) => close(p, q)));
-				if (shared.length >= 2) borders += `M${shared[0][0].toFixed(1)},${shared[0][1].toFixed(1)}L${shared[1][0].toFixed(1)},${shared[1][1].toFixed(1)}`;
-			}
-		const reach = [...owner.keys()].map((i) => [px(reading.places[i].lon), py(reading.places[i].lat)] as [number, number]);
-		return { areas, borders, reach };
+			for (let i = 0; i < f.length; i += 2) d += `${i ? 'L' : 'M'}${px(f[i]).toFixed(1)},${py(f[i + 1]).toFixed(1)}`;
+			return close ? d + 'Z' : d;
+		};
+		const areas = polities
+			.map((pol, k) => {
+				const rings = shape.areas[pol.name];
+				if (!rings) return null;
+				const n = polities.slice(0, k).filter((x) => x.side === pol.side).length;
+				const fill = `color-mix(in srgb, var(--${pol.side}) ${[100, 62, 82, 45][n % 4]}%, ${n % 2 ? '#fff' : '#000'} )`;
+				return { pol, d: rings.map((r) => line(r, true)).join(''), fill };
+			})
+			.filter((a) => a != null);
+		return { areas, borders: shape.borders.map((b) => line(b, false)).join('') };
 	});
 	const eventPlaces = $derived(new Set(reading.event?.places ?? []));
 	const near = $derived(reading.nearby.places);
@@ -249,10 +234,6 @@
 			aria-label={t ? '形勢圖' : '形势图'}
 		>
 			<defs>
-				<mask id="reach">
-					<rect x="-2000" y="-2000" width={W + 4000} height={H + 4000} fill="#000" />
-					{#each territory.reach as [x, y], i (i)}<circle cx={x} cy={y} r={REACH} fill="#fff" />{/each}
-				</mask>
 				{#if reading.basemap}
 					<clipPath id="land-clip">
 						{#each reading.basemap.land as l, i (i)}<path d={ring(l)} />{/each}
@@ -299,7 +280,7 @@
 			{#if reading.basemap && territory.areas.length}
 				<g clip-path="url(#land-clip)">
 					<g mask="url(#not-han-sea)">
-						<g mask="url(#reach)" class="territory">
+						<g class="territory">
 							<g class="areas">
 								{#each territory.areas as a (a.pol.name)}<path d={a.d} style="fill:{a.fill}" />{/each}
 							</g>

@@ -43,6 +43,8 @@ npm run dev        # http://localhost:5173
 - Commentary: each commentary can be shown or hidden, each in its own colour: 集解, 索隐, 正义 and 述赞 for the 史记, 裴注 for the 三国志, and 杜注, 音义 and 疏 for the 春秋. The 殿本 考证 is moved from the end of the chapter to the words it discusses. The notes can sit in the text as 双行小注 (夹注) or as coloured dots that open in the side panel (点记). The ? button explains each commentary.
 - Typeface: 楷 (霞鹜文楷) or 宋.
 
+**Your own portraits.** Pictures put in `static/portraits-local/` and named after a person's id (`zhuge-liang.png`, or `sanguozhi/zhuge-liang.png` for one book only) replace that person's woodcut. Git ignores the folder, so pictures you don't have the rights to share stay on your machine. See the README in that folder.
+
 Settings persist in the browser. Positions can be linked as `#shiji-7/7.16.6`, `#sanguozhi-54/54.16.1` or `#chunqiu-15/15.1.1` (chapter, then sentence).
 
 **Context layers.** The left panel and the bottom strip hold the context layers:

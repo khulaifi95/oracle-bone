@@ -20,7 +20,20 @@ export const loadCatalog = () => load<Catalog>('catalog.json');
 export const loadChapter = (id: string) => load<Chapter>(`text/${id}.json`);
 export const loadPlain = (id: string) => load<PlainChapter>(`text/${id}.json`);
 // each reading book has its own people, places, events and states by year
-export const loadPeople = (book: string) => load<Person[]>(`${book}/people.json`);
+// your own pictures in static/portraits-local/ (never committed) take the place of the woodcuts
+type LocalPortraits = Record<string, Record<string, string>>;
+let localPortraits: Promise<LocalPortraits> | null = null;
+const loadLocalPortraits = () =>
+	(localPortraits ??= fetch('./portraits-local/index.json')
+		.then((r): Promise<LocalPortraits> => (r.ok ? r.json() : Promise.resolve({})))
+		.catch((): LocalPortraits => ({})));
+export const loadPeople = (book: string) =>
+	Promise.all([load<Person[]>(`${book}/people.json`), loadLocalPortraits()]).then(([people, local]) =>
+		people.map((p) => {
+			const file = local[book]?.[p.id] ?? local['*']?.[p.id];
+			return file ? { ...p, portrait: { image: `portraits-local/${file}`, source: '本机所存' } } : p;
+		})
+	);
 export const loadPlaces = (book: string) => load<Place[]>(`${book}/places.json`);
 export const loadEvents = (book: string) => load<HistEvent[]>(`${book}/events.json`);
 export const loadPolities = (book: string) => load<Record<string, Polity[]>>(`${book}/polities.json`);

@@ -39,7 +39,7 @@
 		app.goto(v.seg);
 	}
 	const read = (x: { s: string; t: string }) => t ? x.t : x.s;
-	const eds = $derived(reading.book?.editions);
+	const eds = $derived(reading.editions);
 	const jName = $derived(eds ? eds.j.short : '');
 </script>
 

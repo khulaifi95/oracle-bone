@@ -85,6 +85,8 @@ export interface EditionInfo {
 	t: string;
 	short: string;
 	full: string;
+	shortT: string;
+	fullT: string;
 	date: string;
 	/** top: what the 版心 prints above the fishtail, if anything */
 	layout: { cols: number; rows: number; noteRows: number; frame: string; mouth: string; fishtail: number; desc: string; top?: string };

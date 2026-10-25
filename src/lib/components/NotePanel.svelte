@@ -32,7 +32,7 @@
 		const str = t ? st.t : st.s;
 		return mine.at < 0 ? '' : str.slice(Math.max(0, mine.at - 11), mine.at + 1);
 	});
-	const edName = (ed: Ed) => reading.book?.editions[ed].short ?? ed;
+	const edName = (ed: Ed) => reading.editions?.[ed].short ?? ed;
 
 	// 裴注 by source: which books this chapter's notes quote, how often, and where
 	const ed0 = $derived<Ed>(s.edition === 'j' ? 'j' : 'd');

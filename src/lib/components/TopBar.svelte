@@ -70,8 +70,8 @@
 		<div class="field">
 			<span class="cap">{zh('版本', '版本')}</span>
 			<div class="group" role="group" aria-label="版本">
-				<button class:on={s.edition === 'd'} onclick={() => set('edition', 'd')} title={book.editions.d.full}>{book.editions.d.short}</button>
-				<button class:on={s.edition === 'j'} onclick={() => set('edition', 'j')} title={book.editions.j.full}>{book.editions.j.short}</button>
+				<button class:on={s.edition === 'd'} onclick={() => set('edition', 'd')} title={reading.editions?.d.full}>{reading.editions?.d.short}</button>
+				<button class:on={s.edition === 'j'} onclick={() => set('edition', 'j')} title={reading.editions?.j.full}>{reading.editions?.j.short}</button>
 				<button class:on={s.edition === 'both'} onclick={() => set('edition', 'both')} title={zh('两本对照', '兩本對照')}>{zh('对照', '對照')}</button>
 			</div>
 		</div>

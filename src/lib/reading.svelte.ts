@@ -1,6 +1,6 @@
 // What is being read: the loaded data, and what the current position means
 // (which event it belongs to, what date it is, who and where is mentioned nearby).
-import type { Basemap, BookInfo, Catalog, Chapter, HistEvent, NoteDef, Person, Place, Polity, Script, Side } from './types';
+import type { Basemap, BookInfo, Catalog, Chapter, HistEvent, NoteDef, Person, Place, Polity, Script, Side, EditionInfo } from './types';
 import { app } from './state.svelte';
 import { loadBasemap, loadCatalog, loadChapter, loadEvents, loadPeople, loadPlaces, loadPolities } from './data';
 import { eraLabel, monthLabel, julianYear, yearLong } from './dates';
@@ -29,6 +29,13 @@ class Reading {
 	placeById = $derived(new Map(this.places.map((p) => [p.id, p])));
 
 	book = $derived<BookInfo | null>(this.catalog?.books[this.bookId] ?? null);
+	/** the book's editions, named in the script being read */
+	editions = $derived.by(() => {
+		const eds = this.book?.editions;
+		if (!eds || app.settings.script === 's') return eds ?? null;
+		const tr = (e: EditionInfo): EditionInfo => ({ ...e, short: e.shortT, full: e.fullT });
+		return { d: tr(eds.d), j: tr(eds.j) };
+	});
 	noteDefs = $derived(new Map<string, NoteDef>((this.book?.notes ?? []).map((n) => [n.k, n])));
 	sideById = $derived(new Map<string, Side>((this.book?.sides ?? []).map((x) => [x.id, x])));
 	/** the chapter's entry in the catalog */

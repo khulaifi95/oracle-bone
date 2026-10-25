@@ -5,7 +5,7 @@
 
 	const t = $derived(app.settings.script === 't');
 	const book = $derived(reading.book);
-	const eds = $derived(book ? Object.values(book.editions) : []);
+	const eds = $derived(reading.editions ? Object.values(reading.editions) : []);
 	const read = (x: { s: string; t: string } | undefined) => (x ? (t ? x.t : x.s) : '');
 	const firstNote = $derived(book?.notes[0]);
 </script>
@@ -16,9 +16,9 @@
 		<li><span class="m tp">{book?.legend.person[t ? 0 : 1]}</span>{t ? '人名：左側直線' : '人名：左侧直线'}</li>
 		<li><span class="m tl">{book?.legend.place[t ? 0 : 1]}</span>{t ? '地名：左側虛線' : '地名：左侧虚线'}</li>
 		<li><span class="m v">己</span>{t ? '兩本異文：字旁橙色短豎，點擊查看；楔形表示他本此處多字' : '两本异文：字旁橙色短竖，点击查看；楔形表示他本此处多字'}</li>
-		<li><span class="m r">之</span>{t ? `${book?.editions.d.short ?? ''}錄文缺字，據${book?.editions.j.short ?? ''}補` : `${book?.editions.d.short ?? ''}录文缺字，据${book?.editions.j.short ?? ''}补`}</li>
+		<li><span class="m r">之</span>{t ? `${reading.editions?.d.short ?? ''}錄文缺字，據${reading.editions?.j.short ?? ''}補` : `${reading.editions?.d.short ?? ''}录文缺字，据${reading.editions?.j.short ?? ''}补`}</li>
 		<li><span class="m qb">玄</span>{t ? '缺筆避諱：殿本刻作缺末筆，避康熙、乾隆名諱' : '缺笔避讳：殿本刻作缺末笔，避康熙、乾隆名讳'}</li>
-		<li><span class="m del">而</span>{t ? `點校本刪去之字（${book?.editions.j.short ?? ''}）` : `点校本删去之字（${book?.editions.j.short ?? ''}）`}</li>
+		<li><span class="m del">而</span>{t ? `點校本刪去之字（${reading.editions?.j.short ?? ''}）` : `点校本删去之字（${reading.editions?.j.short ?? ''}）`}</li>
 		<li><span class="m add">也</span>{t ? '點校本補字，懸停可見' : '点校本补字，悬停可见'}</li>
 		{#if firstNote}<li><span class="lab">{t ? firstNote.t : firstNote.s}</span>{t ? '雙行小注，點擊在左欄展開' : '双行小注，点击在左栏展开'}</li>{/if}
 		{#if book?.jingzhuan}<li><span class="lab jz">{t ? '經' : '经'}</span>{t ? '經、傳各以陰文標起；點「經」字看三傳' : '经、传各以阴文标起；点“经”字看三传'}</li>{/if}

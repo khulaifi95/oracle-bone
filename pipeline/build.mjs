@@ -216,7 +216,8 @@ for (const B of BOOKS) {
 	const claim = new Map();
 	const owner = (ref, n) => claim.get(`${ref}:${n}`);
 	const eventOf = new Map();
-	for (const e of events)
+	for (const e of events) {
+		e.t = toTraditional(e.title);
 		for (const a of e.accounts) {
 			eventOf.set(a, e);
 			const U = unitsFor(a.ref);
@@ -244,6 +245,7 @@ for (const B of BOOKS) {
 			}
 			delete a.to;
 		}
+	}
 	if (misses.length) {
 		console.error(`Unresolved event passages in ${id}:\n` + misses.join('\n'));
 		process.exitCode = 1;
@@ -376,7 +378,8 @@ for (const B of BOOKS) {
 	catalogBooks[id] = {
 		...B.book,
 		chapters: chapterInfo.map((c) => ({ id: `${id}-${c.juan}`, juan: c.juan, juanZh: c.juanZh, title: c.title, t: c.t, kind: c.kind, n: c.n, court: c.court, stats: c.stats })),
-		editions
+		// each edition's names in both scripts
+		editions: Object.fromEntries(Object.entries(editions).map(([k, e]) => [k, { ...e, shortT: toTraditional(e.short), fullT: toTraditional(e.full) }]))
 	};
 }
 

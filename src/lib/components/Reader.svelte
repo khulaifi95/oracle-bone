@@ -14,7 +14,7 @@
 	{#if reading.chapter && reading.book}
 		{#key reading.chapter.id}
 			{#each eds as ed (ed)}
-				{@const edition = reading.book.editions[ed]}
+				{@const edition = (reading.editions ?? reading.book.editions)[ed]}
 				<div class="pane">
 					{#if s.form === 'scroll'}
 						<Scroll chapter={reading.chapter} {ed} id={ed} label={eds.length === 2 ? edition.short : ''} />

@@ -1,0 +1,34 @@
+{
+	"d": {
+		"id": "d",
+		"name": "武英殿本",
+		"t": "武英殿本",
+		"short": "殿本",
+		"full": "清乾隆四年武英殿刊《史记》（四库全书本据以缮写），附考证",
+		"date": "1739",
+		"layout": { "cols": 10, "rows": 21, "noteRows": 21, "frame": "四周双边", "mouth": "白口", "fishtail": 1, "desc": "半叶十行，行二十一字，小字双行同；白口，单鱼尾，四周双边" },
+		"commentary": ["jijie", "suoyin", "zhengyi", "kaozheng"],
+		"source": {
+			"name": "gujilab/chinese-classical-corpus",
+			"url": "https://huggingface.co/datasets/gujilab/chinese-classical-corpus",
+			"licence": "CC0 1.0",
+			"basis": "文渊阁四库全书本《史记》录文：简体，无标点，三家注夹于正文，卷末附考证。录文中缺字以「防」代替者，据金陵本对应位置回补，并在字下标记。"
+		}
+	},
+	"j": {
+		"id": "j",
+		"name": "金陵书局本",
+		"t": "金陵書局本",
+		"short": "金陵本",
+		"full": "清同治五至九年金陵书局刊《史记集解索隐正义合刻本》，张文虎校；中华书局点校本即以此为底本",
+		"date": "1866–1870",
+		"layout": { "cols": 11, "rows": 22, "noteRows": 22, "frame": "四周双边", "mouth": "粗黑口", "fishtail": 2, "desc": "半叶十一行，行二十二字，小字双行同；粗黑口，双鱼尾，四周双边" },
+		"commentary": ["jijie", "suoyin", "zhengyi"],
+		"source": {
+			"name": "维基文库《史記三家註》",
+			"url": "https://zh.wikisource.org/wiki/史記三家註",
+			"licence": "录文 CC BY-SA 4.0；底本属公有领域",
+			"basis": "中华书局点校本录文：繁体，带点校本标点与删补符号。本书以金陵本原字为正文，点校本所删之字加圆括号标出，所补之字作为校记附注。"
+		}
+	}
+}

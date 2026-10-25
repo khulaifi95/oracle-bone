@@ -1,0 +1,62 @@
+{
+	"cao-cao": {
+		"article": "曹操",
+		"file": "Cao_Cao_scth.jpg",
+		"licence": "Public domain",
+		"artist": "Wang Qi",
+		"description": "A portrait of Cao Cao from Sancai Tuhui.",
+		"page": "https://commons.wikimedia.org/wiki/File:Cao_Cao_scth.jpg",
+		"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Cao_Cao_scth.jpg/250px-Cao_Cao_scth.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+		"image": "portraits/cao-cao.jpg"
+	},
+	"liu-bei": {
+		"article": "刘备",
+		"file": "Liu_Bei_Tang.jpg",
+		"licence": "Public domain",
+		"artist": "Yan Liben (閻立本)",
+		"description": "",
+		"page": "https://commons.wikimedia.org/wiki/File:Liu_Bei_Tang.jpg",
+		"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Liu_Bei_Tang.jpg/250px-Liu_Bei_Tang.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+		"image": "portraits/liu-bei.jpg"
+	},
+	"sun-quan": {
+		"article": "孙权",
+		"file": "Sun_Quan_Tang.jpg",
+		"licence": "Public domain",
+		"artist": "Yan Liben",
+		"description": "",
+		"page": "https://commons.wikimedia.org/wiki/File:Sun_Quan_Tang.jpg",
+		"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Sun_Quan_Tang.jpg/250px-Sun_Quan_Tang.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+		"image": "portraits/sun-quan.jpg"
+	},
+	"zhuge-liang": {
+		"article": "诸葛亮",
+		"file": "蜀汉丞相忠武侯诸葛亮.jpg",
+		"licence": "Public domain",
+		"artist": "Unknown authorUnknown author",
+		"description": "Zhuge Liang",
+		"page": "https://commons.wikimedia.org/wiki/File:%E8%9C%80%E6%B1%89%E4%B8%9E%E7%9B%B8%E5%BF%A0%E6%AD%A6%E4%BE%AF%E8%AF%B8%E8%91%9B%E4%BA%AE.jpg",
+		"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/%E8%9C%80%E6%B1%89%E4%B8%9E%E7%9B%B8%E5%BF%A0%E6%AD%A6%E4%BE%AF%E8%AF%B8%E8%91%9B%E4%BA%AE.jpg/250px-%E8%9C%80%E6%B1%89%E4%B8%9E%E7%9B%B8%E5%BF%A0%E6%AD%A6%E4%BE%AF%E8%AF%B8%E8%91%9B%E4%BA%AE.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+		"image": "portraits/zhuge-liang.jpg"
+	},
+	"zhou-yu": {
+		"article": "周瑜",
+		"file": "ZhouYu.jpg",
+		"licence": "Public domain",
+		"artist": "Unknown authorUnknown author",
+		"description": "Portrait of the general Zhou Yu from a Qing Dynasty edition of The Romance of the Three Kingdoms.",
+		"page": "https://commons.wikimedia.org/wiki/File:ZhouYu.jpg",
+		"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/ZhouYu.jpg/250px-ZhouYu.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+		"image": "portraits/zhou-yu.jpg"
+	},
+	"lu-su": {
+		"article": "鲁肃",
+		"file": "LuSu.jpg",
+		"licence": "Public domain",
+		"artist": "Unknown authorUnknown author",
+		"description": "Portrait of the advisor Lu Su from a Qing Dynasty edition of The Romance of the Three Kingdoms.",
+		"page": "https://commons.wikimedia.org/wiki/File:LuSu.jpg",
+		"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/LuSu.jpg/250px-LuSu.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+		"image": "portraits/lu-su.jpg"
+	}
+}

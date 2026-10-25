@@ -1,0 +1,881 @@
+{
+	"$comment": "事件表。ey 为公历年（负数为公元前），m 为《春秋》所书之月（周正，正月约当公历前一年十二月）。accounts 为各书记载此事的段落：ref 指书卷，at 为段中的一句原文（简体，可省标点），可加 to 把段落延到另一句所在之处。build.mjs 再以左传各段为准，按文字相合扩展各段并补入他处同文的段落。absent 记某书不载此事。",
+	"events": [
+		{
+			"id": "yin-sheweii",
+			"title": "隐公摄位",
+			"era": "隐公元年",
+			"ey": -722,
+			"m": 1,
+			"places": [
+				"qufu"
+			],
+			"people": [
+				"lu-yingong",
+				"lu-huigong",
+				"zhong-zi"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-1",
+					"at": "惠公元妃孟子"
+				},
+				{
+					"ref": "chunqiu-1",
+					"at": "元年春王周正月不书即位摄也"
+				}
+			]
+		},
+		{
+			"id": "mie-zhi-meng",
+			"title": "公及邾仪父盟于蔑",
+			"era": "隐公元年",
+			"ey": -722,
+			"m": 3,
+			"places": [
+				"mie",
+				"zhu"
+			],
+			"people": [
+				"lu-yingong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-1",
+					"at": "三月公及邾仪父盟于蔑邾子克也"
+				}
+			]
+		},
+		{
+			"id": "ke-duan",
+			"title": "郑伯克段于鄢",
+			"era": "隐公元年",
+			"ey": -722,
+			"m": 5,
+			"places": [
+				"jing",
+				"yan",
+				"gong",
+				"chengying",
+				"yinggu",
+				"xinzheng"
+			],
+			"people": [
+				"zheng-zhuanggong",
+				"gongshu-duan",
+				"wu-jiang",
+				"yingkao-shu",
+				"zhai-zhong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-1",
+					"at": "夏五月郑伯克段于鄢"
+				},
+				{
+					"ref": "chunqiu-1",
+					"at": "初郑武公娶于申"
+				},
+				{
+					"ref": "shiji-42",
+					"at": "庄公元年封弟段于京"
+				}
+			]
+		},
+		{
+			"id": "zai-xuan",
+			"title": "天王使宰咺归惠公仲子之赗",
+			"era": "隐公元年",
+			"ey": -722,
+			"m": 7,
+			"places": [
+				"luoyi",
+				"qufu"
+			],
+			"people": [
+				"zhou-pingwang",
+				"zhong-zi",
+				"lu-huigong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-1",
+					"at": "秋七月天王使宰咺来归惠公仲子之赗缓且子氏未薨"
+				}
+			]
+		},
+		{
+			"id": "gongsun-hua",
+			"title": "郑共叔之乱，公孙滑奔卫",
+			"era": "隐公元年",
+			"ey": -722,
+			"m": null,
+			"places": [
+				"xinzheng",
+				"chuqiu"
+			],
+			"people": [
+				"zheng-zhuanggong",
+				"gongshu-duan"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-1",
+					"at": "郑共叔之乱公孙滑出奔卫"
+				}
+			]
+		},
+		{
+			"id": "hui-rong-qian",
+			"title": "公会戎于潜，盟于唐",
+			"era": "隐公二年",
+			"ey": -721,
+			"m": 1,
+			"places": [
+				"qian",
+				"tang"
+			],
+			"people": [
+				"lu-yingong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-1",
+					"at": "二年春公会戎于潜修惠公之好也"
+				},
+				{
+					"ref": "chunqiu-1",
+					"at": "戎请盟秋盟于唐复修戎好也"
+				}
+			]
+		},
+		{
+			"id": "ju-ru-xiang",
+			"title": "莒人入向",
+			"era": "隐公二年",
+			"ey": -721,
+			"m": 5,
+			"places": [
+				"ju",
+				"xiang-state"
+			],
+			"people": [],
+			"accounts": [
+				{
+					"ref": "chunqiu-1",
+					"at": "莒子娶于向向姜不安莒而归"
+				}
+			]
+		},
+		{
+			"id": "zheng-fa-wei",
+			"title": "郑人伐卫",
+			"era": "隐公二年",
+			"ey": -721,
+			"m": 12,
+			"places": [
+				"xinzheng",
+				"chuqiu"
+			],
+			"people": [
+				"zheng-zhuanggong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-1",
+					"at": "郑人伐卫讨公孙滑之乱也"
+				}
+			]
+		},
+		{
+			"id": "hong",
+			"title": "泓之战",
+			"era": "僖公二十二年",
+			"ey": -638,
+			"m": 11,
+			"places": [
+				"hong",
+				"shangqiu"
+			],
+			"people": [
+				"song-xianggong",
+				"zi-yu-song",
+				"chu-chengwang"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-14",
+					"at": "冬十一月己巳朔宋公及楚人战于泓宋人既成列"
+				},
+				{
+					"ref": "shiji-40",
+					"at": "楚成王北伐宋败之泓"
+				},
+				{
+					"ref": "shiji-39",
+					"at": "过宋宋襄公新困兵于楚伤于泓"
+				}
+			]
+		},
+		{
+			"id": "ke-ze",
+			"title": "郑文夫人劳楚子于柯泽",
+			"era": "僖公二十二年",
+			"ey": -638,
+			"m": 11,
+			"places": [
+				"xinzheng"
+			],
+			"people": [
+				"chu-chengwang",
+				"zheng-wengong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-14",
+					"at": "丙子晨郑文夫人芈氏姜氏劳楚子于柯泽"
+				}
+			]
+		},
+		{
+			"id": "song-xiang-zu",
+			"title": "宋襄公卒",
+			"era": "僖公二十三年",
+			"ey": -637,
+			"m": 5,
+			"places": [
+				"shangqiu"
+			],
+			"people": [
+				"song-xianggong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-14",
+					"at": "夏五月宋襄公卒伤于泓故也"
+				}
+			]
+		},
+		{
+			"id": "jin-hui-zu",
+			"title": "晋惠公卒，怀公杀狐突",
+			"era": "僖公二十三年",
+			"ey": -637,
+			"m": 9,
+			"places": [
+				"jiang"
+			],
+			"people": [
+				"jin-huigong",
+				"jin-huaigong",
+				"hu-yan"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-14",
+					"at": "九月晋惠公卒怀公命无从亡人"
+				}
+			]
+		},
+		{
+			"id": "chong-er-liuwang",
+			"title": "重耳出亡十九年",
+			"era": "僖公五年至二十三年",
+			"ey": -637,
+			"m": null,
+			"approx": true,
+			"places": [
+				"pu",
+				"di",
+				"wulu",
+				"linzi",
+				"taoqiu",
+				"shangqiu",
+				"xinzheng",
+				"ying",
+				"yong"
+			],
+			"people": [
+				"jin-wengong",
+				"hu-yan",
+				"zhao-shuai",
+				"ji-wei",
+				"qi-jiang",
+				"cao-gonggong",
+				"xi-fuji",
+				"shu-zhan",
+				"chu-chengwang",
+				"qin-mugong",
+				"huai-ying",
+				"zi-yu"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-14",
+					"at": "晋公子重耳之及于难也",
+					"to": "子犯曰吾不如衰之文也"
+				},
+				{
+					"ref": "shiji-39",
+					"at": "过曹曹共公不礼欲观重耳骈胁"
+				},
+				{
+					"ref": "guoyu-10",
+					"at": "自卫过曹曹共公亦不礼焉"
+				}
+			]
+		},
+		{
+			"id": "qin-na-chonger",
+			"title": "秦穆公纳重耳，晋文公即位",
+			"era": "僖公二十四年",
+			"ey": -636,
+			"m": 1,
+			"places": [
+				"he-river",
+				"linghu",
+				"luliu",
+				"xun",
+				"quwo",
+				"jiang",
+				"gaoliang"
+			],
+			"people": [
+				"jin-wengong",
+				"qin-mugong",
+				"hu-yan",
+				"jie-zhitui",
+				"jin-huaigong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-14",
+					"at": "二十四年春王正月秦伯纳之"
+				},
+				{
+					"ref": "shiji-39",
+					"at": "秦缪公乃发兵送内重耳"
+				},
+				{
+					"ref": "shiji-5",
+					"at": "于是使人送重耳二月重耳立为晋君"
+				}
+			]
+		},
+		{
+			"id": "siren-pi",
+			"title": "寺人披告吕郤之谋",
+			"era": "僖公二十四年",
+			"ey": -636,
+			"m": 3,
+			"places": [
+				"jiang",
+				"wangcheng-qin"
+			],
+			"people": [
+				"siren-pi",
+				"jin-wengong",
+				"qin-mugong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-14",
+					"at": "将焚公宫而弑晋侯寺人披请见"
+				},
+				{
+					"ref": "guoyu-10",
+					"at": "初献公使寺人勃鞮伐公于蒲城"
+				}
+			]
+		},
+		{
+			"id": "jie-zhitui",
+			"title": "介之推不言禄",
+			"era": "僖公二十四年",
+			"ey": -636,
+			"m": null,
+			"places": [
+				"mianshang",
+				"jiang"
+			],
+			"people": [
+				"jie-zhitui",
+				"jin-wengong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-14",
+					"at": "晋侯赏从亡者介之推不言禄"
+				},
+				{
+					"ref": "shiji-39",
+					"at": "隐者介子推推亦不言禄"
+				}
+			]
+		},
+		{
+			"id": "wang-chu-ju-zheng",
+			"title": "王子带以狄师伐周，天王出居于郑",
+			"era": "僖公二十四年",
+			"ey": -636,
+			"m": 10,
+			"places": [
+				"luoyi",
+				"fan-zheng",
+				"wen"
+			],
+			"people": [
+				"zhou-xiangwang",
+				"wangzi-dai",
+				"fu-chen",
+				"zheng-wengong",
+				"zang-wenzhong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-14",
+					"at": "冬天王出居于郑"
+				},
+				{
+					"ref": "chunqiu-14",
+					"at": "秋颓叔桃子奉大叔以狄师伐周"
+				},
+				{
+					"ref": "shiji-42",
+					"at": "冬翟攻伐襄王襄王出奔郑"
+				},
+				{
+					"ref": "shiji-5",
+					"at": "其秋周襄王弟带以翟伐王"
+				},
+				{
+					"ref": "guoyu-10",
+					"at": "冬襄王避昭叔之难居于郑地汜"
+				}
+			]
+		},
+		{
+			"id": "qin-wang",
+			"title": "晋文公勤王，纳襄王，杀王子带",
+			"era": "僖公二十五年",
+			"ey": -635,
+			"m": 4,
+			"places": [
+				"luoyi",
+				"wen",
+				"xicheng",
+				"yangfan",
+				"yuan"
+			],
+			"people": [
+				"jin-wengong",
+				"hu-yan",
+				"zhou-xiangwang",
+				"wangzi-dai",
+				"qin-mugong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-15",
+					"at": "秦伯师于河上将纳王狐偃言于晋侯曰求诸侯莫如勤王"
+				},
+				{
+					"ref": "chunqiu-15",
+					"at": "夏四月丁巳王入于王城"
+				},
+				{
+					"ref": "shiji-39",
+					"at": "入襄王于周四月杀王弟带"
+				},
+				{
+					"ref": "shiji-5",
+					"at": "秦缪公将兵助晋文公入襄王"
+				}
+			]
+		},
+		{
+			"id": "wei-yuan",
+			"title": "晋侯围原，示之以信",
+			"era": "僖公二十五年",
+			"ey": -635,
+			"m": 12,
+			"places": [
+				"yuan"
+			],
+			"people": [
+				"jin-wengong",
+				"zhao-shuai",
+				"siren-pi"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-15",
+					"at": "冬晋侯围原命三日之粮"
+				},
+				{
+					"ref": "guoyu-10",
+					"at": "文公伐原令以三日之粮"
+				}
+			]
+		},
+		{
+			"id": "zhanxi-kaoshi",
+			"title": "展喜犒师",
+			"era": "僖公二十六年",
+			"ey": -634,
+			"m": 5,
+			"places": [
+				"qufu"
+			],
+			"people": [
+				"zhan-xi",
+				"liuxia-hui",
+				"qi-xiaogong",
+				"lu-xigong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-15",
+					"at": "夏齐孝公伐我北鄙卫人伐齐洮之盟故也公使展喜犒师"
+				}
+			]
+		},
+		{
+			"id": "chu-wei-song",
+			"title": "楚围宋，晋作三军",
+			"era": "僖公二十七年",
+			"ey": -633,
+			"m": 12,
+			"places": [
+				"shangqiu",
+				"beilu"
+			],
+			"people": [
+				"chu-chengwang",
+				"zi-yu",
+				"zi-wen",
+				"wei-jia",
+				"gongsun-gu",
+				"xian-zhen",
+				"hu-yan",
+				"xi-hu",
+				"zhao-shuai",
+				"jin-wengong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-15",
+					"at": "楚子将围宋使子文治兵于睽"
+				},
+				{
+					"ref": "chunqiu-15",
+					"at": "冬楚子及诸侯围宋宋公孙固如晋告急"
+				},
+				{
+					"ref": "guoyu-10",
+					"at": "乃大搜于被庐作三军"
+				}
+			]
+		},
+		{
+			"id": "qin-cao-fa-wei",
+			"title": "晋侵曹伐卫，入曹执曹伯",
+			"era": "僖公二十八年",
+			"ey": -632,
+			"m": 3,
+			"places": [
+				"wulu",
+				"taoqiu",
+				"chuqiu"
+			],
+			"people": [
+				"jin-wengong",
+				"cao-gonggong",
+				"wei-chenggong",
+				"xi-fuji",
+				"xian-zhen"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-15",
+					"at": "二十八年春晋侯将伐曹假道于卫"
+				}
+			]
+		},
+		{
+			"id": "chengpu",
+			"title": "城濮之战",
+			"era": "僖公二十八年",
+			"ey": -632,
+			"m": 4,
+			"places": [
+				"chengpu",
+				"youshen"
+			],
+			"people": [
+				"jin-wengong",
+				"zi-yu",
+				"chu-chengwang",
+				"xian-zhen",
+				"hu-yan",
+				"luan-zhi",
+				"xu-chen",
+				"qin-mugong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-15",
+					"at": "夏四月己巳晋侯齐师宋师秦师及楚人战于城濮"
+				},
+				{
+					"ref": "chunqiu-15",
+					"at": "子玉使伯棼请战"
+				},
+				{
+					"ref": "shiji-39",
+					"at": "宋公齐将秦将与晋侯次城濮"
+				},
+				{
+					"ref": "shiji-40",
+					"at": "晋果败子玉于城濮"
+				},
+				{
+					"ref": "guoyu-10",
+					"at": "至于城濮果战楚众大败"
+				}
+			]
+		},
+		{
+			"id": "jiantu",
+			"title": "践土之盟，策命晋侯为侯伯",
+			"era": "僖公二十八年",
+			"ey": -632,
+			"m": 5,
+			"places": [
+				"jiantu",
+				"heng-yong"
+			],
+			"people": [
+				"jin-wengong",
+				"zhou-xiangwang",
+				"lu-xigong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-15",
+					"at": "五月癸丑公会晋侯齐侯宋公蔡侯郑伯卫子莒子盟于践土"
+				},
+				{
+					"ref": "shiji-39",
+					"at": "甲午晋师还至衡雍作王宫于践土"
+				}
+			]
+		},
+		{
+			"id": "wen-zhi-hui",
+			"title": "温之会，天王狩于河阳",
+			"era": "僖公二十八年",
+			"ey": -632,
+			"m": 10,
+			"places": [
+				"wen",
+				"heyang"
+			],
+			"people": [
+				"jin-wengong",
+				"zhou-xiangwang",
+				"wei-chenggong",
+				"lu-xigong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-15",
+					"at": "天王狩于河阳壬申公朝于王所"
+				},
+				{
+					"ref": "chunqiu-15",
+					"at": "是会也晋侯召王以诸侯见且使王狩"
+				},
+				{
+					"ref": "shiji-39",
+					"at": "乃使人言周襄王狩于河阳"
+				}
+			]
+		},
+		{
+			"id": "zhuzhiwu",
+			"title": "烛之武退秦师",
+			"era": "僖公三十年",
+			"ey": -630,
+			"m": 9,
+			"places": [
+				"xinzheng",
+				"hanling",
+				"fannan"
+			],
+			"people": [
+				"zhu-zhiwu",
+				"qin-mugong",
+				"jin-wengong",
+				"zheng-wengong",
+				"zheng-mugong",
+				"hu-yan"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-16",
+					"at": "九月甲午晋侯秦伯围郑"
+				},
+				{
+					"ref": "shiji-5",
+					"at": "缪公助晋文公围郑"
+				},
+				{
+					"ref": "shiji-39",
+					"at": "围郑欲得叔瞻"
+				}
+			]
+		},
+		{
+			"id": "wei-qian-diqiu",
+			"title": "狄围卫，卫迁于帝丘",
+			"era": "僖公三十一年",
+			"ey": -629,
+			"m": 12,
+			"places": [
+				"diqiu",
+				"chuqiu"
+			],
+			"people": [
+				"wei-chenggong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-16",
+					"at": "冬狄围卫卫迁于帝丘"
+				}
+			]
+		},
+		{
+			"id": "jin-wen-zu",
+			"title": "晋文公卒，蹇叔哭师",
+			"era": "僖公三十二年",
+			"ey": -628,
+			"m": 12,
+			"places": [
+				"jiang",
+				"quwo",
+				"yong"
+			],
+			"people": [
+				"jin-wengong",
+				"jian-shu",
+				"qin-mugong",
+				"mengming-shi",
+				"xiqi-shu",
+				"baiyi-bing"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-16",
+					"at": "冬晋文公卒庚辰将殡于曲沃"
+				},
+				{
+					"ref": "shiji-39",
+					"at": "九年冬晋文公卒"
+				},
+				{
+					"ref": "shiji-5",
+					"at": "三十二年冬晋文公卒"
+				}
+			]
+		},
+		{
+			"id": "xiangao",
+			"title": "弦高犒师，秦灭滑",
+			"era": "僖公三十三年",
+			"ey": -627,
+			"m": 2,
+			"places": [
+				"hua",
+				"luoyi"
+			],
+			"people": [
+				"xian-gao",
+				"mengming-shi"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-16",
+					"at": "三十三年春晋秦师过周北门"
+				},
+				{
+					"ref": "shiji-42",
+					"at": "至滑逢郑贾人弦高"
+				},
+				{
+					"ref": "shiji-5",
+					"at": "郑贩卖贾人弦高"
+				}
+			]
+		},
+		{
+			"id": "xiao",
+			"title": "殽之战",
+			"era": "僖公三十三年",
+			"ey": -627,
+			"m": 4,
+			"places": [
+				"xiao"
+			],
+			"people": [
+				"jin-xianggong",
+				"xian-zhen",
+				"luan-zhi",
+				"mengming-shi",
+				"xiqi-shu",
+				"baiyi-bing",
+				"huai-ying",
+				"qin-mugong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-16",
+					"at": "晋原轸曰秦违蹇叔"
+				},
+				{
+					"ref": "chunqiu-16",
+					"at": "夏四月辛巳败秦师于殽"
+				},
+				{
+					"ref": "shiji-39",
+					"at": "四月败秦师于殽"
+				},
+				{
+					"ref": "shiji-5",
+					"at": "遮秦兵于殽击之"
+				}
+			]
+		},
+		{
+			"id": "ji-zhi-zhan",
+			"title": "箕之战，先轸死于狄",
+			"era": "僖公三十三年",
+			"ey": -627,
+			"m": 8,
+			"places": [
+				"ji-di"
+			],
+			"people": [
+				"xian-zhen",
+				"jin-xianggong"
+			],
+			"accounts": [
+				{
+					"ref": "chunqiu-16",
+					"at": "狄伐晋及箕"
+				}
+			]
+		}
+	]
+}

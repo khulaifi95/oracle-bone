@@ -1,0 +1,823 @@
+{
+	"$comment": "各年割据形势，用于地图。只列形势有变的年份，地图取不晚于当年的最近一年；以该年大部分时间的状态为准。capital 为治所地名 id，side：han 汉室，wei 曹魏，shu 蜀汉，wu 孙吴，qun 群雄。",
+	"years": {
+		"184": [
+			{
+				"name": "汉",
+				"ruler": "han-lingdi",
+				"capital": "luoyang",
+				"side": "han"
+			},
+			{
+				"name": "黄巾",
+				"ruler": "zhang-jiao",
+				"capital": "guangzong",
+				"side": "qun"
+			}
+		],
+		"189": [
+			{
+				"name": "汉（董卓）",
+				"ruler": "dong-zhuo",
+				"capital": "luoyang",
+				"side": "han"
+			}
+		],
+		"190": [
+			{
+				"name": "汉（董卓）",
+				"ruler": "dong-zhuo",
+				"capital": "luoyang",
+				"side": "han"
+			},
+			{
+				"name": "袁绍",
+				"ruler": "yuan-shao",
+				"capital": "nanpi",
+				"side": "qun"
+			},
+			{
+				"name": "袁术",
+				"ruler": "yuan-shu",
+				"capital": "wan",
+				"side": "qun"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "suanzao",
+				"side": "wei"
+			},
+			{
+				"name": "刘表",
+				"ruler": "liu-biao",
+				"capital": "xiangyang",
+				"side": "qun"
+			},
+			{
+				"name": "孙坚",
+				"ruler": "sun-jian",
+				"capital": "changsha",
+				"side": "wu"
+			},
+			{
+				"name": "陶谦",
+				"ruler": "tao-qian",
+				"capital": "xiapi",
+				"side": "qun"
+			},
+			{
+				"name": "公孙瓒",
+				"ruler": "gongsun-zan",
+				"capital": "ji",
+				"side": "qun"
+			}
+		],
+		"191": [
+			{
+				"name": "汉（董卓）",
+				"ruler": "dong-zhuo",
+				"capital": "changan",
+				"side": "han"
+			},
+			{
+				"name": "袁绍",
+				"ruler": "yuan-shao",
+				"capital": "ye",
+				"side": "qun"
+			},
+			{
+				"name": "袁术",
+				"ruler": "yuan-shu",
+				"capital": "wan",
+				"side": "qun"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "puyang",
+				"side": "wei"
+			},
+			{
+				"name": "刘表",
+				"ruler": "liu-biao",
+				"capital": "xiangyang",
+				"side": "qun"
+			},
+			{
+				"name": "陶谦",
+				"ruler": "tao-qian",
+				"capital": "xiapi",
+				"side": "qun"
+			},
+			{
+				"name": "公孙瓒",
+				"ruler": "gongsun-zan",
+				"capital": "ji",
+				"side": "qun"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			}
+		],
+		"192": [
+			{
+				"name": "汉（李傕、郭汜）",
+				"ruler": "han-xiandi",
+				"capital": "changan",
+				"side": "han"
+			},
+			{
+				"name": "袁绍",
+				"ruler": "yuan-shao",
+				"capital": "ye",
+				"side": "qun"
+			},
+			{
+				"name": "袁术",
+				"ruler": "yuan-shu",
+				"capital": "wan",
+				"side": "qun"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "juancheng",
+				"side": "wei"
+			},
+			{
+				"name": "刘表",
+				"ruler": "liu-biao",
+				"capital": "xiangyang",
+				"side": "qun"
+			},
+			{
+				"name": "陶谦",
+				"ruler": "tao-qian",
+				"capital": "xiapi",
+				"side": "qun"
+			},
+			{
+				"name": "公孙瓒",
+				"ruler": "gongsun-zan",
+				"capital": "ji",
+				"side": "qun"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			}
+		],
+		"194": [
+			{
+				"name": "汉（李傕、郭汜）",
+				"ruler": "han-xiandi",
+				"capital": "changan",
+				"side": "han"
+			},
+			{
+				"name": "袁绍",
+				"ruler": "yuan-shao",
+				"capital": "ye",
+				"side": "qun"
+			},
+			{
+				"name": "袁术",
+				"ruler": "yuan-shu",
+				"capital": "shouchun",
+				"side": "qun"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "juancheng",
+				"side": "wei"
+			},
+			{
+				"name": "吕布",
+				"ruler": "lu-bu",
+				"capital": "puyang",
+				"side": "qun"
+			},
+			{
+				"name": "刘备",
+				"ruler": "liu-bei",
+				"capital": "xiapi",
+				"side": "shu"
+			},
+			{
+				"name": "刘表",
+				"ruler": "liu-biao",
+				"capital": "xiangyang",
+				"side": "qun"
+			},
+			{
+				"name": "刘璋",
+				"ruler": "liu-zhang",
+				"capital": "chengdu",
+				"side": "qun"
+			},
+			{
+				"name": "公孙瓒",
+				"ruler": "gongsun-zan",
+				"capital": "yijing",
+				"side": "qun"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			}
+		],
+		"196": [
+			{
+				"name": "汉（曹操）",
+				"ruler": "han-xiandi",
+				"capital": "xu",
+				"side": "han"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "xu",
+				"side": "wei"
+			},
+			{
+				"name": "袁绍",
+				"ruler": "yuan-shao",
+				"capital": "ye",
+				"side": "qun"
+			},
+			{
+				"name": "袁术",
+				"ruler": "yuan-shu",
+				"capital": "shouchun",
+				"side": "qun"
+			},
+			{
+				"name": "吕布",
+				"ruler": "lu-bu",
+				"capital": "xiapi",
+				"side": "qun"
+			},
+			{
+				"name": "刘备",
+				"ruler": "liu-bei",
+				"capital": "xiaopei",
+				"side": "shu"
+			},
+			{
+				"name": "刘表",
+				"ruler": "liu-biao",
+				"capital": "xiangyang",
+				"side": "qun"
+			},
+			{
+				"name": "张绣",
+				"ruler": "zhang-xiu",
+				"capital": "wan",
+				"side": "qun"
+			},
+			{
+				"name": "孙策",
+				"ruler": "sun-ce",
+				"capital": "wu",
+				"side": "wu"
+			},
+			{
+				"name": "刘璋",
+				"ruler": "liu-zhang",
+				"capital": "chengdu",
+				"side": "qun"
+			},
+			{
+				"name": "公孙瓒",
+				"ruler": "gongsun-zan",
+				"capital": "yijing",
+				"side": "qun"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			}
+		],
+		"199": [
+			{
+				"name": "汉（曹操）",
+				"ruler": "han-xiandi",
+				"capital": "xu",
+				"side": "han"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "xu",
+				"side": "wei"
+			},
+			{
+				"name": "袁绍",
+				"ruler": "yuan-shao",
+				"capital": "ye",
+				"side": "qun"
+			},
+			{
+				"name": "刘表",
+				"ruler": "liu-biao",
+				"capital": "xiangyang",
+				"side": "qun"
+			},
+			{
+				"name": "孙策",
+				"ruler": "sun-ce",
+				"capital": "wu",
+				"side": "wu"
+			},
+			{
+				"name": "刘璋",
+				"ruler": "liu-zhang",
+				"capital": "chengdu",
+				"side": "qun"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			}
+		],
+		"200": [
+			{
+				"name": "汉（曹操）",
+				"ruler": "han-xiandi",
+				"capital": "xu",
+				"side": "han"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "xu",
+				"side": "wei"
+			},
+			{
+				"name": "袁绍",
+				"ruler": "yuan-shao",
+				"capital": "ye",
+				"side": "qun"
+			},
+			{
+				"name": "刘表",
+				"ruler": "liu-biao",
+				"capital": "xiangyang",
+				"side": "qun"
+			},
+			{
+				"name": "孙权",
+				"ruler": "sun-quan",
+				"capital": "wu",
+				"side": "wu"
+			},
+			{
+				"name": "刘璋",
+				"ruler": "liu-zhang",
+				"capital": "chengdu",
+				"side": "qun"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			}
+		],
+		"202": [
+			{
+				"name": "汉（曹操）",
+				"ruler": "han-xiandi",
+				"capital": "xu",
+				"side": "han"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "xu",
+				"side": "wei"
+			},
+			{
+				"name": "袁尚",
+				"ruler": "yuan-shang",
+				"capital": "ye",
+				"side": "qun"
+			},
+			{
+				"name": "袁谭",
+				"ruler": "yuan-tan",
+				"capital": "nanpi",
+				"side": "qun"
+			},
+			{
+				"name": "刘表",
+				"ruler": "liu-biao",
+				"capital": "xiangyang",
+				"side": "qun"
+			},
+			{
+				"name": "孙权",
+				"ruler": "sun-quan",
+				"capital": "wu",
+				"side": "wu"
+			},
+			{
+				"name": "刘璋",
+				"ruler": "liu-zhang",
+				"capital": "chengdu",
+				"side": "qun"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			}
+		],
+		"204": [
+			{
+				"name": "汉（曹操）",
+				"ruler": "han-xiandi",
+				"capital": "xu",
+				"side": "han"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "ye",
+				"side": "wei"
+			},
+			{
+				"name": "袁谭",
+				"ruler": "yuan-tan",
+				"capital": "nanpi",
+				"side": "qun"
+			},
+			{
+				"name": "刘表",
+				"ruler": "liu-biao",
+				"capital": "xiangyang",
+				"side": "qun"
+			},
+			{
+				"name": "孙权",
+				"ruler": "sun-quan",
+				"capital": "wu",
+				"side": "wu"
+			},
+			{
+				"name": "刘璋",
+				"ruler": "liu-zhang",
+				"capital": "chengdu",
+				"side": "qun"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			}
+		],
+		"205": [
+			{
+				"name": "汉（曹操）",
+				"ruler": "han-xiandi",
+				"capital": "xu",
+				"side": "han"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "ye",
+				"side": "wei"
+			},
+			{
+				"name": "刘表",
+				"ruler": "liu-biao",
+				"capital": "xiangyang",
+				"side": "qun"
+			},
+			{
+				"name": "刘备",
+				"ruler": "liu-bei",
+				"capital": "xinye",
+				"side": "shu"
+			},
+			{
+				"name": "孙权",
+				"ruler": "sun-quan",
+				"capital": "wu",
+				"side": "wu"
+			},
+			{
+				"name": "刘璋",
+				"ruler": "liu-zhang",
+				"capital": "chengdu",
+				"side": "qun"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			}
+		],
+		"208": [
+			{
+				"name": "汉（曹操）",
+				"ruler": "han-xiandi",
+				"capital": "xu",
+				"side": "han"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "ye",
+				"side": "wei"
+			},
+			{
+				"name": "刘备",
+				"ruler": "liu-bei",
+				"capital": "xiakou",
+				"side": "shu"
+			},
+			{
+				"name": "孙权",
+				"ruler": "sun-quan",
+				"capital": "jingkou",
+				"side": "wu"
+			},
+			{
+				"name": "刘璋",
+				"ruler": "liu-zhang",
+				"capital": "chengdu",
+				"side": "qun"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			}
+		],
+		"209": [
+			{
+				"name": "汉（曹操）",
+				"ruler": "han-xiandi",
+				"capital": "xu",
+				"side": "han"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "ye",
+				"side": "wei"
+			},
+			{
+				"name": "刘备",
+				"ruler": "liu-bei",
+				"capital": "gongan",
+				"side": "shu"
+			},
+			{
+				"name": "孙权",
+				"ruler": "sun-quan",
+				"capital": "jingkou",
+				"side": "wu"
+			},
+			{
+				"name": "刘璋",
+				"ruler": "liu-zhang",
+				"capital": "chengdu",
+				"side": "qun"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			},
+			{
+				"name": "马超、韩遂",
+				"ruler": "ma-chao",
+				"capital": "changan",
+				"side": "qun"
+			}
+		],
+		"212": [
+			{
+				"name": "汉（曹操）",
+				"ruler": "han-xiandi",
+				"capital": "xu",
+				"side": "han"
+			},
+			{
+				"name": "曹操",
+				"ruler": "cao-cao",
+				"capital": "ye",
+				"side": "wei"
+			},
+			{
+				"name": "刘备",
+				"ruler": "liu-bei",
+				"capital": "jiameng",
+				"side": "shu"
+			},
+			{
+				"name": "孙权",
+				"ruler": "sun-quan",
+				"capital": "jianye",
+				"side": "wu"
+			},
+			{
+				"name": "刘璋",
+				"ruler": "liu-zhang",
+				"capital": "chengdu",
+				"side": "qun"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			}
+		],
+		"214": [
+			{
+				"name": "汉（曹操）",
+				"ruler": "han-xiandi",
+				"capital": "xu",
+				"side": "han"
+			},
+			{
+				"name": "魏公国",
+				"ruler": "cao-cao",
+				"capital": "ye",
+				"side": "wei"
+			},
+			{
+				"name": "刘备",
+				"ruler": "liu-bei",
+				"capital": "chengdu",
+				"side": "shu"
+			},
+			{
+				"name": "孙权",
+				"ruler": "sun-quan",
+				"capital": "jianye",
+				"side": "wu"
+			},
+			{
+				"name": "张鲁",
+				"ruler": "zhang-lu",
+				"capital": "hanzhong",
+				"side": "qun"
+			}
+		],
+		"216": [
+			{
+				"name": "汉（曹操）",
+				"ruler": "han-xiandi",
+				"capital": "xu",
+				"side": "han"
+			},
+			{
+				"name": "魏国",
+				"ruler": "cao-cao",
+				"capital": "ye",
+				"side": "wei"
+			},
+			{
+				"name": "刘备",
+				"ruler": "liu-bei",
+				"capital": "chengdu",
+				"side": "shu"
+			},
+			{
+				"name": "孙权",
+				"ruler": "sun-quan",
+				"capital": "jianye",
+				"side": "wu"
+			}
+		],
+		"219": [
+			{
+				"name": "汉（曹操）",
+				"ruler": "han-xiandi",
+				"capital": "xu",
+				"side": "han"
+			},
+			{
+				"name": "魏国",
+				"ruler": "cao-cao",
+				"capital": "ye",
+				"side": "wei"
+			},
+			{
+				"name": "汉中王",
+				"ruler": "liu-bei",
+				"capital": "chengdu",
+				"side": "shu"
+			},
+			{
+				"name": "孙权",
+				"ruler": "sun-quan",
+				"capital": "jianye",
+				"side": "wu"
+			}
+		],
+		"220": [
+			{
+				"name": "魏",
+				"ruler": "cao-pi",
+				"capital": "luoyang",
+				"side": "wei"
+			},
+			{
+				"name": "汉中王",
+				"ruler": "liu-bei",
+				"capital": "chengdu",
+				"side": "shu"
+			},
+			{
+				"name": "孙权",
+				"ruler": "sun-quan",
+				"capital": "gongan",
+				"side": "wu"
+			}
+		],
+		"221": [
+			{
+				"name": "魏",
+				"ruler": "cao-pi",
+				"capital": "luoyang",
+				"side": "wei"
+			},
+			{
+				"name": "蜀汉",
+				"ruler": "liu-bei",
+				"capital": "chengdu",
+				"side": "shu"
+			},
+			{
+				"name": "吴",
+				"ruler": "sun-quan",
+				"capital": "wuchang",
+				"side": "wu"
+			}
+		],
+		"223": [
+			{
+				"name": "魏",
+				"ruler": "cao-pi",
+				"capital": "luoyang",
+				"side": "wei"
+			},
+			{
+				"name": "蜀汉",
+				"ruler": "liu-shan",
+				"capital": "chengdu",
+				"side": "shu"
+			},
+			{
+				"name": "吴",
+				"ruler": "sun-quan",
+				"capital": "wuchang",
+				"side": "wu"
+			}
+		],
+		"229": [
+			{
+				"name": "魏",
+				"ruler": "cao-rui",
+				"capital": "luoyang",
+				"side": "wei"
+			},
+			{
+				"name": "蜀汉",
+				"ruler": "liu-shan",
+				"capital": "chengdu",
+				"side": "shu"
+			},
+			{
+				"name": "吴",
+				"ruler": "sun-quan",
+				"capital": "jianye",
+				"side": "wu"
+			}
+		]
+	}
+}

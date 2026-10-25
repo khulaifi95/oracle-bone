@@ -1,0 +1,891 @@
+{
+	"$comment": "地名表。坐标为今地的近似经纬度（WGS84），用于地图定位，不是考古测绘精度；所在有异说或未详的标「约略」。modern 为今地。kind：city 城邑，pass 关隘，river 水，battle 战场，mountain 山，region 地区，site 地点。",
+	"places": [
+		{
+			"id": "qufu",
+			"name": "曲阜",
+			"aliases": [
+				"曲阜"
+			],
+			"lon": 116.98,
+			"lat": 35.6,
+			"modern": "山东曲阜",
+			"kind": "city",
+			"note": "鲁都"
+		},
+		{
+			"id": "luoyi",
+			"name": "王城",
+			"aliases": [
+				"王城",
+				"洛邑",
+				"成周",
+				"京师"
+			],
+			"lon": 112.45,
+			"lat": 34.68,
+			"modern": "河南洛阳",
+			"kind": "city",
+			"note": "周都，平王东迁所居"
+		},
+		{
+			"id": "xinzheng",
+			"name": "新郑",
+			"aliases": [
+				"新郑"
+			],
+			"lon": 113.73,
+			"lat": 34.4,
+			"modern": "河南新郑",
+			"kind": "city",
+			"note": "郑都"
+		},
+		{
+			"id": "jiang",
+			"name": "绛",
+			"aliases": [
+				"绛"
+			],
+			"lon": 111.72,
+			"lat": 35.73,
+			"modern": "山西翼城东南",
+			"kind": "city",
+			"note": "晋都"
+		},
+		{
+			"id": "quwo",
+			"name": "曲沃",
+			"aliases": [
+				"曲沃"
+			],
+			"lon": 111.47,
+			"lat": 35.63,
+			"modern": "山西闻喜东北",
+			"kind": "city",
+			"note": "晋宗庙所在"
+		},
+		{
+			"id": "ying",
+			"name": "郢",
+			"aliases": [
+				"郢"
+			],
+			"lon": 112.18,
+			"lat": 30.42,
+			"modern": "湖北荆州纪南城",
+			"kind": "city",
+			"note": "楚都（春秋时所在有异说）"
+		},
+		{
+			"id": "yong",
+			"name": "雍",
+			"aliases": [
+				"雍"
+			],
+			"lon": 107.4,
+			"lat": 34.5,
+			"modern": "陕西凤翔南",
+			"kind": "city",
+			"note": "秦都"
+		},
+		{
+			"id": "linzi",
+			"name": "临淄",
+			"aliases": [
+				"临淄"
+			],
+			"lon": 118.35,
+			"lat": 36.85,
+			"modern": "山东淄博临淄",
+			"kind": "city",
+			"note": "齐都"
+		},
+		{
+			"id": "shangqiu",
+			"name": "商丘",
+			"aliases": [
+				"商丘",
+				"宋"
+			],
+			"lon": 115.65,
+			"lat": 34.42,
+			"modern": "河南商丘南",
+			"kind": "city",
+			"note": "宋都"
+		},
+		{
+			"id": "chuqiu",
+			"name": "楚丘",
+			"aliases": [
+				"楚丘"
+			],
+			"lon": 114.85,
+			"lat": 35.55,
+			"modern": "河南滑县东",
+			"kind": "city",
+			"note": "卫都，狄灭卫后迁此"
+		},
+		{
+			"id": "diqiu",
+			"name": "帝丘",
+			"aliases": [
+				"帝丘"
+			],
+			"lon": 115.05,
+			"lat": 35.75,
+			"modern": "河南濮阳西南",
+			"kind": "city",
+			"note": "僖公三十一年卫迁都于此"
+		},
+		{
+			"id": "taoqiu",
+			"name": "陶丘",
+			"aliases": [
+				"陶丘",
+				"曹"
+			],
+			"lon": 115.55,
+			"lat": 35.1,
+			"modern": "山东定陶西北",
+			"kind": "city",
+			"note": "曹都"
+		},
+		{
+			"id": "wanqiu",
+			"name": "宛丘",
+			"aliases": [
+				"宛丘",
+				"陈"
+			],
+			"lon": 114.88,
+			"lat": 33.73,
+			"modern": "河南淮阳",
+			"kind": "city",
+			"note": "陈都"
+		},
+		{
+			"id": "cai",
+			"name": "蔡",
+			"aliases": [
+				"蔡"
+			],
+			"lon": 114.27,
+			"lat": 33.27,
+			"modern": "河南上蔡西南",
+			"kind": "city",
+			"note": "蔡都"
+		},
+		{
+			"id": "xu-state",
+			"name": "许",
+			"aliases": [
+				"许"
+			],
+			"lon": 113.85,
+			"lat": 34.0,
+			"modern": "河南许昌东",
+			"kind": "city",
+			"note": "许都"
+		},
+		{
+			"id": "ju",
+			"name": "莒",
+			"aliases": [
+				"莒"
+			],
+			"lon": 118.83,
+			"lat": 35.58,
+			"modern": "山东莒县",
+			"kind": "city"
+		},
+		{
+			"id": "zhu",
+			"name": "邾",
+			"aliases": [
+				"邾"
+			],
+			"lon": 117.0,
+			"lat": 35.4,
+			"modern": "山东邹城东南",
+			"kind": "city"
+		},
+		{
+			"id": "qi-state",
+			"name": "杞",
+			"aliases": [
+				"杞"
+			],
+			"lon": 117.75,
+			"lat": 36.1,
+			"modern": "山东新泰一带",
+			"kind": "city",
+			"note": "杞此时已东迁"
+		},
+		{
+			"id": "ji-state",
+			"name": "纪",
+			"aliases": [
+				"纪"
+			],
+			"lon": 118.65,
+			"lat": 36.9,
+			"modern": "山东寿光南",
+			"kind": "city"
+		},
+		{
+			"id": "yi-jin",
+			"name": "翼",
+			"aliases": [
+				"翼"
+			],
+			"lon": 111.7,
+			"lat": 35.73,
+			"modern": "山西翼城东南",
+			"kind": "city",
+			"note": "晋都，献公时改称绛"
+		},
+		{
+			"id": "qian-wei",
+			"name": "汧渭之会",
+			"aliases": [],
+			"lon": 107.15,
+			"lat": 34.38,
+			"modern": "陕西宝鸡东",
+			"kind": "city",
+			"note": "秦文公所居，约略"
+		},
+		{
+			"id": "danyang",
+			"name": "丹阳",
+			"aliases": [
+				"丹阳"
+			],
+			"lon": 111.5,
+			"lat": 32.95,
+			"modern": "河南淅川一带",
+			"kind": "city",
+			"note": "楚早期都城，所在有异说，此取丹淅说，约略"
+		},
+		{
+			"id": "zhaoge",
+			"name": "朝歌",
+			"aliases": [
+				"朝歌"
+			],
+			"lon": 114.2,
+			"lat": 35.6,
+			"modern": "河南淇县",
+			"kind": "city",
+			"note": "卫都，狄灭卫前所居"
+		},
+		{
+			"id": "hua",
+			"name": "滑",
+			"aliases": [
+				"滑",
+				"费"
+			],
+			"lon": 112.75,
+			"lat": 34.6,
+			"modern": "河南偃师东南",
+			"kind": "city",
+			"note": "滑国都于费"
+		},
+		{
+			"id": "jing",
+			"name": "京",
+			"aliases": [
+				"京城",
+				"京"
+			],
+			"lon": 113.5,
+			"lat": 34.73,
+			"modern": "河南荥阳东南",
+			"kind": "city",
+			"note": "共叔段所居"
+		},
+		{
+			"id": "yan",
+			"name": "鄢",
+			"aliases": [
+				"鄢"
+			],
+			"lon": 114.18,
+			"lat": 34.1,
+			"modern": "河南鄢陵西北",
+			"kind": "city"
+		},
+		{
+			"id": "gong",
+			"name": "共",
+			"aliases": [
+				"共"
+			],
+			"lon": 113.8,
+			"lat": 35.45,
+			"modern": "河南辉县",
+			"kind": "city",
+			"note": "共叔段所奔"
+		},
+		{
+			"id": "chengying",
+			"name": "城颍",
+			"aliases": [
+				"城颍"
+			],
+			"lon": 113.7,
+			"lat": 33.95,
+			"modern": "河南临颍西北",
+			"kind": "city",
+			"note": "郑庄公置母之所"
+		},
+		{
+			"id": "yinggu",
+			"name": "颍谷",
+			"aliases": [
+				"颍谷"
+			],
+			"lon": 113.05,
+			"lat": 34.45,
+			"modern": "河南登封西南",
+			"kind": "site",
+			"note": "颍考叔为封人之地"
+		},
+		{
+			"id": "zhi",
+			"name": "制",
+			"aliases": [
+				"制",
+				"虎牢"
+			],
+			"lon": 113.3,
+			"lat": 34.85,
+			"modern": "河南荥阳汜水镇",
+			"kind": "pass",
+			"note": "即虎牢"
+		},
+		{
+			"id": "mie",
+			"name": "蔑",
+			"aliases": [
+				"蔑",
+				"姑蔑"
+			],
+			"lon": 117.5,
+			"lat": 35.55,
+			"modern": "山东泗水东",
+			"kind": "site"
+		},
+		{
+			"id": "su",
+			"name": "宿",
+			"aliases": [
+				"宿"
+			],
+			"lon": 116.3,
+			"lat": 35.95,
+			"modern": "山东东平东",
+			"kind": "city"
+		},
+		{
+			"id": "qian",
+			"name": "潜",
+			"aliases": [
+				"潜"
+			],
+			"lon": 116.6,
+			"lat": 35.2,
+			"modern": "山东济宁一带",
+			"kind": "site",
+			"note": "鲁地，所在未详，约略"
+		},
+		{
+			"id": "xiang-state",
+			"name": "向",
+			"aliases": [
+				"向"
+			],
+			"lon": 118.4,
+			"lat": 35.25,
+			"modern": "山东莒南一带",
+			"kind": "city",
+			"note": "约略"
+		},
+		{
+			"id": "ji-city",
+			"name": "极",
+			"aliases": [
+				"极"
+			],
+			"lon": 116.7,
+			"lat": 35.1,
+			"modern": "山东金乡一带",
+			"kind": "city",
+			"note": "约略"
+		},
+		{
+			"id": "tang",
+			"name": "唐",
+			"aliases": [
+				"唐"
+			],
+			"lon": 116.5,
+			"lat": 35.05,
+			"modern": "山东鱼台东北",
+			"kind": "site",
+			"note": "鲁地"
+		},
+		{
+			"id": "hong",
+			"name": "泓",
+			"aliases": [
+				"泓"
+			],
+			"lon": 115.35,
+			"lat": 34.2,
+			"modern": "河南柘城北",
+			"kind": "battle",
+			"note": "泓水之上"
+		},
+		{
+			"id": "pu",
+			"name": "蒲",
+			"aliases": [
+				"蒲城",
+				"蒲"
+			],
+			"lon": 110.93,
+			"lat": 36.69,
+			"modern": "山西隰县西北",
+			"kind": "city",
+			"note": "重耳所居邑"
+		},
+		{
+			"id": "di",
+			"name": "狄",
+			"aliases": [
+				"狄"
+			],
+			"lon": 112.6,
+			"lat": 37.8,
+			"modern": "山西太原一带及其北",
+			"kind": "region",
+			"note": "重耳奔狄十二年"
+		},
+		{
+			"id": "wulu",
+			"name": "五鹿",
+			"aliases": [
+				"五鹿"
+			],
+			"lon": 115.2,
+			"lat": 36.15,
+			"modern": "河南清丰西北",
+			"kind": "city",
+			"note": "重耳乞食于野人之处"
+		},
+		{
+			"id": "he-river",
+			"name": "河",
+			"aliases": [
+				"河"
+			],
+			"lon": 110.4,
+			"lat": 34.95,
+			"modern": "黄河",
+			"kind": "river"
+		},
+		{
+			"id": "linghu",
+			"name": "令狐",
+			"aliases": [
+				"令狐"
+			],
+			"lon": 110.7,
+			"lat": 35.1,
+			"modern": "山西临猗西",
+			"kind": "city"
+		},
+		{
+			"id": "luliu",
+			"name": "庐柳",
+			"aliases": [
+				"庐柳"
+			],
+			"lon": 110.9,
+			"lat": 35.15,
+			"modern": "山西临猗西北",
+			"kind": "site"
+		},
+		{
+			"id": "xun",
+			"name": "郇",
+			"aliases": [
+				"郇"
+			],
+			"lon": 111.0,
+			"lat": 35.05,
+			"modern": "山西临猗西南",
+			"kind": "city"
+		},
+		{
+			"id": "gaoliang",
+			"name": "高梁",
+			"aliases": [
+				"高梁"
+			],
+			"lon": 111.5,
+			"lat": 36.0,
+			"modern": "山西临汾东北",
+			"kind": "city",
+			"note": "晋怀公被杀之地"
+		},
+		{
+			"id": "wangcheng-qin",
+			"name": "王城（秦）",
+			"aliases": [],
+			"lon": 110.0,
+			"lat": 34.8,
+			"modern": "陕西大荔东",
+			"kind": "city",
+			"note": "秦地，晋文公潜会秦伯于此"
+		},
+		{
+			"id": "mianshang",
+			"name": "绵上",
+			"aliases": [
+				"绵上"
+			],
+			"lon": 111.95,
+			"lat": 36.95,
+			"modern": "山西介休东南",
+			"kind": "site",
+			"note": "以为介之推田"
+		},
+		{
+			"id": "li-zheng",
+			"name": "栎",
+			"aliases": [
+				"栎"
+			],
+			"lon": 113.5,
+			"lat": 34.1,
+			"modern": "河南禹州",
+			"kind": "city",
+			"note": "郑别都"
+		},
+		{
+			"id": "fan-zheng",
+			"name": "氾",
+			"aliases": [
+				"氾",
+				"泛"
+			],
+			"lon": 113.5,
+			"lat": 33.85,
+			"modern": "河南襄城南",
+			"kind": "city",
+			"note": "襄王出居之所"
+		},
+		{
+			"id": "wen",
+			"name": "温",
+			"aliases": [
+				"温"
+			],
+			"lon": 112.95,
+			"lat": 34.95,
+			"modern": "河南温县西南",
+			"kind": "city",
+			"note": "王子带所居；冬会于温"
+		},
+		{
+			"id": "xicheng",
+			"name": "隰城",
+			"aliases": [
+				"隰城"
+			],
+			"lon": 112.9,
+			"lat": 35.0,
+			"modern": "河南武陟西南",
+			"kind": "city"
+		},
+		{
+			"id": "yuan",
+			"name": "原",
+			"aliases": [
+				"原"
+			],
+			"lon": 112.6,
+			"lat": 35.1,
+			"modern": "河南济源西北",
+			"kind": "city",
+			"note": "晋伐原以示信"
+		},
+		{
+			"id": "yangfan",
+			"name": "阳樊",
+			"aliases": [
+				"阳樊"
+			],
+			"lon": 112.75,
+			"lat": 35.05,
+			"modern": "河南济源东南",
+			"kind": "city"
+		},
+		{
+			"id": "xiang-lu",
+			"name": "向（鲁会）",
+			"aliases": [],
+			"lon": 117.3,
+			"lat": 35.8,
+			"modern": "山东莒县一带",
+			"kind": "site",
+			"note": "鲁与莒、卫盟于向，约略"
+		},
+		{
+			"id": "gu",
+			"name": "谷",
+			"aliases": [
+				"谷"
+			],
+			"lon": 116.3,
+			"lat": 36.25,
+			"modern": "山东平阴西南",
+			"kind": "city",
+			"note": "齐邑"
+		},
+		{
+			"id": "kui",
+			"name": "夔",
+			"aliases": [
+				"夔"
+			],
+			"lon": 110.5,
+			"lat": 31.0,
+			"modern": "湖北秭归东",
+			"kind": "city"
+		},
+		{
+			"id": "min",
+			"name": "缗",
+			"aliases": [
+				"缗"
+			],
+			"lon": 116.3,
+			"lat": 35.3,
+			"modern": "山东金乡东北",
+			"kind": "city",
+			"note": "宋邑"
+		},
+		{
+			"id": "beilu",
+			"name": "被庐",
+			"aliases": [
+				"被庐"
+			],
+			"lon": 111.5,
+			"lat": 35.7,
+			"modern": "山西境内，所在未详",
+			"kind": "site",
+			"note": "晋蒐于被庐，作三军"
+		},
+		{
+			"id": "chengpu",
+			"name": "城濮",
+			"aliases": [
+				"城濮"
+			],
+			"lon": 115.53,
+			"lat": 35.58,
+			"modern": "山东鄄城西南临濮集一带",
+			"kind": "battle"
+		},
+		{
+			"id": "youshen",
+			"name": "有莘",
+			"aliases": [
+				"有莘"
+			],
+			"lon": 115.45,
+			"lat": 35.15,
+			"modern": "山东曹县西北",
+			"kind": "site",
+			"note": "晋师登有莘之虚以观师"
+		},
+		{
+			"id": "jiantu",
+			"name": "践土",
+			"aliases": [
+				"践土"
+			],
+			"lon": 113.88,
+			"lat": 35.0,
+			"modern": "河南原阳西南",
+			"kind": "site",
+			"note": "晋侯作王宫于践土"
+		},
+		{
+			"id": "heng-yong",
+			"name": "衡雍",
+			"aliases": [
+				"衡雍"
+			],
+			"lon": 113.75,
+			"lat": 35.0,
+			"modern": "河南原阳西",
+			"kind": "site"
+		},
+		{
+			"id": "liangu",
+			"name": "连谷",
+			"aliases": [
+				"连谷"
+			],
+			"lon": 113.0,
+			"lat": 32.5,
+			"modern": "楚地，所在未详",
+			"kind": "site",
+			"note": "子玉自杀之地，约略"
+		},
+		{
+			"id": "heyang",
+			"name": "河阳",
+			"aliases": [
+				"河阳"
+			],
+			"lon": 112.8,
+			"lat": 34.85,
+			"modern": "河南孟州西",
+			"kind": "city",
+			"note": "天王狩于河阳"
+		},
+		{
+			"id": "wanpu",
+			"name": "宛濮",
+			"aliases": [
+				"宛濮"
+			],
+			"lon": 114.95,
+			"lat": 35.65,
+			"modern": "河南长垣西南",
+			"kind": "site"
+		},
+		{
+			"id": "dizquan",
+			"name": "翟泉",
+			"aliases": [
+				"翟泉"
+			],
+			"lon": 112.62,
+			"lat": 34.73,
+			"modern": "河南洛阳东",
+			"kind": "site"
+		},
+		{
+			"id": "hanling",
+			"name": "函陵",
+			"aliases": [
+				"函陵"
+			],
+			"lon": 113.7,
+			"lat": 34.5,
+			"modern": "河南新郑北",
+			"kind": "site",
+			"note": "晋军所屯"
+		},
+		{
+			"id": "fannan",
+			"name": "氾南",
+			"aliases": [
+				"氾南"
+			],
+			"lon": 113.95,
+			"lat": 34.55,
+			"modern": "河南中牟南",
+			"kind": "site",
+			"note": "秦军所屯"
+		},
+		{
+			"id": "xiao",
+			"name": "殽",
+			"aliases": [
+				"殽",
+				"崤",
+				"殽山"
+			],
+			"lon": 111.25,
+			"lat": 34.6,
+			"modern": "河南洛宁西北、三门峡东南",
+			"kind": "battle"
+		},
+		{
+			"id": "ji-di",
+			"name": "箕",
+			"aliases": [
+				"箕"
+			],
+			"lon": 112.8,
+			"lat": 37.55,
+			"modern": "山西太谷东南",
+			"kind": "battle"
+		},
+		{
+			"id": "qingyuan",
+			"name": "清原",
+			"aliases": [
+				"清原"
+			],
+			"lon": 111.1,
+			"lat": 35.65,
+			"modern": "山西稷山东南",
+			"kind": "site"
+		},
+		{
+			"id": "shengxing",
+			"name": "升陉",
+			"aliases": [
+				"升陉"
+			],
+			"lon": 117.1,
+			"lat": 35.45,
+			"modern": "山东曲阜一带",
+			"kind": "battle",
+			"note": "鲁地，约略"
+		},
+		{
+			"id": "xugou",
+			"name": "须句",
+			"aliases": [
+				"须句"
+			],
+			"lon": 116.3,
+			"lat": 35.95,
+			"modern": "山东东平西北",
+			"kind": "city"
+		},
+		{
+			"id": "xu-qian",
+			"name": "訾娄",
+			"aliases": [
+				"訾娄"
+			],
+			"lon": 117.2,
+			"lat": 35.35,
+			"modern": "山东济宁一带",
+			"kind": "city",
+			"note": "邾邑，约略"
+		},
+		{
+			"id": "zhou-region",
+			"name": "周",
+			"aliases": [
+				"周"
+			],
+			"lon": 112.45,
+			"lat": 34.68,
+			"modern": "河南洛阳一带",
+			"kind": "region"
+		}
+	]
+}

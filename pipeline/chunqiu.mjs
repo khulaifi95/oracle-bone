@@ -61,7 +61,11 @@ function labelled(s, fallback) {
  * on lines of their own; later 卷 have plain lines with {{annotate|（【注】…【音義】…）}} inline and
  * 【疏】 paragraphs between the text.
  */
+// Lines whose 注 the transcription leaves unmarked.
+const UNMARKED = [['晉侯夷吾卒。文公定位而後告，未同盟而赴以名。', '晉侯夷吾卒。{{annotate|（【注】文公定位而後告，未同盟而赴以名。）}}']];
+
 export function parseZhengyi(src) {
+	for (const [from, to] of UNMARKED) src = src.replace(from, to);
 	const paragraphs = [];
 	let k = null;
 	let y = null;
@@ -127,8 +131,10 @@ export function parseZhengyi(src) {
 			} else addNote(labelled(body, n.tpl === '~' ? 'du' : n.tpl === 'annotate' ? 'yinyi' : 'shu'));
 			continue;
 		}
-		// later style: 經 entries are each a paragraph; in the 傳 a 疏 does not end the paragraph
-		if (!(k === 'zhuan' && afterShu)) newPara();
+		// later style: 經 entries are each a paragraph; in the 傳 a 疏 that breaks into a sentence
+		// does not end the paragraph
+		const lastText = para?.findLast((x) => x.t === 'text');
+		if (!(k === 'zhuan' && afterShu && lastText && !/[。」』！？]$/.test(lastText.s))) newPara();
 		afterShu = false;
 		for (const n of tree) {
 			if (typeof n === 'string') {
@@ -145,6 +151,39 @@ export function parseZhengyi(src) {
 		}
 	}
 	return { title: '', headings: [], paragraphs: paragraphs.filter((p) => p.length) };
+}
+
+/**
+ * The 正義 breaks the 傳 wherever a 疏 comes in, which is often within one telling. The plain
+ * 左傳 on Wikisource has a paragraph for each telling: join the 正義 paragraphs that do not begin
+ * one of its paragraphs to the paragraph before.
+ */
+export function zuoParagraphs(paragraphs, plainSrc) {
+	const KEY = 6;
+	const key = (s) => bare(s).slice(0, KEY).join('');
+	const starts = new Set();
+	let inZhuan = false;
+	for (const raw of joinLines(plainSrc)) {
+		const line = raw.trim();
+		const h = line.match(/^===\s*(.+?)\s*===$/);
+		if (h) {
+			inZhuan = h[1] === '傳';
+			continue;
+		}
+		if (!inZhuan || !line || line.startsWith('=')) continue;
+		const k = key(text(parseTree(line)));
+		if (k.length === KEY) starts.add(k);
+	}
+	const out = [];
+	for (const p of paragraphs) {
+		const prev = out[out.length - 1];
+		const head = p.find((x) => x.t === 'text');
+		const prevHead = prev?.findLast((x) => x.t === 'text');
+		const k = head ? key(p.filter((x) => x.t === 'text').map((x) => x.s).join('')) : '';
+		if (prev && head?.k === 'zhuan' && prevHead?.k === 'zhuan' && head.y === prevHead.y && !starts.has(k)) prev.push(...p);
+		else out.push(p);
+	}
+	return out;
 }
 
 // ---------------------------------------------------------------- 四庫 注疏

@@ -3,7 +3,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { assemble, align, jinlingStream } from '../text.mjs';
-import { parseZhengyi, parseZhushu, parseSanzhuanPage, matchSanzhuan, isSkChar, similarity } from '../chunqiu.mjs';
+import { parseZhengyi, zuoParagraphs, parseZhushu, parseSanzhuanPage, matchSanzhuan, isSkChar, similarity } from '../chunqiu.mjs';
 import { fixPUA } from '../siku.mjs';
 import { normChar, toSimplified, isPunct } from '../script.mjs';
 import { zhNum } from '../dates.mjs';
@@ -22,6 +22,7 @@ export const chapters = [
 export async function buildChapter(c) {
 	const n = String(c.juan).padStart(3, '0');
 	const zy = parseZhengyi(await src(`zhengyi-${n}.wiki`));
+	zy.paragraphs = zuoParagraphs(zy.paragraphs, await src(`zuozhuan-${PAGES[c.duke]}.wiki`));
 	const zs = parseZhushu(await src(`zhushu-${n}.wiki`));
 	const J = jinlingStream(zy);
 	const jNote = new Map(J.notes.map((x) => [x.id, x]));

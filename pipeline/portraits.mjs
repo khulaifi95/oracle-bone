@@ -1,6 +1,7 @@
 // Finds a public-domain portrait for each person: the lead image of their zh.wikipedia
 // article (usually a 晚笑堂畫傳 or 三才圖會 woodcut), kept only if Commons marks it public
-// domain. Thumbnails go to static/portraits/, provenance to data/portraits.json.
+// domain. Thumbnails go to static/portraits/, provenance to data/<book>/portraits.json.
+// Run with `node pipeline/portraits.mjs <book>`; each found image's `source` is then checked by hand.
 import { readFile, writeFile, mkdir, access } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -22,8 +23,9 @@ async function api(host, params) {
 	throw new Error(`429 ${url}`);
 }
 
-const people = JSON.parse(await readFile(path.join(ROOT, 'data/people.json'), 'utf8')).people;
-const outFile = path.join(ROOT, 'data/portraits.json');
+const book = process.argv[2] ?? 'shiji';
+const people = JSON.parse(await readFile(path.join(ROOT, 'data', book, 'people.json'), 'utf8')).people;
+const outFile = path.join(ROOT, 'data', book, 'portraits.json');
 const done = (await exists(outFile)) ? JSON.parse(await readFile(outFile, 'utf8')) : {};
 await mkdir(path.join(ROOT, 'static/portraits'), { recursive: true });
 

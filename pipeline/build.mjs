@@ -7,10 +7,12 @@ import { loadPlain, PARALLEL_BOOKS, BOOK_NAMES } from './plain.mjs';
 import { buildBasemap } from './geo.mjs';
 import { normChar, toTraditional } from './script.mjs';
 import * as shiji from './books/shiji.mjs';
+import * as sanguozhi from './books/sanguozhi.mjs';
+import * as chunqiu from './books/chunqiu.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const OUT = path.join(ROOT, 'static/data');
-const BOOKS = [shiji];
+const BOOKS = [shiji, sanguozhi, chunqiu];
 const only = process.env.BOOK ? new Set(process.env.BOOK.split(',')) : null;
 
 const readJson = async (rel) => JSON.parse(await readFile(path.join(ROOT, rel), 'utf8'));

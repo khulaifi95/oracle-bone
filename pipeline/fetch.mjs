@@ -24,7 +24,9 @@ const WIKISOURCE = [
 	...CHUNQIU.map((n) => [`春秋左傳正義/卷${String(n).padStart(2, '0')}`, `wikisource/zhengyi-${pad(n)}.wiki`]),
 	...['隱公', '僖公'].flatMap((g) => [
 		[`春秋公羊傳/${g}`, `wikisource/gongyang-${g === '隱公' ? 'yin' : 'xi'}.wiki`],
-		[`春秋穀梁傳/${g}`, `wikisource/guliang-${g === '隱公' ? 'yin' : 'xi'}.wiki`]
+		[`春秋穀梁傳/${g}`, `wikisource/guliang-${g === '隱公' ? 'yin' : 'xi'}.wiki`],
+		// the plain 左傳, for its paragraphs: the 正義 breaks the 傳 wherever a 疏 comes in
+		[`春秋左氏傳/${g}`, `wikisource/zuozhuan-${g === '隱公' ? 'yin' : 'xi'}.wiki`]
 	]),
 	['國語/卷10', 'wikisource/guoyu-010.wiki'],
 	['後漢書/卷9', 'wikisource/houhanshu-009.wiki'],

@@ -286,5 +286,11 @@
 		"source": "刘锡永等绘《三国演义》绣像",
 		"page": "https://commons.wikimedia.org/wiki/File:%E8%A2%81%E5%B0%9A.png",
 		"licence": "Public domain"
+	},
+	"zhuge-liang": {
+		"image": "portraits/zhuge-liang.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:ZhugeLiang1.jpg",
+		"licence": "Public domain"
 	}
 }

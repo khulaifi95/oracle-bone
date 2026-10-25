@@ -1,8 +1,9 @@
 <script lang="ts">
 	// 人物: who is on stage around the current passage, and a card for the selected person
 	// (名、字、封號官稱 as of the current year, 歲數, and where the chapter mentions them).
-	import { app, SIDE_LABEL, ageAt, bceOf, eraLabel } from '#lib/state.svelte.js';
+	import { app } from '#lib/state.svelte.js';
 	import { reading } from '#lib/reading.svelte.js';
+	import { ageAt, eraLabel, julianYear, yearShort } from '#lib/dates.js';
 	import { occurrences } from '#lib/find.js';
 	import type { Person } from '#lib/types.js';
 	import Seal from './Seal.svelte';
@@ -12,7 +13,10 @@
 	const ed = $derived(s.edition === 'j' ? 'j' : 'd');
 	const person = $derived(app.person ? reading.personById.get(app.person) : null);
 	const date = $derived(reading.date);
-	const bce = $derived(date ? bceOf(date.ey, date.m) : null);
+	const cal = $derived(reading.book?.calendar);
+	/** the Julian year being read */
+	const year = $derived(date && cal ? julianYear(date.ey, date.m, cal) : null);
+	const era = (ey: number) => (cal ? eraLabel(ey, cal, s.script, reading.info?.court) : '');
 
 	const occ = $derived(person && reading.chapter ? occurrences(reading.chapter, person.id, ed) : []);
 	const segById = $derived(new Map((reading.chapter?.segs ?? []).map((x) => [x.id, x])));
@@ -37,14 +41,14 @@
 		return cur;
 	}
 	function lifeLine(p: Person) {
-		const b = p.born != null ? `前${-p.born}` : '?';
-		const d = p.died != null ? `前${-p.died}` : '?';
+		const b = p.born != null ? yearShort(p.born) : '?';
+		const d = p.died != null ? yearShort(p.died) : '?';
 		return p.born == null && p.died == null ? '' : `${b}—${d}`;
 	}
 	function status(p: Person) {
-		if (bce == null) return '';
-		if (p.died != null && bce < -p.died) return t ? '已卒' : '已卒';
-		const a = ageAt(p.born, bce);
+		if (year == null) return '';
+		if (p.died != null && year > p.died) return t ? '已卒' : '已卒';
+		const a = ageAt(p.born, year);
 		return a != null && a > 0 ? `${a}${t ? '歲' : '岁'}` : '';
 	}
 	function context(segId: string) {
@@ -62,8 +66,9 @@
 	}
 	const nm = (p: Person) => (t ? p.t : p.name);
 	const chapterTitle = (id: string) => {
-		const c = reading.catalog?.books.shiji.chapters.find((x) => x.id === id);
-		return c ? `${t ? '史記' : '史记'}·${t ? c.t : c.title}` : '';
+		const b = reading.book;
+		const c = b?.chapters.find((x) => x.id === id);
+		return b && c ? `${t ? b.t : b.title}·${t ? c.t : c.title}` : '';
 	};
 </script>
 
@@ -82,12 +87,12 @@
 					<header>
 						<h2>{nm(person)}</h2>
 						{#if person.zi}<span class="zi">字{person.zi}</span>{/if}
-						<span class="side">{SIDE_LABEL[person.side]}</span>
+						<span class="side">{reading.sideLabel(person.side, s.script)}</span>
 						<button class="x" onclick={() => (app.person = null)} aria-label="关闭">×</button>
 					</header>
 					<div class="facts">
 						{#if lifeLine(person)}<span>{lifeLine(person)}</span>{/if}
-						{#if date && status(person)}<span class="age">{eraLabel(date.ey)}{status(person)}</span>{/if}
+						{#if date && status(person)}<span class="age">{era(date.ey)}{status(person)}</span>{/if}
 					</div>
 					{#if titleAt(person, date?.ey)}<div class="now">{titleAt(person, date?.ey)}</div>{/if}
 				</div>
@@ -106,7 +111,7 @@
 				<ol class="titles">
 					{#each person.titles as [from, to, title], k (k)}
 						<li class:cur={date && Number(from) <= date.ey && date.ey <= Number(to)}>
-							<span>{eraLabel(Number(from))}</span><b>{title}</b>
+							<span>{era(Number(from))}</span><b>{title}</b>
 						</li>
 					{/each}
 				</ol>

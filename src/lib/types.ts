@@ -2,7 +2,8 @@
 
 export type Ed = 'd' | 'j';
 export type Script = 's' | 't';
-export type NoteKind = 'jijie' | 'suoyin' | 'zhengyi' | 'kaozheng' | 'zan';
+/** a commentary: jijie, suoyin, zhengyi, kaozheng, zan (史記); pei (三國志); du, yinyi, shu (春秋) */
+export type NoteKind = string;
 
 /** One edition's text for a segment. Offsets are character indexes into s/t. */
 export interface SegText {
@@ -32,12 +33,18 @@ export interface Segment {
 	d: SegText;
 	j: SegText;
 	dt?: { ey: number; m: number | null; x: string }[];
+	/** 春秋: 經 or 傳, and the year it stands under */
+	k?: 'jing' | 'zhuan';
+	y?: number;
 }
 
 export interface NotePart {
 	k: NoteKind;
 	s: string;
 	t: string;
+	/** 裴注: the book a passage quotes (traditional, and simplified) */
+	src?: string;
+	srcS?: string;
 }
 
 export interface Variant {
@@ -60,6 +67,8 @@ export interface Chapter {
 	variants: Variant[];
 	mentions: Record<string, number>;
 	stats: Record<string, unknown>;
+	/** a 卷 with several lives: where each one begins */
+	sub?: { seg: string; s: string; t: string }[];
 }
 
 export interface PlainChapter {
@@ -77,7 +86,8 @@ export interface EditionInfo {
 	short: string;
 	full: string;
 	date: string;
-	layout: { cols: number; rows: number; noteRows: number; frame: string; mouth: string; fishtail: number; desc: string };
+	/** top: what the 版心 prints above the fishtail, if anything */
+	layout: { cols: number; rows: number; noteRows: number; frame: string; mouth: string; fishtail: number; desc: string; top?: string };
 	commentary: NoteKind[];
 	source: { name: string; url: string; licence: string; basis: string };
 }
@@ -90,11 +100,100 @@ export interface ChapterInfo {
 	t: string;
 	kind?: string;
 	n?: string;
+	/** the court (三國) or state (春秋) the chapter belongs to */
+	court?: string;
+	stats?: Record<string, unknown>;
+}
+
+/** simplified and traditional forms of a text */
+export interface ST {
+	s: string;
+	t: string;
+}
+
+export interface NoteDef {
+	k: NoteKind;
+	s: string;
+	t: string;
+	color: string;
+	/** shown by default */
+	on: boolean;
+	who: string;
+	info: ST;
+	/** found in one edition only */
+	only?: Ed;
+}
+
+export interface Era {
+	name: string;
+	t?: string;
+	from: number;
+	to?: number;
+	court?: string;
+}
+
+export interface Calendar {
+	/** the month the year begins with (秦曆: 十月) */
+	start: number;
+	/** months the first month lies after January (秦曆, 夏正: 1; 周正: -1) */
+	m1: number;
+	/** how years are named: one line of eras, by court (三國), or by state (春秋) */
+	mode?: 'courts' | 'states';
+	courts?: { id: string; s: string; t: string }[];
+	eras: Era[];
+	note: ST;
+}
+
+export interface Side {
+	id: string;
+	s: string;
+	t: string;
+	color: string;
+}
+
+export interface BookInfo {
+	id: string;
+	title: string;
+	t: string;
+	cluster: ST;
+	/** the title the editions print in the 卷首 and the 版心 */
+	printed: ST;
+	notes: NoteDef[];
+	notesLead: ST;
+	calendar: Calendar;
+	sides: Side[];
+	timeline: { breaks: [number, number][]; from: number; to: number; major: [number, number]; minor: number[]; marks: { ey: number; s: string; t: string }[] };
+	map: { period: string; home: [number, number, number, number]; named: string[]; marshNames: string[]; empty: ST; purpose: ST; key: ST; about: ST };
+	parallels: { books: string[]; chapters: string[]; how: ST; sources: ST };
+	data: ST;
+	legend: { person: [string, string]; place: [string, string] };
+	chapters: ChapterInfo[];
+	editions: Record<Ed, EditionInfo>;
+	/** a 卷 can hold several lives */
+	subheadings?: boolean;
+	/** 經 and 傳 stand apart (春秋) */
+	jingzhuan?: boolean;
 }
 
 export interface Catalog {
-	books: Record<string, { title: string; t: string; chapters: ChapterInfo[] }>;
-	editions: Record<Ed, EditionInfo>;
+	books: Record<string, BookInfo>;
+	/** names of every book read or quoted */
+	names: Record<string, [string, string]>;
+	/** the chapters of the parallel books */
+	plain: Record<string, { book: string; juan: number; title: string; t: string }>;
+}
+
+/** 三傳: for each 經 entry of a 春秋 chapter, the 左氏 telling and the 公羊 and 穀梁 readings */
+export interface SanzhuanEntry {
+	seg: string;
+	y: number;
+	zuo: ST;
+	/** the 傳 paragraph (its first segment) that tells the entry */
+	told?: string;
+	/** 杜注 says the 左氏 has no 傳 here */
+	noZhuan?: boolean;
+	gong?: { jing: ST; zhuan: ST | null };
+	gu?: { jing: ST; zhuan: ST | null };
 }
 
 export interface Person {
@@ -108,7 +207,8 @@ export interface Person {
 	bornNote?: string;
 	died: number | null;
 	deathPlace?: string;
-	side: 'qin' | 'chu' | 'han' | 'other';
+	/** a side of the book (its `sides`) */
+	side: string;
 	titles?: [string, string, string][];
 	bio: string;
 	bioT: string;
@@ -134,7 +234,7 @@ export interface Account {
 	at: string;
 	paras: [number, number];
 	segs?: [string, string];
-	/** found by shared wording with the 史記 accounts, not anchored by hand */
+	/** found by shared wording with the reading book's accounts, not anchored by hand */
 	auto?: boolean;
 }
 
@@ -156,8 +256,10 @@ export interface HistEvent {
 export interface Polity {
 	name: string;
 	ruler: string;
+	/** the ruler's name when the people list has no card for them */
+	who?: string;
 	capital: string;
-	side: 'qin' | 'chu' | 'han' | 'other';
+	side: string;
 }
 
 export interface Basemap {

@@ -1,7 +1,8 @@
 <script lang="ts">
-	// 對讀: the same event as told by 史記, 漢書 and 資治通鑑, set side by side in vertical
-	// columns. Wording that differs from the 史記 account is marked.
-	import { app, eraLabel, monthLabel, bceOf } from '#lib/state.svelte.js';
+	// 對讀: the same event as told by the book being read and the books beside it (漢書 and
+	// 資治通鑑 for the 史記, 後漢書 and 通鑑 for the 三國志, 史記 and 國語 for the 左傳), set side by
+	// side in vertical columns. Wording that differs from the account being read is marked.
+	import { app } from '#lib/state.svelte.js';
 	import { reading } from '#lib/reading.svelte.js';
 	import { loadChapter, loadPlain } from '#lib/data.js';
 	import type { Account, Chapter, HistEvent, PlainChapter } from '#lib/types.js';
@@ -25,6 +26,8 @@
 		title: string;
 		paras: { text: string; mark: boolean[] }[];
 		here: boolean;
+		/** the account the others are compared with */
+		base: boolean;
 		where: string;
 		/** share of the wording found in the primary account */
 		sim: number | null;
@@ -32,7 +35,9 @@
 	let told = $state<Told[]>([]);
 	let loading = $state(false);
 
-	const BOOK: Record<string, [string, string]> = { shiji: ['史记', '史記'], hanshu: ['汉书', '漢書'], tongjian: ['通鉴', '通鑑'] };
+	const bookName = (b: string) => reading.bookName(b, s.script);
+	/** a chapter of a book read here (with its segments), rather than a plain parallel text */
+	const isReading = (ref: string) => !reading.catalog?.plain[ref] && !!reading.catalog?.books[ref.split('-')[0]]?.chapters.some((c) => c.id === ref);
 
 	function segText(ch: Chapter, from: string, to: string): string[] {
 		const i = ch.segs.findIndex((x) => x.id === from);
@@ -64,7 +69,7 @@
 			let texts: string[];
 			let title: string;
 			let heading = '';
-			if (book === 'shiji') {
+			if (isReading(a.ref)) {
 				const ch = await loadChapter(a.ref);
 				texts = a.segs ? segText(ch, a.segs[0], a.segs[1]) : [];
 				title = t ? ch.title.t : ch.title.s;
@@ -79,10 +84,14 @@
 			heading = heading.replace(/（.*$/, '');
 			const [p0, p1] = a.paras;
 			const where = `${heading ? heading + ' ' : ''}第${p0 + 1}${p1 > p0 ? '–' + (p1 + 1) : ''}段`;
-			res.push({ a, book, title, paras: texts.map((text) => ({ text, mark: [] })), here: a.ref === reading.chapter?.id, where, sim: null });
+			res.push({ a, book, title, paras: texts.map((text) => ({ text, mark: [] })), here: a.ref === reading.chapter?.id, base: false, where, sim: null });
 		}
-		// mark wording that differs from the primary 史記 account
-		const primary = res.find((r) => r.here) ?? res.find((r) => r.book === 'shiji');
+		// mark wording that differs from the primary account, in the book being read
+		// (in the 春秋 an event is told twice in the chapter, in the 經 and in the 傳: the longer is the base)
+		const size = (r: Told) => r.paras.reduce((n, p) => n + p.text.length, 0);
+		const pool = res.some((r) => r.here) ? res.filter((r) => r.here) : res.filter((r) => r.book === reading.bookId);
+		const primary = pool.reduce<Told | null>((a, b) => (!a || size(b) > size(a) ? b : a), null);
+		if (primary) primary.base = true;
 		if (primary) {
 			const key = (r: Told) => {
 				const chars: string[] = [];
@@ -125,16 +134,19 @@
 	});
 
 	function open(r: Told) {
-		if (r.book !== 'shiji' || !r.a.segs) return;
+		if (!isReading(r.a.ref) || !r.a.segs) return;
 		app.parallelWide = false;
 		if (r.a.ref === reading.chapter?.id) app.goto(r.a.segs[0]);
 		else reading.open(r.a.ref, r.a.segs[0]).then(() => app.goto(r.a.segs![0]));
 	}
 	const chapterEvents = $derived(reading.chapterEvents);
-	const BOOKS = ['shiji', 'hanshu', 'tongjian'] as const;
+	// an event can be told twice in a chapter (the 經 entry and the 傳 that tells it): list it once
+	const eventChoices = $derived([...new Map(chapterEvents.map((c) => [c.e.id, c.e])).values()]);
+	const BOOKS = $derived([reading.bookId, ...(reading.book?.parallels.books ?? [])]);
 	const chapterTitle = (ref: string) => {
-		const [b] = ref.split('-');
-		const c = reading.catalog?.books[b]?.chapters.find((x) => x.id === ref);
+		const plain = reading.catalog?.plain[ref];
+		if (plain) return t ? plain.t : plain.title;
+		const c = reading.catalog?.books[ref.split('-')[0]]?.chapters.find((x) => x.id === ref);
 		return c ? (t ? c.t : c.title) : ref;
 	};
 	// which books tell this event, and where
@@ -161,29 +173,27 @@
 	<div class="head">
 		<select value={event?.id ?? ''} onchange={(e) => pick((e.target as HTMLSelectElement).value)} aria-label="事件">
 			{#if !event}<option value="">{t ? '— 本段無對應事件 —' : '— 本段无对应事件 —'}</option>{/if}
-			{#each chapterEvents as { e } (e.id)}
+			{#each eventChoices as e (e.id)}
 				<option value={e.id}>{t ? e.t : e.title}</option>
 			{/each}
 		</select>
 		{#if event}
 			{#if between}<span class="when soft">{t ? '前事' : '前事'}</span>{/if}
-			<span class="when">{eraLabel(event.ey)}{monthLabel(event.m)}{event.approx ? '前后' : ''} · 前{bceOf(event.ey, event.m)}</span>
+			<span class="when">{reading.dateText(event.ey, event.m, s.script, event.approx)}</span>
 		{/if}
 		<button class="how-btn" class:open={how} onclick={() => (how = !how)} aria-label="对读如何系联">?</button>
 		<button class="wide-btn" onclick={() => (app.parallelWide = !app.parallelWide)}>{wide ? (t ? '收起' : '收起') : t ? '展開' : '展开'}</button>
 	</div>
 	{#if how}
 		<div class="how">
-			{t
-				? '每一事先由人工在《史記》《漢書》《資治通鑑》中各定一句起句（及止句），找到所在段落；再以本事的《史記》原文為準，凡前後段落與之四字連文相合達四分之一者併入，他處重述此事的段落也照此找出，標為「同文」。比照以當前所讀之篇為底本：標色之字是措辭不同處，百分數是該段文字見於底本的比例。'
-				: '每一事先由人工在《史记》《汉书》《资治通鉴》中各定一句起句（及止句），找到所在段落；再以本事的《史记》原文为准，凡前后段落与之四字连文相合达四分之一者并入，他处重述此事的段落也照此找出，标为“同文”。比照以当前所读之篇为底本：标色之字是措辞不同处，百分数是该段文字见于底本的比例。'}
+			{reading.book ? (t ? reading.book.parallels.how.t : reading.book.parallels.how.s) : ''}
 		</div>
 	{/if}
 	{#if event}
 		<div class="cov">
 			{#each coverage as c (c.b)}
 				<span class="book" class:none={!c.titles.length} title={c.absent ?? ''}>
-					<b>{BOOK[c.b][t ? 1 : 0]}</b>
+					<b>{bookName(c.b)}</b>
 					{#if c.titles.length}{c.titles.join('、')}{:else}{t ? '未載' : '未载'}{/if}
 				</span>
 			{/each}
@@ -192,11 +202,11 @@
 			{#each told as r (r.a.ref + ":" + r.a.paras[0])}
 				<section class="acc" class:here={r.here}>
 					<div class="label">
-						<b>{BOOK[r.book][t ? 1 : 0]}</b>·{r.title}
+						<b>{bookName(r.book)}</b>·{r.title}
 						<span class="where">{r.where}</span>
 						{#if r.a.auto}<span class="tag" title="按文字相合找到的段落">同文</span>{/if}
-						{#if r.here}<span class="tag base">底本</span>{:else if r.sim !== null}<span class="sim" title={t ? '此段文字見於底本的比例' : '此段文字见于底本的比例'}>{Math.round(r.sim * 100)}%</span>{/if}
-						{#if r.book === 'shiji' && !r.here}<button onclick={() => open(r)}>{t ? '往讀' : '往读'}</button>{/if}
+						{#if r.base}<span class="tag base">底本</span>{:else if r.sim !== null}<span class="sim" title={t ? '此段文字見於底本的比例' : '此段文字见于底本的比例'}>{Math.round(r.sim * 100)}%</span>{/if}
+						{#if isReading(r.a.ref) && !r.base}<button onclick={() => open(r)}>{t ? '往讀' : '往读'}</button>{/if}
 					</div>
 					<div class="vt">
 						{#each r.paras as p, pi (pi)}
@@ -208,7 +218,7 @@
 			{#if loading && !told.length}<div class="msg">……</div>{/if}
 		</div>
 		{#each coverage.filter((c) => c.absent) as c (c.b)}
-			<div class="foot">{BOOK[c.b][t ? 1 : 0]}{t ? '未載' : '未载'}：{c.absent}</div>
+			<div class="foot">{bookName(c.b)}{t ? '未載' : '未载'}：{c.absent}</div>
 		{/each}
 		<div class="foot">{t ? '標色之字為與底本措辭不同處' : '标色之字为与底本措辞不同处'}</div>
 	{:else}

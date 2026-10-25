@@ -1,13 +1,16 @@
 <script lang="ts">
-	import { app, NOTE_LABEL, NOTE_LABEL_T, NOTE_INFO } from '#lib/state.svelte.js';
+	import { app } from '#lib/state.svelte.js';
 	import { reading } from '#lib/reading.svelte.js';
 	import type { NoteKind } from '#lib/types.js';
 
 	const s = app.settings;
 	const t = $derived(s.script === 't');
-	const chapters = $derived(reading.catalog?.books.shiji.chapters ?? []);
-	const NOTE_KINDS: NoteKind[] = ['jijie', 'suoyin', 'zhengyi', 'kaozheng', 'zan'];
+	const book = $derived(reading.book);
+	const chapters = $derived(book?.chapters ?? []);
+	const notes = $derived(book?.notes ?? []);
+	const shelf = $derived(Object.values(reading.catalog?.books ?? {}));
 	let help = $state(false);
+	let shelfOpen = $state(false);
 
 	function set<K extends keyof typeof s>(k: K, v: (typeof s)[K]) {
 		s[k] = v;
@@ -17,12 +20,40 @@
 		s.notes[k] = !s.notes[k];
 		app.save();
 	}
+	function openBook(id: string) {
+		shelfOpen = false;
+		const b = reading.catalog?.books[id];
+		if (!b || id === reading.bookId) return;
+		const last = s.chapters[id];
+		reading.open(last && b.chapters.some((c) => c.id === last) ? last : b.chapters[0].id);
+	}
 	const zh = (simp: string, trad: string) => (t ? trad : simp);
-	const label = $derived(t ? NOTE_LABEL_T : NOTE_LABEL);
 </script>
 
+<svelte:window
+	onclick={(e) => {
+		if (shelfOpen && !(e.target as HTMLElement).closest('.shelf-wrap')) shelfOpen = false;
+	}}
+	onkeydown={(e) => e.key === 'Escape' && (shelfOpen = false)}
+/>
+
 <header class="bar">
-	<div class="brand" title="史读">{zh('史读', '史讀')}<span>{zh('秦汉之际', '秦漢之際')}</span></div>
+	<div class="shelf-wrap">
+		<button class="brand" class:open={shelfOpen} onclick={() => (shelfOpen = !shelfOpen)} title={zh('书架：换一部书', '書架：換一部書')}
+			>{zh('史读', '史讀')}<span>{book ? `${t ? book.t : book.title} · ${t ? book.cluster.t : book.cluster.s}` : ''}</span><i>▾</i></button
+		>
+		{#if shelfOpen}
+			<div class="shelf" role="dialog" aria-label={zh('书架', '書架')}>
+				{#each shelf as b (b.id)}
+					<button class="tao" class:on={b.id === reading.bookId} onclick={() => openBook(b.id)}>
+						<span class="qian">{t ? b.t : b.title}</span>
+						<span class="what">{t ? b.cluster.t : b.cluster.s}</span>
+						<span class="count">{b.chapters.length}{zh('篇', '篇')}</span>
+					</button>
+				{/each}
+			</div>
+		{/if}
+	</div>
 
 	<select
 		class="chapter"
@@ -31,18 +62,30 @@
 		aria-label="篇章"
 	>
 		{#each chapters as c (c.id)}
-			<option value={c.id}>{zh('史记', '史記')}{c.juanZh} {t ? c.t : c.title}</option>
+			<option value={c.id}>{c.juanZh} {t ? c.t : c.title}</option>
 		{/each}
 	</select>
 
-	<div class="field">
-		<span class="cap">{zh('版本', '版本')}</span>
-		<div class="group" role="group" aria-label="版本">
-			<button class:on={s.edition === 'd'} onclick={() => set('edition', 'd')} title="清乾隆四年武英殿本（四库本）">殿本</button>
-			<button class:on={s.edition === 'j'} onclick={() => set('edition', 'j')} title="清同治金陵书局本（点校本底本）">金陵本</button>
-			<button class:on={s.edition === 'both'} onclick={() => set('edition', 'both')} title="两本对照">{zh('对照', '對照')}</button>
+	{#if book}
+		<div class="field">
+			<span class="cap">{zh('版本', '版本')}</span>
+			<div class="group" role="group" aria-label="版本">
+				<button class:on={s.edition === 'd'} onclick={() => set('edition', 'd')} title={book.editions.d.full}>{book.editions.d.short}</button>
+				<button class:on={s.edition === 'j'} onclick={() => set('edition', 'j')} title={book.editions.j.full}>{book.editions.j.short}</button>
+				<button class:on={s.edition === 'both'} onclick={() => set('edition', 'both')} title={zh('两本对照', '兩本對照')}>{zh('对照', '對照')}</button>
+			</div>
 		</div>
-	</div>
+	{/if}
+
+	{#if book?.jingzhuan}
+		<div class="field">
+			<div class="group" role="group" aria-label="经传">
+				<button class:on={s.jz === 'all'} onclick={() => set('jz', 'all')} title={zh('经与传合读', '經與傳合讀')}>{zh('经传', '經傳')}</button>
+				<button class:on={s.jz === 'jing'} onclick={() => set('jz', 'jing')} title={zh('只读春秋经文', '只讀春秋經文')}>{zh('经', '經')}</button>
+				<button class:on={s.jz === 'zhuan'} onclick={() => set('jz', 'zhuan')} title={zh('只读左氏传文', '只讀左氏傳文')}>{zh('传', '傳')}</button>
+			</div>
+		</div>
+	{/if}
 
 	<div class="field">
 		<span class="cap">{zh('形制', '形制')}</span>
@@ -76,14 +119,14 @@
 	<div class="field notes">
 		<span class="cap">{zh('注', '注')}</span>
 		<div class="group" role="group" aria-label="注">
-			{#each NOTE_KINDS as k (k)}
+			{#each notes as n (n.k)}
 				<button
 					class="nk"
-					class:on={s.notes[k]}
-					style="--c:var(--n-{k})"
-					disabled={k === 'kaozheng' && s.edition === 'j'}
-					onclick={() => toggleNote(k)}
-					title="{label[k]}：{NOTE_INFO[k].who}{t ? NOTE_INFO[k].t : NOTE_INFO[k].s}">{label[k]}</button
+					class:on={s.notes[n.k]}
+					style="--c:var(--n-{n.k})"
+					disabled={!!n.only && s.edition !== 'both' && s.edition !== n.only}
+					onclick={() => toggleNote(n.k)}
+					title="{t ? n.t : n.s}：{n.who}{t ? n.info.t : n.info.s}">{t ? n.t : n.s}</button
 				>
 			{/each}
 		</div>
@@ -94,16 +137,11 @@
 		<button class="help" class:open={help} onclick={() => (help = !help)} aria-label="注是什么">?</button>
 		{#if help}
 			<div class="pop" role="dialog">
-				<p class="lead">
-					{zh(
-						'《史记》流传最广的是“三家注”本：南朝宋裴骃、唐司马贞、唐张守节三家的注，以双行小字夹在正文中。殿本另附清代馆臣的《考证》。各家颜色不同，可分别开关；“点记”只在正文留色点，读起来更清爽。',
-						'《史記》流傳最廣的是「三家注」本：南朝宋裴駰、唐司馬貞、唐張守節三家的注，以雙行小字夾在正文中。殿本另附清代館臣的《考證》。各家顏色不同，可分別開關；「點記」只在正文留色點，讀起來更清爽。'
-					)}
-				</p>
-				{#each NOTE_KINDS as k (k)}
+				<p class="lead">{book ? (t ? book.notesLead.t : book.notesLead.s) : ''}</p>
+				{#each notes as n (n.k)}
 					<div class="row">
-						<span class="lab" style="background:var(--n-{k})">{label[k]}</span>
-						<div><b>{NOTE_INFO[k].who}</b> {t ? NOTE_INFO[k].t : NOTE_INFO[k].s}</div>
+						<span class="lab" style="background:var(--n-{n.k})">{t ? n.t : n.s}</span>
+						<div><b>{n.who}</b> {t ? n.info.t : n.info.s}</div>
 					</div>
 				{/each}
 			</div>
@@ -113,7 +151,7 @@
 	<div class="field">
 		<div class="group" role="group" aria-label="标记">
 			<button class:on={s.names} onclick={() => set('names', !s.names)} title="人名直线，地名虚线">{zh('专名线', '專名線')}</button>
-			<button class:on={s.variants} onclick={() => set('variants', !s.variants)} title="两本异文处加点">{zh('异文', '異文')}</button>
+			<button class:on={s.variants} onclick={() => set('variants', !s.variants)} title={zh('两本异文处加标记', '兩本異文處加標記')}>{zh('异文', '異文')}</button>
 		</div>
 		<div class="group" role="group" aria-label="字号">
 			<button onclick={() => set('size', Math.max(16, s.size - 2))} disabled={s.form === 'book'} aria-label="缩小">A−</button>
@@ -135,12 +173,29 @@
 		white-space: nowrap;
 		position: relative;
 		z-index: 10;
+		/* on a narrow window the controls scroll rather than push the page wider */
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+	.shelf-wrap {
+		position: relative;
 	}
 	.brand {
 		font-family: var(--font-brush);
 		font-size: 26px;
 		letter-spacing: 0.12em;
 		color: var(--gold);
+		background: none;
+		border: none;
+		padding: 2px 6px;
+		border-radius: 4px;
+		cursor: pointer;
+		display: flex;
+		align-items: baseline;
+	}
+	.brand:hover,
+	.brand.open {
+		background: var(--chrome-2);
 	}
 	.brand span {
 		font-family: var(--font);
@@ -148,6 +203,75 @@
 		color: var(--chrome-soft);
 		margin-left: 8px;
 		letter-spacing: 0.1em;
+	}
+	.brand i {
+		font-style: normal;
+		font-family: var(--font);
+		font-size: 11px;
+		color: var(--chrome-soft);
+		margin-left: 4px;
+	}
+	/* 書架: each book as a 函 (case) with its 題簽 pasted on */
+	.shelf {
+		position: fixed;
+		top: 52px;
+		left: 10px;
+		display: flex;
+		flex-direction: row-reverse;
+		gap: 12px;
+		padding: 16px 18px 14px;
+		background: var(--desk);
+		border: 1px solid var(--chrome-edge);
+		border-radius: 6px;
+		box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
+		z-index: 20;
+	}
+	.tao {
+		position: relative;
+		width: 92px;
+		height: 196px;
+		border: none;
+		border-radius: 3px;
+		cursor: pointer;
+		background: var(--silk);
+		background-image: repeating-linear-gradient(0deg, transparent 0 5px, rgba(255, 255, 255, 0.05) 5px 6px);
+		box-shadow: inset 0 0 0 3px var(--silk-edge), 0 3px 8px rgba(0, 0, 0, 0.35);
+		color: var(--ink);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 14px 0 10px;
+		transition: transform 0.15s;
+	}
+	.tao:hover {
+		transform: translateY(-3px);
+	}
+	.tao.on {
+		box-shadow: inset 0 0 0 3px var(--gold), 0 3px 8px rgba(0, 0, 0, 0.35);
+	}
+	.qian {
+		writing-mode: vertical-rl;
+		background: var(--book-paper);
+		border: 1px solid var(--frame);
+		outline: 1px solid var(--frame);
+		outline-offset: -4px;
+		padding: 8px 4px;
+		font-size: 19px;
+		font-weight: 600;
+		letter-spacing: 0.2em;
+		min-height: 104px;
+	}
+	.what {
+		writing-mode: vertical-rl;
+		margin-top: 8px;
+		font-size: 12px;
+		letter-spacing: 0.15em;
+		color: var(--chrome-ink);
+		flex: 1;
+	}
+	.count {
+		font-size: 11px;
+		color: var(--chrome-soft);
 	}
 	.chapter {
 		background: var(--chrome-2);
@@ -225,9 +349,9 @@
 		border-color: var(--gold);
 	}
 	.pop {
-		position: absolute;
-		top: 44px;
-		left: 0;
+		position: fixed;
+		top: 54px;
+		right: 12px;
 		width: 440px;
 		white-space: normal;
 		background: var(--panel);
@@ -257,14 +381,15 @@
 		padding: 1px 6px;
 		border-radius: 2px;
 	}
-	@media (max-width: 1500px) {
+	@media (max-width: 1760px) {
 		.cap {
 			display: none;
 		}
-	}
-	@media (max-width: 1280px) {
 		.bar {
-			overflow-x: auto;
+			gap: 10px;
+		}
+		.group button {
+			padding: 5px 8px;
 		}
 	}
 </style>

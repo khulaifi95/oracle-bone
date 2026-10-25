@@ -2,6 +2,7 @@
 	// 卷軸: the chapter as one continuous handscroll, read from right to left.
 	import type { Chapter, Ed } from '#lib/types.js';
 	import { app } from '#lib/state.svelte.js';
+	import { reading } from '#lib/reading.svelte.js';
 	import { layoutChapter, segOfColumn, type Layout } from '#lib/layout.js';
 	import { onTextClick } from '#lib/interact.js';
 	import ColumnView from './ColumnView.svelte';
@@ -32,8 +33,7 @@
 			rows,
 			noteH: 0.62,
 			frontMatter: false,
-			bookTitle: '史记',
-			juanZh: ''
+			...reading.layoutOf(s.script)
 		})
 	);
 	const total = $derived(layout.cols.length * colW + END * 2);
@@ -118,7 +118,7 @@
 		<div class="paper" style="width:{total}px">
 			<div class="mount top"></div>
 			<div class="mount bottom"></div>
-			<div class="yinshou" style="left:{total - END + 30}px"><span>{s.script === 's' ? '史记' : '史記'}</span></div>
+			<div class="yinshou" style="left:{total - END + 30}px"><span>{reading.book ? (s.script === 't' ? reading.book.t : reading.book.title) : ''}</span></div>
 			<div class="roller right" style="left:{total - 26}px"></div>
 			<div class="roller left"></div>
 			{#each visible as i (i)}

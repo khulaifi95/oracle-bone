@@ -4,26 +4,27 @@
 	import { reading } from '#lib/reading.svelte.js';
 
 	const t = $derived(app.settings.script === 't');
-	const eds = $derived(reading.catalog ? Object.values(reading.catalog.editions) : []);
+	const book = $derived(reading.book);
+	const eds = $derived(book ? Object.values(book.editions) : []);
+	const read = (x: { s: string; t: string } | undefined) => (x ? (t ? x.t : x.s) : '');
+	const firstNote = $derived(book?.notes[0]);
 </script>
 
 <div class="about">
 	<h3>{t ? '凡例' : '凡例'}</h3>
 	<ul class="legend">
-		<li><span class="m tp">項羽</span>{t ? '人名：左側直線' : '人名：左侧直线'}</li>
-		<li><span class="m tl">彭城</span>{t ? '地名：左側虛線' : '地名：左侧虚线'}</li>
+		<li><span class="m tp">{book?.legend.person[t ? 0 : 1]}</span>{t ? '人名：左側直線' : '人名：左侧直线'}</li>
+		<li><span class="m tl">{book?.legend.place[t ? 0 : 1]}</span>{t ? '地名：左側虛線' : '地名：左侧虚线'}</li>
 		<li><span class="m v">己</span>{t ? '兩本異文：字旁橙色短豎，點擊查看；楔形表示他本此處多字' : '两本异文：字旁橙色短竖，点击查看；楔形表示他本此处多字'}</li>
-		<li><span class="m r">之</span>{t ? '四庫錄文缺字，據金陵本補' : '四库录文缺字，据金陵本补'}</li>
+		<li><span class="m r">之</span>{t ? `${book?.editions.d.short ?? ''}錄文缺字，據${book?.editions.j.short ?? ''}補` : `${book?.editions.d.short ?? ''}录文缺字，据${book?.editions.j.short ?? ''}补`}</li>
 		<li><span class="m qb">玄</span>{t ? '缺筆避諱：殿本刻作缺末筆，避康熙、乾隆名諱' : '缺笔避讳：殿本刻作缺末笔，避康熙、乾隆名讳'}</li>
-		<li><span class="m del">而</span>{t ? '點校本刪去之字（金陵本）' : '点校本删去之字（金陵本）'}</li>
+		<li><span class="m del">而</span>{t ? `點校本刪去之字（${book?.editions.j.short ?? ''}）` : `点校本删去之字（${book?.editions.j.short ?? ''}）`}</li>
 		<li><span class="m add">也</span>{t ? '點校本補字，懸停可見' : '点校本补字，悬停可见'}</li>
-		<li><span class="lab">集解</span>{t ? '雙行小注，點擊在左欄展開' : '双行小注，点击在左栏展开'}</li>
+		{#if firstNote}<li><span class="lab">{t ? firstNote.t : firstNote.s}</span>{t ? '雙行小注，點擊在左欄展開' : '双行小注，点击在左栏展开'}</li>{/if}
+		{#if book?.jingzhuan}<li><span class="lab jz">{t ? '經' : '经'}</span>{t ? '經、傳各以陰文標起；點「經」字看三傳' : '经、传各以阴文标起；点“经”字看三传'}</li>{/if}
+		{#if book?.subheadings}<li><span class="lab src">江表傳</span>{t ? '裴注所引之書；「注」欄可按書檢看' : '裴注所引之书；“注”栏可按书检看'}</li>{/if}
 	</ul>
-	<p class="small">
-		{t
-			? '年代以秦曆推算：歲首十月，故「元年十月」在前一年冬。歲數為虛歲。時間軸由右向左，與書寫方向一致。'
-			: '年代以秦历推算：岁首十月，故「元年十月」在前一年冬。岁数为虚岁。时间轴由右向左，与书写方向一致。'}
-	</p>
+	<p class="small">{read(book?.calendar.note)}</p>
 
 	<h3>{t ? '版本' : '版本'}</h3>
 	{#each eds as e (e.id)}
@@ -37,20 +38,11 @@
 
 	<h3>{t ? '對讀與地圖' : '对读与地图'}</h3>
 	<section>
+		<p class="small">{read(book?.parallels.sources)}</p>
 		<p class="small">
-			{t ? '《漢書》卷一、三十一、三十四、四十，《資治通鑑》卷七至十二，錄文據' : '《汉书》卷一、三十一、三十四、四十，《资治通鉴》卷七至十二，录文据'}
-			<a href="https://zh.wikisource.org/" target="_blank" rel="noreferrer">{t ? '維基文庫' : '维基文库'}</a>（CC BY-SA 4.0）。
+			{t ? '底圖據' : '底图据'} <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a>{read(book?.map.about)}
 		</p>
-		<p class="small">
-			{t ? '底圖據' : '底图据'} <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a>{t
-				? '（公有領域），再改繪為秦漢之際的形勢：黃河下游依西漢故道，今黃河下游一線標為濟水；淮水自盱眙東流入海，不繪洪澤湖等後世湖泊；補繪泗水、睢水、鴻溝，及大野、雲夢、彭蠡等澤；蘇北、長江口、渤海西南岸的海岸依古海岸線，今海岸以虛線示之。以上均據譚其驤《中國歷史地圖集》第二冊約略繪出。地名坐標取古城遺址或今治所的約略位置。'
-				: '（公有领域），再改绘为秦汉之际的形势：黄河下游依西汉故道，今黄河下游一线标为济水；淮水自盱眙东流入海，不绘洪泽湖等后世湖泊；补绘泗水、睢水、鸿沟，及大野、云梦、彭蠡等泽；苏北、长江口、渤海西南岸的海岸依古海岸线，今海岸以虚线示之。以上均据谭其骧《中国历史地图集》第二册约略绘出。地名坐标取古城遗址或今治所的约略位置。'}
-		</p>
-		<p class="small">
-			{t
-				? '人物、地名、事件、諸侯年表為本項目據史記、漢書整理；人物生年多由本文推得，見人物卡說明。'
-				: '人物、地名、事件、诸侯年表为本项目据史记、汉书整理；人物生年多由本文推得，见人物卡说明。'}
-		</p>
+		<p class="small">{read(book?.data)}</p>
 	</section>
 	<h3>{t ? '操作' : '操作'}</h3>
 	<p class="small">
@@ -98,6 +90,14 @@
 		list-style: none;
 		padding: 0;
 		margin: 0;
+	}
+	.lab.jz {
+		background: var(--ink);
+	}
+	.lab.src {
+		background: none;
+		color: var(--n-pei);
+		border: 1px solid var(--n-pei);
 	}
 	.legend li {
 		display: flex;

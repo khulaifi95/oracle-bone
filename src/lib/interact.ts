@@ -7,6 +7,11 @@ export function onTextClick(e: MouseEvent, ed: Ed) {
 	if (!el) return;
 	const d = el.dataset;
 	if (d.seg) app.seg = d.seg;
+	// a 經 mark opens the 三傳 for that year's entries
+	if (d.k === 'jing') {
+		app.settings.panel = 'sanzhuan';
+		return;
+	}
 	if (d.note) {
 		app.note = { ed, id: d.note, seg: d.seg ?? '' };
 		app.settings.panel = 'note';

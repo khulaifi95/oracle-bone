@@ -2,7 +2,9 @@
 	// 線裝: the chapter cut into 版面 the way the edition was printed — its own 行款,
 	// frame, 界行 and 版心 — and turned one leaf (葉) at a time.
 	import type { Chapter, Ed, EditionInfo } from '#lib/types.js';
-	import { app, zhNumber } from '#lib/state.svelte.js';
+	import { app } from '#lib/state.svelte.js';
+	import { reading } from '#lib/reading.svelte.js';
+	import { zhNumber } from '#lib/dates.js';
 	import { layoutChapter, segOfColumn } from '#lib/layout.js';
 	import { onTextClick } from '#lib/interact.js';
 	import ColumnView from './ColumnView.svelte';
@@ -13,9 +15,8 @@
 		chapter,
 		ed,
 		edition,
-		juanZh,
 		half = false
-	}: { chapter: Chapter; ed: Ed; edition: EditionInfo; juanZh: string; half?: boolean } = $props();
+	}: { chapter: Chapter; ed: Ed; edition: EditionInfo; half?: boolean } = $props();
 
 	const s = app.settings;
 	let viewW = $state(800);
@@ -34,8 +35,7 @@
 			rows: L.rows,
 			noteH: L.rows / L.noteRows,
 			frontMatter: true,
-			bookTitle: s.script === 's' ? '史记' : '史記',
-			juanZh
+			...reading.layoutOf(s.script)
 		})
 	);
 	const COL = 1.32; // column width in rows
@@ -51,8 +51,9 @@
 	const perLeaf = $derived(L.cols * (half ? 1 : 2));
 	const leaves = $derived(Math.max(1, Math.ceil(layout.cols.length / perLeaf)));
 	const black = $derived(L.mouth.includes('黑'));
-	const bookName = $derived(s.script === 's' ? '史记' : '史記');
+	const bookName = $derived(reading.layoutOf(s.script).bookTitle);
 	// 白口 books print 卷 in the 版心 title, 黑口 ones only the number
+	const juanZh = $derived(reading.info?.juanZh ?? '');
 	const juanShort = $derived(black ? juanZh.replace('卷', '') : juanZh);
 	const noteStretch = $derived(Math.min(1.9, unit / (colW / 2 * 0.92)));
 
@@ -155,7 +156,7 @@
 						{/each}
 					{/each}
 					<div class="banxin" style="left:{halfW}px;width:{bxW}px">
-						{#if black}<div class="xiangbi top"></div>{:else}<div class="bx-top">乾隆四年校刊</div>{/if}
+						{#if black}<div class="xiangbi top"></div>{:else if L.top}<div class="bx-top">{L.top}</div>{/if}
 						<svg class="yuwei" viewBox="0 0 20 10" style="top:{pageH * 0.2}px" aria-hidden="true"><path d="M0 0 H20 V10 L10 4 L0 10 Z" /></svg>
 						<div class="bx-title" style="top:{pageH * 0.2 + bxW * 0.6}px;font-size:{bxW * 0.42}px">{bookName}{juanShort}</div>
 						{#if L.fishtail === 2}<svg class="yuwei down" viewBox="0 0 20 10" style="top:{pageH * 0.78}px" aria-hidden="true"><path d="M0 10 H20 V0 L10 6 L0 0 Z" /></svg>{/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
-	// 輿圖: the base map with the rivers on their Han courses, the states of the current year
+	// 輿圖: the base map with the rivers on their courses of the period, the states of the current year
 	// at their capitals, and the places named around the current passage.
-	import { app, SIDE_LABEL, eraLabel, bceOf } from '#lib/state.svelte.js';
+	import { app } from '#lib/state.svelte.js';
 	import { reading } from '#lib/reading.svelte.js';
 	import { occurrences } from '#lib/find.js';
 
@@ -20,10 +20,17 @@
 
 	// view box (zoom and pan)
 	let view = $state<[number, number, number, number] | null>(null);
-	// the heartland of the 秦漢之際 wars, from 關中 to the sea
-	const HOME: [number, number, number, number] = [106.5, 28.5, 122.5, 38.8];
+	// where the book's events happen: the view the map opens on
+	const HOME = $derived<[number, number, number, number]>(reading.book?.map.home ?? [106.5, 28.5, 122.5, 38.8]);
+	const mapInfo = $derived(reading.book?.map);
+	const sides = $derived(reading.book?.sides ?? []);
 	const home = $derived<[number, number, number, number]>([px(HOME[0]), py(HOME[3]), px(HOME[2]) - px(HOME[0]), py(HOME[1]) - py(HOME[3])]);
 	const vb = $derived(view ?? home);
+	// another book: back to its home view
+	$effect(() => {
+		void reading.bookId;
+		view = null;
+	});
 	let svg: SVGSVGElement;
 	let drag: { x: number; y: number; v: [number, number, number, number] } | null = null;
 
@@ -62,7 +69,8 @@
 	const ring = (pts: [number, number][]) => path(pts) + 'Z';
 	const mid = (line: [number, number][]) => line[Math.floor(line.length / 2)];
 	// rivers worth a name even when zoomed out
-	const NAMED = new Set(['河', '江', '淮水', '渭水', '汉水', '济水', '鸿沟', '睢水', '泗水', '漳水', '颍水', '汾水']);
+	const NAMED = $derived(new Set(mapInfo?.named ?? []));
+	const MARSH_NAMED = $derived(new Set(mapInfo?.marshNames ?? []));
 	const riverLabels = $derived.by(() => {
 		const seen = new Set<string>();
 		const out: { name: string; t: string; x: number; y: number }[] = [];
@@ -80,9 +88,14 @@
 		if (wide && e.key === 'Escape') app.mapWide = false;
 	}
 
-	const year = $derived(reading.date ? reading.date.ey : -209);
-	const polityYear = $derived(String(Math.max(-209, Math.min(-201, year))));
-	const polities = $derived(year < -209 ? [] : (reading.polities[polityYear] ?? []));
+	// the states as they stood in the latest year listed at or before the one being read
+	const polityYears = $derived(Object.keys(reading.polities).map(Number).sort((a, b) => a - b));
+	const polities = $derived.by(() => {
+		const y = reading.date?.ey ?? polityYears[0];
+		let best: number | null = null;
+		for (const k of polityYears) if (k <= y) best = k;
+		return best == null ? [] : (reading.polities[String(best)] ?? []);
+	});
 	const eventPlaces = $derived(new Set(reading.event?.places ?? []));
 	const near = $derived(reading.nearby.places);
 	const place = $derived(app.place ? reading.placeById.get(app.place) : null);
@@ -113,16 +126,12 @@
 
 <div class="map" class:wide>
 	<div class="head">
-		<span class="year">{reading.date ? `${eraLabel(reading.date.ey)} · 前${bceOf(reading.date.ey, reading.date.m)}年` : ''}</span>
+		<span class="year">{reading.date ? reading.dateText(reading.date.ey, null, s.script) : ''}</span>
 		<span class="hint">{t ? '滾輪縮放，拖動平移' : '滚轮缩放，拖动平移'}</span>
 		<button class="btn" onclick={() => (view = view ? null : [0, 0, W, H])}>{view ? (t ? '復原' : '复原') : t ? '全圖' : '全图'}</button>
 		<button class="btn" onclick={() => (app.mapWide = !app.mapWide)} title={wide ? 'Esc' : ''}>{wide ? (t ? '收起' : '收起') : t ? '放大' : '放大'}</button>
 	</div>
-	<p class="purpose">
-		{t
-			? '此圖隨所讀之處而變：方框是當年諸侯的國都，顏色分秦、楚、漢與其他諸侯；藍點是本段前後提到的地方，紅點是本事發生之地。山川、海岸依秦漢之際的形勢。點地名看詳情。'
-			: '此图随所读之处而变：方框是当年诸侯的国都，颜色分秦、楚、汉与其他诸侯；蓝点是本段前后提到的地方，红点是本事发生之地。山川、海岸依秦汉之际的形势。点地名看详情。'}
-	</p>
+	<p class="purpose">{mapInfo ? (t ? mapInfo.purpose.t : mapInfo.purpose.s) : ''}</p>
 	<div class="frame" bind:clientWidth={cw} bind:clientHeight={ch}>
 		<svg
 			bind:this={svg}
@@ -133,10 +142,10 @@
 			onpointermove={onMove}
 			onpointerup={() => (drag = null)}
 			role="img"
-			aria-label="秦汉之际形势图"
+			aria-label={t ? '形勢圖' : '形势图'}
 		>
 			<defs>
-				{#each ['qin', 'chu', 'han', 'other'] as side (side)}
+				{#each sides as { id: side } (side)}
 					<radialGradient id="halo-{side}">
 						<stop offset="0" style="stop-color:var(--{side});stop-opacity:0.42" />
 						<stop offset="0.6" style="stop-color:var(--{side});stop-opacity:0.16" />
@@ -173,7 +182,7 @@
 					{/each}
 				</g>
 				{#each reading.basemap.hanSea as h (h.name)}
-					<path d={path(h.coast)} class="coast" style="stroke-width:{1.3 * u}"><title>{t ? '秦漢之際海岸（約略）' : '秦汉之际海岸（约略）'}</title></path>
+					<path d={path(h.coast)} class="coast" style="stroke-width:{1.3 * u}"><title>{t ? '古海岸（約略）' : '古海岸（约略）'}</title></path>
 				{/each}
 				{#each reading.basemap.lakes as line, i (i)}
 					<path d={ring(line)} class="lake" style="stroke-width:{0.7 * u}" />
@@ -198,7 +207,7 @@
 					<text x={l.x} y={l.y} class="rlabel" style="font-size:{12.5 * u}px;stroke-width:{3 * u}">{t ? l.t : l.name}</text>
 				{/each}
 				{#each reading.basemap.marshes as m (m.name)}
-					{#if detail || m.name === '大野泽' || m.name === '云梦泽'}
+					{#if detail || MARSH_NAMED.has(m.name)}
 						<text x={px(m.c[0])} y={py(m.c[1]) + 4 * u} class="mlabel" style="font-size:{12 * u}px;stroke-width:{3 * u}">{t ? m.t : m.name}</text>
 					{/if}
 				{/each}
@@ -248,13 +257,13 @@
 			<div class="pols">
 				{#each polities as pol (pol.name)}
 					{@const ruler = reading.personById.get(pol.ruler)}
-					<button class="pol" style="--c:{sideColor(pol.side)}" onclick={() => ruler && ((app.person = ruler.id), (s.panel = 'people'))}>
-						<b>{pol.name}</b>{ruler ? name(ruler) : ''}
+					<button class="pol" style="--c:{sideColor(pol.side)}" disabled={!ruler} onclick={() => ruler && ((app.person = ruler.id), (s.panel = 'people'))}>
+						<b>{pol.name}</b>{ruler ? name(ruler) : (pol.who ?? '')}
 					</button>
 				{/each}
 			</div>
 		{:else}
-			<div class="note">{t ? '秦統一天下，郡縣治之。' : '秦统一天下，郡县治之。'}</div>
+			{#if mapInfo && mapInfo.empty.s}<div class="note">{t ? mapInfo.empty.t : mapInfo.empty.s}</div>{/if}
 		{/if}
 	</div>
 
@@ -273,10 +282,10 @@
 		</div>
 	{/if}
 	<div class="key">
-		<span class="side" style="--c:var(--qin)">{SIDE_LABEL.qin}</span><span class="side" style="--c:var(--chu)">{SIDE_LABEL.chu}</span><span class="side" style="--c:var(--han)">{SIDE_LABEL.han}</span><span class="side" style="--c:var(--other)">{SIDE_LABEL.other}</span>
+		{#each sides as x (x.id)}<span class="side" style="--c:var(--{x.id})">{t ? x.t : x.s}</span>{/each}
 		<span class="dot" style="--c:var(--accent)">{t ? '本事' : '本事'}</span><span class="dot" style="--c:var(--place-line)">{t ? '本段' : '本段'}</span>
 		<span class="dash">{t ? '今海岸' : '今海岸'}</span>
-		<i>{t ? '河、淮、泗、睢、鴻溝與海岸依秦漢故道，約略' : '河、淮、泗、睢、鸿沟与海岸依秦汉故道，约略'}</i>
+		<i>{mapInfo ? (t ? mapInfo.key.t : mapInfo.key.s) : ''}</i>
 	</div>
 </div>
 

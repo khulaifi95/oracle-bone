@@ -1,0 +1,1829 @@
+{
+	"$comment": "事件表。ey 为该年正月所在的公历年（负数为公元前），m 为当年的月（秦及汉初以十月为岁首，十至十二月在公历上属前一年）。accounts 为各书记载此事的段落：ref 指书卷，at 为段中的一句原文（简体，可省标点），可加 to 把段落延到另一句所在之处。build.mjs 再以史记各篇为准，按文字相合扩展各段并补入他处同文的段落。absent 记某书不载此事。",
+	"events": [
+		{
+			"id": "shihuang-kuaiji",
+			"title": "秦始皇游会稽",
+			"era": "始皇三十七年",
+			"ey": -210,
+			"m": 11,
+			"places": [
+				"kuaiji",
+				"zhejiang"
+			],
+			"people": [
+				"qin-shihuang",
+				"xiang-yu",
+				"xiang-liang"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "秦始皇帝游会稽"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "秦始皇帝东游会稽"
+				},
+				{
+					"ref": "tongjian-7",
+					"at": "从陿中渡上会稽祭大禹"
+				}
+			]
+		},
+		{
+			"id": "bolangsha",
+			"title": "张良狙击始皇于博浪沙",
+			"era": "始皇二十九年",
+			"ey": -218,
+			"m": null,
+			"places": [
+				"bolangsha"
+			],
+			"people": [
+				"zhang-liang",
+				"qin-shihuang"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-55",
+					"at": "秦皇帝东游良与客狙击"
+				},
+				{
+					"ref": "hanshu-40",
+					"at": "秦皇帝东游"
+				},
+				{
+					"ref": "tongjian-7",
+					"at": "始皇东游至阳武博浪沙中"
+				}
+			]
+		},
+		{
+			"id": "yishang",
+			"title": "圯上老父授书",
+			"era": "",
+			"ey": -218,
+			"m": null,
+			"approx": true,
+			"places": [
+				"xiapi"
+			],
+			"people": [
+				"zhang-liang",
+				"huang-shi-gong"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-55",
+					"at": "良尝闲从容步游下邳圯上"
+				},
+				{
+					"ref": "hanshu-40",
+					"at": "良尝闲从容步游下邳圯上"
+				}
+			],
+			"absent": {
+				"tongjian": "通鉴记博浪沙狙击，不载圯上授书事"
+			}
+		},
+		{
+			"id": "kuaxia",
+			"title": "韩信受胯下之辱",
+			"era": "",
+			"ey": -212,
+			"m": null,
+			"approx": true,
+			"places": [
+				"huaiyin"
+			],
+			"people": [
+				"han-xin",
+				"piaomu"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-92",
+					"at": "淮阴屠中少年有侮信者"
+				},
+				{
+					"ref": "hanshu-34",
+					"at": "淮阴少年又侮信"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "淮阴屠中少年有侮信者"
+				}
+			]
+		},
+		{
+			"id": "dazexiang",
+			"title": "大泽乡起事",
+			"era": "二世元年七月",
+			"ey": -209,
+			"m": 7,
+			"places": [
+				"dazexiang",
+				"qi-xian"
+			],
+			"people": [
+				"chen-sheng",
+				"wu-guang"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-48",
+					"at": "二世元年七月发闾左适戍渔阳"
+				},
+				{
+					"ref": "shiji-48",
+					"at": "吴广素爱人"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "秦二世元年秋七月"
+				},
+				{
+					"ref": "tongjian-7",
+					"at": "阳城人陈胜"
+				}
+			]
+		},
+		{
+			"id": "zhangchu",
+			"title": "陈胜据陈称王，号张楚",
+			"era": "二世元年七月",
+			"ey": -209,
+			"m": 7,
+			"places": [
+				"chen"
+			],
+			"people": [
+				"chen-sheng",
+				"wu-guang"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-48",
+					"at": "陈涉乃立为王号为张楚"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "胜乃立为王号为张楚"
+				},
+				{
+					"ref": "tongjian-7",
+					"at": "遂自立为王号张楚"
+				}
+			]
+		},
+		{
+			"id": "kuaiji-qibing",
+			"title": "项梁、项羽斩会稽守起兵",
+			"era": "二世元年九月",
+			"ey": -209,
+			"m": 9,
+			"places": [
+				"wu"
+			],
+			"people": [
+				"xiang-liang",
+				"xiang-yu",
+				"yin-tong",
+				"huan-chu"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "其九月会稽守通谓梁曰"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "会稽假守通素贤梁"
+				},
+				{
+					"ref": "tongjian-7",
+					"at": "会稽守殷通闻陈涉起"
+				}
+			]
+		},
+		{
+			"id": "peigong-qibing",
+			"title": "刘邦起兵于沛，号沛公",
+			"era": "二世元年九月",
+			"ey": -209,
+			"m": 9,
+			"places": [
+				"pei"
+			],
+			"people": [
+				"liu-bang",
+				"xiao-he",
+				"cao-can",
+				"fan-kuai"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-8",
+					"at": "秦二世元年秋陈胜等起蕲",
+					"to": "于是樊哙从刘季来沛令"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "秦二世元年秋七月陈涉起蕲"
+				},
+				{
+					"ref": "tongjian-7",
+					"at": "沛人刘邦"
+				}
+			]
+		},
+		{
+			"id": "zhouwen-xi",
+			"title": "周文西至戏，章邯击破之",
+			"era": "二世元年九月",
+			"ey": -209,
+			"m": 9,
+			"places": [
+				"xi",
+				"hanguguan"
+			],
+			"people": [
+				"zhou-wen",
+				"zhang-han"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-48",
+					"at": "周文陈之贤人也"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "周文陈贤人也"
+				},
+				{
+					"ref": "tongjian-7",
+					"at": "周文陈之贤人也"
+				}
+			]
+		},
+		{
+			"id": "chensheng-si",
+			"title": "陈胜败死城父",
+			"era": "二世二年十二月",
+			"ey": -208,
+			"m": 12,
+			"places": [
+				"chengfu",
+				"chen"
+			],
+			"people": [
+				"chen-sheng",
+				"zhuang-jia",
+				"lü-chen"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-48",
+					"at": "腊月陈王之汝阴"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "腊月胜之汝阴"
+				},
+				{
+					"ref": "tongjian-8",
+					"at": "陈王之汝阴"
+				}
+			]
+		},
+		{
+			"id": "zhangliang-peigong",
+			"title": "张良遇沛公于留",
+			"era": "二世二年",
+			"ey": -208,
+			"m": 1,
+			"places": [
+				"liu",
+				"xiapi"
+			],
+			"people": [
+				"zhang-liang",
+				"liu-bang",
+				"jing-ju"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-55",
+					"at": "良欲往从之道遇沛公"
+				},
+				{
+					"ref": "hanshu-40",
+					"at": "良欲往从之行道遇沛公"
+				},
+				{
+					"ref": "tongjian-8",
+					"at": "张良亦聚少年百余人"
+				}
+			]
+		},
+		{
+			"id": "jiangxi",
+			"title": "项梁渡江，陈婴、黥布来属",
+			"era": "二世二年",
+			"ey": -208,
+			"m": 2,
+			"places": [
+				"dongyang",
+				"xiapi"
+			],
+			"people": [
+				"xiang-liang",
+				"chen-ying",
+				"ying-bu"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "广陵人召平"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "广陵人召平"
+				},
+				{
+					"ref": "tongjian-8",
+					"at": "广陵人召平"
+				}
+			]
+		},
+		{
+			"id": "li-huaiwang",
+			"title": "项梁立楚怀王于薛",
+			"era": "二世二年六月",
+			"ey": -208,
+			"m": 6,
+			"places": [
+				"xue",
+				"xuyi"
+			],
+			"people": [
+				"xiang-liang",
+				"fan-zeng",
+				"huai-wang",
+				"liu-bang"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "居鄛人范增年七十"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "闻项梁在薛"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "居鄛人范增年七十"
+				},
+				{
+					"ref": "tongjian-8",
+					"at": "居鄛人范增年七十"
+				}
+			]
+		},
+		{
+			"id": "han-cheng-li",
+			"title": "张良说项梁立韩王成",
+			"era": "二世二年六月",
+			"ey": -208,
+			"m": 6,
+			"places": [
+				"xue",
+				"yangzhai"
+			],
+			"people": [
+				"zhang-liang",
+				"han-cheng",
+				"xiang-liang"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-55",
+					"at": "及沛公之薛见项梁"
+				},
+				{
+					"ref": "hanshu-40",
+					"at": "沛公之薛见项梁"
+				},
+				{
+					"ref": "tongjian-8",
+					"at": "张良说项梁曰"
+				}
+			]
+		},
+		{
+			"id": "dingtao",
+			"title": "项梁败死定陶",
+			"era": "二世二年九月",
+			"ey": -208,
+			"m": 9,
+			"places": [
+				"dingtao"
+			],
+			"people": [
+				"xiang-liang",
+				"zhang-han",
+				"song-yi"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "项梁起东阿西北至定陶"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "夜衔枚击项梁"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "梁起东阿比至定陶"
+				},
+				{
+					"ref": "tongjian-8",
+					"at": "项梁已破章邯于东阿"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "章邯夜衔枚击项梁定陶"
+				}
+			]
+		},
+		{
+			"id": "huaiwang-yue",
+			"title": "怀王之约：先入定关中者王之",
+			"era": "二世三年后九月",
+			"ey": -208,
+			"m": 9,
+			"places": [
+				"pengcheng"
+			],
+			"people": [
+				"huai-wang",
+				"liu-bang",
+				"xiang-yu",
+				"song-yi"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-8",
+					"at": "与诸将约先入定关中者王之"
+				},
+				{
+					"ref": "shiji-7",
+					"at": "楚兵已破于定陶怀王恐"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "初怀王与诸将约"
+				},
+				{
+					"ref": "tongjian-8",
+					"at": "怀王与诸将约"
+				}
+			]
+		},
+		{
+			"id": "zhan-songyi",
+			"title": "项羽斩宋义于安阳",
+			"era": "二世三年十一月",
+			"ey": -207,
+			"m": 11,
+			"places": [
+				"anyang"
+			],
+			"people": [
+				"xiang-yu",
+				"song-yi"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "行至安阳留四十六日不进"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "至安阳留不进"
+				},
+				{
+					"ref": "tongjian-8",
+					"at": "宋义行至安阳"
+				}
+			]
+		},
+		{
+			"id": "julu",
+			"title": "巨鹿之战",
+			"era": "二世三年十二月",
+			"ey": -207,
+			"m": 12,
+			"places": [
+				"julu",
+				"zhangshui"
+			],
+			"people": [
+				"xiang-yu",
+				"wang-li",
+				"su-jiao",
+				"she-jian",
+				"zhang-han",
+				"ying-bu",
+				"zhang-er",
+				"chen-yu"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "项羽已杀卿子冠军"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "羽乃悉引兵渡河"
+				},
+				{
+					"ref": "tongjian-8",
+					"at": "项羽已杀卿子冠军"
+				}
+			]
+		},
+		{
+			"id": "zhanghan-xiang",
+			"title": "章邯降项羽于殷墟",
+			"era": "二世三年七月",
+			"ey": -207,
+			"m": 7,
+			"places": [
+				"yinxu"
+			],
+			"people": [
+				"zhang-han",
+				"sima-xin",
+				"dong-yi",
+				"xiang-yu"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "章邯使人见项羽欲约"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "邯使使见羽欲约"
+				},
+				{
+					"ref": "tongjian-8",
+					"at": "章邯使人见项羽欲约"
+				}
+			]
+		},
+		{
+			"id": "xinan-keng",
+			"title": "项羽坑秦降卒于新安",
+			"era": "汉元年十一月",
+			"ey": -206,
+			"m": 11,
+			"places": [
+				"xinan"
+			],
+			"people": [
+				"xiang-yu",
+				"zhang-han"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "楚军夜击坑秦卒二十余万人新安城南"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "夜击坑秦军二十余万人"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "楚军夜击坑秦卒二十余万人新安城南"
+				}
+			]
+		},
+		{
+			"id": "yaoguan",
+			"title": "沛公用张良计破峣关，入武关",
+			"era": "二世三年八月",
+			"ey": -207,
+			"m": 8,
+			"places": [
+				"wuguan",
+				"yaoguan",
+				"lantian",
+				"wan"
+			],
+			"people": [
+				"liu-bang",
+				"zhang-liang",
+				"li-yiji"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-55",
+					"at": "沛公欲以兵二万人击秦峣下军"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "因袭攻武关"
+				},
+				{
+					"ref": "hanshu-40",
+					"at": "沛公欲以二万人击秦峣关下军"
+				},
+				{
+					"ref": "tongjian-8",
+					"at": "沛公欲击之张良曰"
+				}
+			]
+		},
+		{
+			"id": "ziying-xiang",
+			"title": "子婴降于轵道，沛公约法三章",
+			"era": "汉元年十月",
+			"ey": -206,
+			"m": 10,
+			"places": [
+				"bashang",
+				"zhidao",
+				"xianyang"
+			],
+			"people": [
+				"liu-bang",
+				"ziying",
+				"xiao-he",
+				"fan-kuai",
+				"zhang-liang"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-8",
+					"at": "汉元年十月沛公兵遂先诸侯至霸上"
+				},
+				{
+					"ref": "shiji-55",
+					"at": "沛公入秦宫"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "元年冬十月"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "冬十月沛公至霸上"
+				}
+			]
+		},
+		{
+			"id": "hongmen",
+			"title": "鸿门宴",
+			"era": "汉元年十二月",
+			"ey": -206,
+			"m": 12,
+			"places": [
+				"hongmen",
+				"bashang",
+				"xi"
+			],
+			"people": [
+				"xiang-yu",
+				"liu-bang",
+				"fan-zeng",
+				"xiang-bo",
+				"zhang-liang",
+				"fan-kuai",
+				"xiang-zhuang"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "沛公军霸上未得与项羽相见",
+					"to": "沛公至军立诛杀曹无伤"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "沛公从百余骑驱之鸿门"
+				},
+				{
+					"ref": "shiji-55",
+					"at": "项羽至鸿门下欲击沛公"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "沛公旦日从百余骑见羽鸿门"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "明日沛公从百余骑至鸿门"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "沛公旦日从百余骑来见项羽鸿门",
+					"to": "沛公至军立诛杀曹无伤"
+				}
+			]
+		},
+		{
+			"id": "tu-xianyang",
+			"title": "项羽屠咸阳，烧秦宫室",
+			"era": "汉元年",
+			"ey": -206,
+			"m": 1,
+			"places": [
+				"xianyang"
+			],
+			"people": [
+				"xiang-yu",
+				"ziying"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "居数日项羽引兵西屠咸阳"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "项羽遂西屠烧咸阳秦宫室"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "后数日羽乃屠咸阳"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "居数日项羽引兵西屠咸阳"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "羽引兵西屠咸阳"
+				}
+			]
+		},
+		{
+			"id": "fenfeng",
+			"title": "项羽分封十八王，自立为西楚霸王",
+			"era": "汉元年二月",
+			"ey": -206,
+			"m": 2,
+			"places": [
+				"pengcheng",
+				"nanzheng"
+			],
+			"people": [
+				"xiang-yu",
+				"liu-bang",
+				"zhang-han",
+				"sima-xin",
+				"dong-yi",
+				"wei-bao",
+				"shen-yang",
+				"han-cheng",
+				"sima-ang",
+				"zhao-xie",
+				"zhang-er",
+				"ying-bu",
+				"wu-rui",
+				"gong-ao",
+				"han-guang",
+				"zang-tu",
+				"tian-shi",
+				"tian-du",
+				"tian-an"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "项王欲自王先王诸将相",
+					"to": "项王自立为西楚霸王"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "正月项羽自立为西楚霸王"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "春正月阳尊怀王为义帝"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "春正月羽阳尊怀王为义帝"
+				}
+			]
+		},
+		{
+			"id": "zhandao",
+			"title": "汉王就国南郑，烧绝栈道",
+			"era": "汉元年四月",
+			"ey": -206,
+			"m": 4,
+			"places": [
+				"nanzheng",
+				"baozhong"
+			],
+			"people": [
+				"liu-bang",
+				"zhang-liang"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-55",
+					"at": "汉王之国良送至褒中"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "四月兵罢戏下诸侯各就国"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "夏四月诸侯罢戏下"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "夏四月诸侯罢戏下兵"
+				}
+			]
+		},
+		{
+			"id": "baijiang",
+			"title": "萧何追韩信，汉王拜韩信为大将",
+			"era": "汉元年",
+			"ey": -206,
+			"m": 5,
+			"places": [
+				"nanzheng"
+			],
+			"people": [
+				"han-xin",
+				"xiao-he",
+				"liu-bang",
+				"xiahou-ying"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-92",
+					"at": "信数与萧何语何奇之",
+					"to": "信拜礼毕上坐王曰丞相"
+				},
+				{
+					"ref": "hanshu-34",
+					"at": "数与萧何语"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "初淮阴人韩信家贫无行"
+				}
+			]
+		},
+		{
+			"id": "sanqin",
+			"title": "汉王还定三秦",
+			"era": "汉元年八月",
+			"ey": -206,
+			"m": 8,
+			"places": [
+				"chencang",
+				"feiqiu",
+				"yueyang",
+				"gaonu"
+			],
+			"people": [
+				"liu-bang",
+				"han-xin",
+				"zhang-han",
+				"sima-xin",
+				"dong-yi"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-8",
+					"at": "八月汉王用韩信之计"
+				},
+				{
+					"ref": "shiji-92",
+					"at": "八月汉王举兵东出陈仓定三秦"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "汉王引兵从故道出袭雍"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "汉王引兵从故道出袭雍"
+				}
+			]
+		},
+		{
+			"id": "tianrong-fan",
+			"title": "田荣并三齐反楚",
+			"era": "汉元年五月",
+			"ey": -206,
+			"m": 5,
+			"places": [
+				"linzi",
+				"jimo",
+				"boyang"
+			],
+			"people": [
+				"tian-rong",
+				"tian-shi",
+				"tian-du",
+				"tian-an",
+				"peng-yue"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "田荣闻项羽徙齐王市胶东"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "田荣闻羽徙齐王市胶东"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "田荣闻项羽徙齐王市于胶东"
+				}
+			]
+		},
+		{
+			"id": "yidi-si",
+			"title": "项羽使人击杀义帝于江中",
+			"era": "汉二年十月",
+			"ey": -205,
+			"m": 10,
+			"places": [
+				"chenxian-chen"
+			],
+			"people": [
+				"huai-wang",
+				"xiang-yu",
+				"ying-bu",
+				"wu-rui",
+				"gong-ao"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "乃使使徙义帝"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "汉王闻之袒而大哭"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "项羽使九江王布杀义帝于郴"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "乃徙义帝于江南都郴"
+				}
+			]
+		},
+		{
+			"id": "pengcheng",
+			"title": "彭城之战",
+			"era": "汉二年四月",
+			"ey": -205,
+			"m": 4,
+			"places": [
+				"pengcheng",
+				"lingbi",
+				"xiayi"
+			],
+			"people": [
+				"xiang-yu",
+				"liu-bang",
+				"xiahou-ying",
+				"taigong",
+				"lü-zhi",
+				"liu-ying"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "春汉王部五诸侯兵凡五十六万人东伐楚",
+					"to": "是时吕后兄周吕侯为汉"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "遂入彭城项羽闻之",
+					"to": "吕后兄周吕侯为汉将兵"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "汉王劫五诸侯兵"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "汉王遂入彭城"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "汉王遂入城收其货宝美人"
+				}
+			]
+		},
+		{
+			"id": "xiayi-mou",
+			"title": "下邑之谋：张良荐英布、彭越、韩信",
+			"era": "汉二年",
+			"ey": -205,
+			"m": 5,
+			"places": [
+				"xiayi"
+			],
+			"people": [
+				"zhang-liang",
+				"liu-bang",
+				"ying-bu",
+				"peng-yue",
+				"han-xin",
+				"sui-he"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-55",
+					"at": "至下邑汉王下马踞鞍而问曰"
+				},
+				{
+					"ref": "hanshu-40",
+					"at": "至下邑汉王下马踞鞍而问曰"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "汉王问群臣曰"
+				}
+			]
+		},
+		{
+			"id": "ji-weibao",
+			"title": "韩信木罂渡军，虏魏豹",
+			"era": "汉二年九月",
+			"ey": -205,
+			"m": 9,
+			"places": [
+				"xiayang",
+				"linjin",
+				"anyi",
+				"pingyang"
+			],
+			"people": [
+				"han-xin",
+				"wei-bao",
+				"cao-can"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-92",
+					"at": "魏王豹谒归视亲疾"
+				},
+				{
+					"ref": "hanshu-34",
+					"at": "汉王使郦生往说魏王豹"
+				},
+				{
+					"ref": "tongjian-9",
+					"at": "以木罂流军袭安邑"
+				}
+			]
+		},
+		{
+			"id": "beishui",
+			"title": "井陉背水之战",
+			"era": "汉三年十月",
+			"ey": -204,
+			"m": 10,
+			"places": [
+				"jingxing",
+				"chishui",
+				"xiangguo"
+			],
+			"people": [
+				"han-xin",
+				"zhang-er",
+				"chen-yu",
+				"zhao-xie",
+				"li-zuoche"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-92",
+					"at": "信与张耳以兵数万欲东下井陉击赵",
+					"to": "斩成安君泜水上"
+				},
+				{
+					"ref": "hanshu-34",
+					"at": "信耳以兵数万欲东下井陉击赵"
+				},
+				{
+					"ref": "tongjian-10",
+					"at": "韩信张耳以兵数万东击赵"
+				}
+			]
+		},
+		{
+			"id": "liuguo-hou",
+			"title": "郦食其议立六国后，张良借箸代筹",
+			"era": "汉三年",
+			"ey": -204,
+			"m": 1,
+			"places": [
+				"xingyang"
+			],
+			"people": [
+				"zhang-liang",
+				"li-yiji",
+				"liu-bang"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-55",
+					"at": "汉三年项羽急围汉王荥阳",
+					"to": "食其未行张良从外来谒"
+				},
+				{
+					"ref": "hanshu-40",
+					"at": "汉三年项羽急围汉王于荥阳"
+				},
+				{
+					"ref": "tongjian-10",
+					"at": "汉王与郦食其谋桡楚权"
+				}
+			]
+		},
+		{
+			"id": "fanjian",
+			"title": "陈平反间，范增去楚",
+			"era": "汉三年四月",
+			"ey": -204,
+			"m": 4,
+			"places": [
+				"xingyang"
+			],
+			"people": [
+				"chen-ping",
+				"fan-zeng",
+				"xiang-yu"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "汉王患之乃用陈平计间项王"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "乃用陈平之计"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "乃与陈平金四万斤以间楚君臣"
+				},
+				{
+					"ref": "tongjian-10",
+					"at": "汉王谓陈平曰天下纷纷何时定乎"
+				}
+			]
+		},
+		{
+			"id": "jixin",
+			"title": "纪信诳楚，汉王出荥阳",
+			"era": "汉三年五月",
+			"ey": -204,
+			"m": 5,
+			"places": [
+				"xingyang",
+				"chenggao"
+			],
+			"people": [
+				"ji-xin",
+				"liu-bang",
+				"zhou-ke",
+				"wei-bao"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "汉将纪信说汉王曰"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "将军纪信乃乘王驾"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "汉将纪信"
+				},
+				{
+					"ref": "tongjian-10",
+					"at": "将军纪信言于汉王曰"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "于是陈平夜出女子东门二千余人"
+				}
+			]
+		},
+		{
+			"id": "xiuwu-duojun",
+			"title": "汉王驰入修武，夺韩信、张耳军",
+			"era": "汉三年六月",
+			"ey": -204,
+			"m": 6,
+			"places": [
+				"xiuwu"
+			],
+			"people": [
+				"liu-bang",
+				"han-xin",
+				"zhang-er",
+				"xiahou-ying"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-92",
+					"at": "汉王出成皋东渡河独与滕公俱"
+				},
+				{
+					"ref": "hanshu-34",
+					"at": "汉王出成皋"
+				},
+				{
+					"ref": "tongjian-10",
+					"at": "独与滕公共车出成皋玉门"
+				}
+			]
+		},
+		{
+			"id": "xi-qi",
+			"title": "郦生说齐，韩信袭破齐",
+			"era": "汉四年十月",
+			"ey": -203,
+			"m": 10,
+			"places": [
+				"lixia",
+				"linzi",
+				"gaomi"
+			],
+			"people": [
+				"han-xin",
+				"li-yiji",
+				"kuai-tong",
+				"tian-guang",
+				"tian-heng"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-92",
+					"at": "信引兵东未渡平原闻汉王使郦食其已说下齐"
+				},
+				{
+					"ref": "hanshu-34",
+					"at": "信引兵东未度平原"
+				},
+				{
+					"ref": "tongjian-10",
+					"at": "韩信引兵东未渡平原"
+				}
+			]
+		},
+		{
+			"id": "chenggao-duo",
+			"title": "汜水之战，曹咎、司马欣自刭",
+			"era": "汉四年十月",
+			"ey": -203,
+			"m": 10,
+			"places": [
+				"chenggao",
+				"sishui"
+			],
+			"people": [
+				"cao-jiu",
+				"sima-xin",
+				"dong-yi",
+				"liu-bang"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "汉果数挑楚军战楚军不出"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "汉果数挑楚军"
+				},
+				{
+					"ref": "tongjian-10",
+					"at": "咎怒渡兵汜水"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "大司马咎怒渡兵汜水"
+				}
+			]
+		},
+		{
+			"id": "guangwu",
+			"title": "广武对峙，项王欲烹太公",
+			"era": "汉四年",
+			"ey": -203,
+			"m": 11,
+			"places": [
+				"guangwu"
+			],
+			"people": [
+				"xiang-yu",
+				"liu-bang",
+				"taigong"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "为高俎置太公其上",
+					"to": "楚汉久相持未决丁壮苦"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "相与临广武之间而语"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "为高俎置太公其上"
+				},
+				{
+					"ref": "tongjian-10",
+					"at": "置太公其上"
+				}
+			]
+		},
+		{
+			"id": "weishui",
+			"title": "潍水之战，韩信斩龙且",
+			"era": "汉四年十一月",
+			"ey": -203,
+			"m": 11,
+			"places": [
+				"weishui",
+				"gaomi"
+			],
+			"people": [
+				"han-xin",
+				"long-ju",
+				"tian-guang",
+				"cao-can",
+				"guan-ying"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-92",
+					"at": "楚亦使龙且将号称二十万救齐",
+					"to": "齐王广龙且并军与信战"
+				},
+				{
+					"ref": "shiji-7",
+					"at": "淮阴侯已举河北破齐赵且欲击楚"
+				},
+				{
+					"ref": "hanshu-34",
+					"at": "使龙且将"
+				},
+				{
+					"ref": "tongjian-10",
+					"at": "使龙且将"
+				}
+			]
+		},
+		{
+			"id": "qiwang",
+			"title": "韩信请为假王，立为齐王；武涉、蒯通说信",
+			"era": "汉四年二月",
+			"ey": -203,
+			"m": 2,
+			"places": [
+				"linzi"
+			],
+			"people": [
+				"han-xin",
+				"zhang-liang",
+				"chen-ping",
+				"wu-she",
+				"kuai-tong",
+				"liu-bang"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-92",
+					"at": "汉四年遂皆降平齐使人言汉王曰",
+					"to": "狂为巫"
+				},
+				{
+					"ref": "shiji-55",
+					"at": "汉四年韩信破齐而欲自立为齐王"
+				},
+				{
+					"ref": "hanshu-34",
+					"at": "使人言汉王曰"
+				},
+				{
+					"ref": "tongjian-10",
+					"at": "韩信使人言汉王曰"
+				}
+			]
+		},
+		{
+			"id": "honggou",
+			"title": "鸿沟之约，中分天下",
+			"era": "汉四年九月",
+			"ey": -203,
+			"m": 9,
+			"places": [
+				"honggou",
+				"guangwu"
+			],
+			"people": [
+				"xiang-yu",
+				"liu-bang",
+				"taigong",
+				"lü-zhi"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "项王乃与汉约中分天下"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "项羽恐乃与汉王约中分天下"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "约中分天下"
+				},
+				{
+					"ref": "tongjian-10",
+					"at": "项羽自知少助食尽"
+				}
+			]
+		},
+		{
+			"id": "guling",
+			"title": "固陵之败，张良劝封韩信、彭越",
+			"era": "汉五年十月",
+			"ey": -202,
+			"m": 10,
+			"places": [
+				"guling",
+				"yangxia"
+			],
+			"people": [
+				"liu-bang",
+				"zhang-liang",
+				"han-xin",
+				"peng-yue"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "汉王乃追项王至阳夏南止军"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "冬十月汉王追项羽至阳夏南"
+				},
+				{
+					"ref": "tongjian-11",
+					"at": "冬十月汉王追项羽至固陵"
+				}
+			]
+		},
+		{
+			"id": "gaixia",
+			"title": "垓下之围，四面楚歌",
+			"era": "汉五年十二月",
+			"ey": -202,
+			"m": 12,
+			"places": [
+				"gaixia"
+			],
+			"people": [
+				"xiang-yu",
+				"yu-ji",
+				"han-xin",
+				"liu-bang",
+				"zhou-yin",
+				"liu-jia",
+				"ying-bu",
+				"peng-yue"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "项王军壁垓下"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "五年高祖与诸侯兵共击楚军与项羽决胜垓下"
+				},
+				{
+					"ref": "shiji-92",
+					"at": "汉王之困固陵用张良计"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "羽壁垓下"
+				},
+				{
+					"ref": "tongjian-11",
+					"at": "项王至垓下兵少食尽"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "十二月围羽垓下"
+				}
+			]
+		},
+		{
+			"id": "wujiang",
+			"title": "东城快战，乌江自刎",
+			"era": "汉五年十二月",
+			"ey": -202,
+			"m": 12,
+			"places": [
+				"yinling",
+				"dongcheng",
+				"wujiang"
+			],
+			"people": [
+				"xiang-yu",
+				"lü-matong",
+				"yang-xi",
+				"guan-ying"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "项王至阴陵迷失道",
+					"to": "封吕胜为涅阳侯"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "羽至阴陵迷失道"
+				},
+				{
+					"ref": "tongjian-11",
+					"at": "至阴陵迷失道"
+				}
+			]
+		},
+		{
+			"id": "zang-gucheng",
+			"title": "以鲁公礼葬项王于穀城",
+			"era": "汉五年",
+			"ey": -202,
+			"m": 1,
+			"places": [
+				"gucheng",
+				"lu"
+			],
+			"people": [
+				"xiang-yu",
+				"liu-bang",
+				"xiang-bo"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-7",
+					"at": "项王已死楚地皆降汉独鲁不下"
+				},
+				{
+					"ref": "hanshu-31",
+					"at": "汉王乃以鲁公号葬羽于谷城"
+				},
+				{
+					"ref": "tongjian-11",
+					"at": "楚地悉定独鲁不下"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "遂以鲁公号葬项羽谷城"
+				}
+			]
+		},
+		{
+			"id": "jiwei",
+			"title": "汉王即皇帝位于汜水之阳",
+			"era": "汉五年二月",
+			"ey": -202,
+			"m": 2,
+			"places": [
+				"sishui",
+				"luoyang"
+			],
+			"people": [
+				"liu-bang",
+				"han-xin",
+				"peng-yue"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-8",
+					"at": "正月诸侯及将相相与共请尊汉王为皇帝"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "春正月追尊兄伯号曰武哀侯"
+				},
+				{
+					"ref": "tongjian-11",
+					"at": "诸侯王皆上疏请尊汉王为皇帝"
+				}
+			]
+		},
+		{
+			"id": "luoyang-zhijiu",
+			"title": "洛阳南宫置酒，论得天下",
+			"era": "汉五年五月",
+			"ey": -202,
+			"m": 5,
+			"places": [
+				"luoyang"
+			],
+			"people": [
+				"liu-bang",
+				"zhang-liang",
+				"xiao-he",
+				"han-xin"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-8",
+					"at": "高祖置酒雒阳南宫"
+				},
+				{
+					"ref": "hanshu-1",
+					"at": "帝置酒雒阳南宫"
+				},
+				{
+					"ref": "tongjian-11",
+					"at": "帝置酒洛阳南宫"
+				}
+			]
+		},
+		{
+			"id": "yunmeng",
+			"title": "伪游云梦，执韩信",
+			"era": "汉六年十二月",
+			"ey": -201,
+			"m": 12,
+			"places": [
+				"yunmeng",
+				"chen"
+			],
+			"people": [
+				"han-xin",
+				"zhongli-mo",
+				"liu-bang",
+				"chen-ping"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-92",
+					"at": "项王亡将钟离"
+				},
+				{
+					"ref": "shiji-8",
+					"at": "用陈平计乃伪游云梦"
+				},
+				{
+					"ref": "hanshu-34",
+					"at": "项王亡将钟离"
+				},
+				{
+					"ref": "tongjian-11",
+					"at": "人有上书告楚王信反"
+				}
+			]
+		},
+		{
+			"id": "fenghou",
+			"title": "封功臣：张良辞三万户，请封留；先封雍齿",
+			"era": "汉六年正月",
+			"ey": -201,
+			"m": 1,
+			"places": [
+				"liu",
+				"luoyang"
+			],
+			"people": [
+				"zhang-liang",
+				"yong-chi",
+				"liu-bang",
+				"xiao-he"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-55",
+					"at": "汉六年正月封功臣",
+					"to": "六年上已封大功臣"
+				},
+				{
+					"ref": "hanshu-40",
+					"at": "汉六年封功臣"
+				},
+				{
+					"ref": "tongjian-11",
+					"at": "上已封大功臣二十余人"
+				},
+				{
+					"ref": "tongjian-11",
+					"at": "良曰始臣起下邳"
+				}
+			]
+		},
+		{
+			"id": "sihao",
+			"title": "商山四皓辅太子",
+			"era": "汉十二年",
+			"ey": -195,
+			"m": 1,
+			"places": [
+				"shangshan",
+				"zhangan"
+			],
+			"people": [
+				"zhang-liang",
+				"liu-ying",
+				"sihao",
+				"lü-zhi",
+				"lü-ze",
+				"shu-sun-tong"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-55",
+					"at": "上欲废太子立戚夫人子赵王如意",
+					"to": "四人为寿已毕趋去"
+				},
+				{
+					"ref": "hanshu-40",
+					"at": "上欲废太子立戚夫人子赵王如意"
+				},
+				{
+					"ref": "tongjian-12",
+					"at": "太子客东园公绮里季夏黄公角里先生"
+				},
+				{
+					"ref": "tongjian-12",
+					"at": "上从破黥布归疾益甚愈欲易太子"
+				}
+			]
+		},
+		{
+			"id": "hanxin-si",
+			"title": "韩信被诛于长乐钟室",
+			"era": "汉十一年正月",
+			"ey": -196,
+			"m": 1,
+			"places": [
+				"zhangan"
+			],
+			"people": [
+				"han-xin",
+				"lü-zhi",
+				"xiao-he",
+				"chen-xi"
+			],
+			"accounts": [
+				{
+					"ref": "shiji-92",
+					"at": "鹿守辞于淮阴侯"
+				},
+				{
+					"ref": "hanshu-34",
+					"at": "陈豨为代相监边"
+				},
+				{
+					"ref": "tongjian-12",
+					"at": "初上以阳夏侯陈豨为相国"
+				},
+				{
+					"ref": "tongjian-12",
+					"at": "淮阴侯信称病不从击豨"
+				}
+			]
+		}
+	]
+}

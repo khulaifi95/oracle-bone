@@ -31,7 +31,7 @@
 		{/each}
 	</nav>
 	<div class="body">
-		{#if s.panel === 'map'}<MapPanel />
+		{#if s.panel === 'map'}{#if app.mapWide}<div class="placeholder">{t ? '輿圖已展開於右側' : '舆图已展开于右侧'}</div>{:else}<MapPanel />{/if}
 		{:else if s.panel === 'people'}<PeoplePanel />
 		{:else if s.panel === 'parallel'}{#if app.parallelWide}<div class="placeholder">{t ? '對讀已展開於右側' : '对读已展开于右侧'}</div>{:else}<ParallelPanel />{/if}
 		{:else if s.panel === 'variants'}<VariantsPanel />
@@ -46,26 +46,32 @@
 		flex-direction: column;
 		min-height: 0;
 		background: var(--panel);
-		border-right: 1px solid var(--chrome-edge);
+		border-right: 3px solid var(--chrome);
 	}
 	nav {
 		display: flex;
-		border-bottom: 1px solid var(--chrome-edge);
+		background: var(--panel-2);
+		border-bottom: 1px solid var(--panel-edge);
 	}
 	nav button {
 		flex: 1;
 		border: none;
 		background: none;
-		padding: 8px 0 7px;
+		padding: 10px 0 8px;
 		cursor: pointer;
+		font-size: 16px;
 		letter-spacing: 0.15em;
 		color: var(--ink-note);
-		border-bottom: 2px solid transparent;
+		border-bottom: 3px solid transparent;
+	}
+	nav button:hover {
+		color: var(--ink);
 	}
 	nav button.on {
 		color: var(--accent);
+		background: var(--panel);
 		border-bottom-color: var(--accent);
-		font-weight: 600;
+		font-weight: 700;
 	}
 	.body {
 		flex: 1;

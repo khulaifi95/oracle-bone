@@ -26,7 +26,7 @@ npm run dev        # http://localhost:5173
 **Text.** The reader shows these marks on the text:
 
 - 专名线: a straight line beside person names and a dashed one beside place names.
-- Dots on characters where the two editions differ.
+- An orange bar beside characters where the two editions differ, and a wedge where the other edition has extra characters.
 - 缺笔 marks on characters the 殿本 cut without their last stroke, to avoid 清 emperors' names.
 - Marks on characters restored where the 四库 transcription has a gap.
 - The 点校本's deletions and additions on the 金陵本 text.
@@ -37,15 +37,16 @@ npm run dev        # http://localhost:5173
 - Form: 卷轴 or 线装.
 - Script: 简 or 繁.
 - Punctuation: none (白文), 句读 circles, or full modern punctuation set in vertical forms.
-- Commentary: each of 集解, 索隐 and 正义 can be shown or hidden. The 殿本 考证 is moved from the end of the chapter to the words it discusses. The 索隐述赞 can also be toggled.
+- Commentary: each of 集解, 索隐 and 正义 can be shown or hidden, each in its own colour. The 殿本 考证 is moved from the end of the chapter to the words it discusses. The 索隐述赞 can also be toggled. The notes can sit in the text as 双行小注 (夹注) or as coloured dots that open in the side panel (点记). The ? button explains each commentary.
+- Typeface: 楷 (霞鹜文楷) or 宋.
 
 Settings persist in the browser. Positions can be linked as `#shiji-7/7.16.6` (chapter, then sentence).
 
 **Context layers.** The left panel and the bottom strip hold the context layers:
 
-- 舆图: a map of the period with the Western Han courses of the 河 and 济. It marks the states of the current year at their capitals, and the places named around the passage.
+- 舆图: a map of the period. It marks the states of the current year at their capitals, coloured by side, and the places named around the passage. The geography is that of about 200 BC: the 河 on its Western Han course, the 淮 running straight to the sea, the 泗, 睢 and 鸿沟, the marshes of the time (大野泽, 云梦泽, 彭蠡泽 and others), and the old coast of 苏北, the 长江 mouth and 渤海, with today's coast dashed. The map can be enlarged to fill the reading area.
 - 人物: who is on stage now, and a card for each person. The card gives 名, 字, side, and the title they held in the current year. It also gives their age (虚岁) at the current date and every mention in the chapter.
-- 对读: the same event as told in 史记, 汉书 and 资治通鉴, set side by side. Wording that differs from the 史记 account is marked.
+- 对读: the same event as told in 史记, 汉书 and 资治通鉴, set side by side, with a line showing which books and chapters tell it. Each event is anchored by hand to a sentence in each book. The build then widens every account over the neighbouring paragraphs that share enough wording with the 史记 account, and adds paragraphs elsewhere that retell it (marked 同文). Wording that differs from the chapter being read is marked, with the share of shared wording.
 - 校勘: every place where 殿本 and 金陵本 differ. Each is classed as 异文, 形近, 避讳 or 异体.
 - 注: the full commentary at a point, next to the other edition's note at the same place.
 - 时间轴: runs right to left like the text. It shows events from 博浪沙 (前218) to 前195, the current date, and the life spans of the people in the passage.
@@ -59,8 +60,9 @@ Dates use the 秦/汉初 calendar, in which the year begins in the tenth month. 
 | 殿本 | 清乾隆四年武英殿本《史记》, as copied into the 文渊阁四库全书, with the 考证 | [gujilab/chinese-classical-corpus](https://huggingface.co/datasets/gujilab/chinese-classical-corpus) | CC0 1.0 |
 | 金陵本 | 清同治金陵书局本《史记集解索隐正义》, the 底本 of the 中华书局点校本, with the 点校本's punctuation | [维基文库《史記三家註》](https://zh.wikisource.org/wiki/史記三家註) | CC BY-SA 4.0 |
 | 汉书 | 卷一、三十一、三十四、四十 | 维基文库 | CC BY-SA 4.0 |
-| 资治通鉴 | 卷七至十一 | 维基文库 | CC BY-SA 4.0 |
-| Base map | coastline, rivers, lakes | [Natural Earth](https://www.naturalearthdata.com/) | public domain |
+| 资治通鉴 | 卷七至十二 | 维基文库 | CC BY-SA 4.0 |
+| Base map | land, coastline, rivers, lakes | [Natural Earth](https://www.naturalearthdata.com/) | public domain |
+| Portraits | 清上官周《晚笑堂竹庄画传》, 明《新镌绘像东西汉全传》, 《三才图会》 and others, via Wikimedia Commons (`data/portraits.json` lists each) | Wikimedia Commons | public domain |
 
 The 四库 transcription is simplified and unpunctuated. Its traditional forms are taken from the aligned 金陵本 character wherever the two editions agree, and from OpenCC elsewhere. Where the transcription has a placeholder or a private-use character, the 金陵本 character is restored and marked.
 
@@ -84,7 +86,8 @@ npm run data       # build static/data/ from sources/ and data/
 | `pipeline/wikitext.mjs` | Parses the Wikisource markup, including the 点校本's deletions and additions. |
 | `pipeline/text.mjs` | Aligns the two editions character by character, then restores placeholders, classifies variants and anchors notes and 考证. It also cuts the text into sentences. |
 | `pipeline/build.mjs` | Tags people and places, finds dates in the text and anchors every event to its passage in each book. It writes the chapter, catalogue and context files. |
-| `pipeline/geo.mjs` | Clips and simplifies the base map, and gives the rivers their classical names. |
+| `pipeline/geo.mjs` | Clips and simplifies the base map, gives the rivers their classical names, and redraws the rivers, marshes and coast of about 200 BC. |
+| `pipeline/portraits.mjs` | Finds a public-domain portrait for each person on Wikimedia Commons and records where it came from. |
 | `data/*.json` | Hand-compiled people, places, events, states by year, and edition descriptions. |
 
 `npm run data` fails if any event's passage can no longer be found in a text, so edits to `data/events.json` are checked against the books.

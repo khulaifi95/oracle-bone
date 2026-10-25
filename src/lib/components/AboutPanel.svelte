@@ -12,7 +12,7 @@
 	<ul class="legend">
 		<li><span class="m tp">項羽</span>{t ? '人名：左側直線' : '人名：左侧直线'}</li>
 		<li><span class="m tl">彭城</span>{t ? '地名：左側虛線' : '地名：左侧虚线'}</li>
-		<li><span class="m v">己</span>{t ? '兩本異文：字旁圓點，點擊查看' : '两本异文：字旁圆点，点击查看'}</li>
+		<li><span class="m v">己</span>{t ? '兩本異文：字旁橙色短豎，點擊查看；楔形表示他本此處多字' : '两本异文：字旁橙色短竖，点击查看；楔形表示他本此处多字'}</li>
 		<li><span class="m r">之</span>{t ? '四庫錄文缺字，據金陵本補' : '四库录文缺字，据金陵本补'}</li>
 		<li><span class="m qb">玄</span>{t ? '缺筆避諱：殿本刻作缺末筆，避康熙、乾隆名諱' : '缺笔避讳：殿本刻作缺末笔，避康熙、乾隆名讳'}</li>
 		<li><span class="m del">而</span>{t ? '點校本刪去之字（金陵本）' : '点校本删去之字（金陵本）'}</li>
@@ -38,13 +38,13 @@
 	<h3>{t ? '對讀與地圖' : '对读与地图'}</h3>
 	<section>
 		<p class="small">
-			{t ? '《漢書》卷一、三十一、三十四、四十，《資治通鑑》卷七至十一，錄文據' : '《汉书》卷一、三十一、三十四、四十，《资治通鉴》卷七至十一，录文据'}
+			{t ? '《漢書》卷一、三十一、三十四、四十，《資治通鑑》卷七至十二，錄文據' : '《汉书》卷一、三十一、三十四、四十，《资治通鉴》卷七至十二，录文据'}
 			<a href="https://zh.wikisource.org/" target="_blank" rel="noreferrer">{t ? '維基文庫' : '维基文库'}</a>（CC BY-SA 4.0）。
 		</p>
 		<p class="small">
 			{t ? '底圖據' : '底图据'} <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a>{t
-				? '（公有領域）；黃河下游改繪為西漢故道，今黃河下游一線標為濟水。地名坐標取古城遺址或今治所的約略位置。'
-				: '（公有领域）；黄河下游改绘为西汉故道，今黄河下游一线标为济水。地名坐标取古城遗址或今治所的约略位置。'}
+				? '（公有領域），再改繪為秦漢之際的形勢：黃河下游依西漢故道，今黃河下游一線標為濟水；淮水自盱眙東流入海，不繪洪澤湖等後世湖泊；補繪泗水、睢水、鴻溝，及大野、雲夢、彭蠡等澤；蘇北、長江口、渤海西南岸的海岸依古海岸線，今海岸以虛線示之。以上均據譚其驤《中國歷史地圖集》第二冊約略繪出。地名坐標取古城遺址或今治所的約略位置。'
+				: '（公有领域），再改绘为秦汉之际的形势：黄河下游依西汉故道，今黄河下游一线标为济水；淮水自盱眙东流入海，不绘洪泽湖等后世湖泊；补绘泗水、睢水、鸿沟，及大野、云梦、彭蠡等泽；苏北、长江口、渤海西南岸的海岸依古海岸线，今海岸以虚线示之。以上均据谭其骧《中国历史地图集》第二册约略绘出。地名坐标取古城遗址或今治所的约略位置。'}
 		</p>
 		<p class="small">
 			{t
@@ -65,11 +65,11 @@
 		padding: 10px 12px;
 		overflow-y: auto;
 		height: 100%;
-		font-size: 13px;
+		font-size: 14.5px;
 		line-height: 1.7;
 	}
 	h3 {
-		font-size: 13px;
+		font-size: 14.5px;
 		letter-spacing: 0.3em;
 		color: var(--accent);
 		margin: 14px 0 6px;
@@ -79,7 +79,7 @@
 	}
 	section {
 		background: var(--paper);
-		border: 1px solid var(--chrome-edge);
+		border: 1px solid var(--panel-edge);
 		border-radius: 4px;
 		padding: 6px 10px;
 		margin-bottom: 8px;
@@ -88,7 +88,7 @@
 		margin: 4px 0;
 	}
 	.small {
-		font-size: 12px;
+		font-size: 13px;
 		color: var(--ink-note);
 	}
 	a {
@@ -121,12 +121,11 @@
 	.m.v::after {
 		content: '';
 		position: absolute;
-		right: 0.9em;
-		top: 50%;
-		width: 5px;
-		height: 5px;
-		margin-top: -2px;
-		border-radius: 50%;
+		right: 0.8em;
+		top: 20%;
+		bottom: 20%;
+		width: 3px;
+		border-radius: 2px;
 		background: var(--var-dot);
 	}
 	.m.r {
@@ -154,7 +153,7 @@
 		text-align: center;
 		background: var(--ink-note);
 		color: var(--paper);
-		font-size: 11px;
+		font-size: 12px;
 		border-radius: 2px;
 	}
 </style>

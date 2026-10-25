@@ -5,6 +5,8 @@
 	import { reading } from '#lib/reading.svelte.js';
 	import { occurrences } from '#lib/find.js';
 
+	let { wide = false }: { wide?: boolean } = $props();
+
 	const s = app.settings;
 	const t = $derived(s.script === 't');
 	const COS = Math.cos((33 * Math.PI) / 180);
@@ -52,6 +54,31 @@
 		view = [drag.v[0] - (e.clientX - drag.x) * scale, drag.v[1] - (e.clientY - drag.y) * scale, drag.v[2], drag.v[3]];
 	}
 	const zoom = $derived(W / vb[2]);
+	// svg units per screen pixel, so that labels keep their size on screen at any zoom or panel size
+	let cw = $state(400);
+	let ch = $state(400);
+	const u = $derived(Math.max(vb[2] / (cw || 1), vb[3] / (ch || 1)));
+	const detail = $derived(u < 1.1);
+	const ring = (pts: [number, number][]) => path(pts) + 'Z';
+	const mid = (line: [number, number][]) => line[Math.floor(line.length / 2)];
+	// rivers worth a name even when zoomed out
+	const NAMED = new Set(['河', '江', '淮水', '渭水', '汉水', '济水', '鸿沟', '睢水', '泗水', '漳水', '颍水', '汾水']);
+	const riverLabels = $derived.by(() => {
+		const seen = new Set<string>();
+		const out: { name: string; t: string; x: number; y: number }[] = [];
+		for (const r of reading.basemap?.rivers ?? []) {
+			if (seen.has(r.name) || !(detail || NAMED.has(r.name))) continue;
+			// label the longest stretch of each river once
+			const best = (reading.basemap?.rivers ?? []).filter((x) => x.name === r.name).sort((a, b) => b.line.length - a.line.length)[0];
+			const [x, y] = mid(best.line);
+			out.push({ name: r.name, t: r.t, x: px(x), y: py(y) });
+			seen.add(r.name);
+		}
+		return out;
+	});
+	function onKey(e: KeyboardEvent) {
+		if (wide && e.key === 'Escape') app.mapWide = false;
+	}
 
 	const year = $derived(reading.date ? reading.date.ey : -209);
 	const polityYear = $derived(String(Math.max(-209, Math.min(-201, year))));
@@ -82,69 +109,140 @@
 	const name = (p: { name: string; t: string }) => (t ? p.t : p.name);
 </script>
 
-<div class="map">
+<svelte:window onkeydown={onKey} />
+
+<div class="map" class:wide>
 	<div class="head">
 		<span class="year">{reading.date ? `${eraLabel(reading.date.ey)} · 前${bceOf(reading.date.ey, reading.date.m)}年` : ''}</span>
 		<span class="hint">{t ? '滾輪縮放，拖動平移' : '滚轮缩放，拖动平移'}</span>
-		<button class="reset" onclick={() => (view = view ? null : [0, 0, W, H])}>{view ? (t ? '復原' : '复原') : t ? '全圖' : '全图'}</button>
+		<button class="btn" onclick={() => (view = view ? null : [0, 0, W, H])}>{view ? (t ? '復原' : '复原') : t ? '全圖' : '全图'}</button>
+		<button class="btn" onclick={() => (app.mapWide = !app.mapWide)} title={wide ? 'Esc' : ''}>{wide ? (t ? '收起' : '收起') : t ? '放大' : '放大'}</button>
 	</div>
-	<svg
-		bind:this={svg}
-		viewBox={vb.join(' ')}
-		preserveAspectRatio="xMidYMid meet"
-		onwheel={onWheel}
-		onpointerdown={onDown}
-		onpointermove={onMove}
-		onpointerup={() => (drag = null)}
-		role="img"
-		aria-label="秦汉之际形势图"
-	>
-		<rect x="-2000" y="-2000" width={W + 4000} height={H + 4000} class="sea" />
-		{#if reading.basemap}
-			{#each reading.basemap.coast as line, i (i)}
-				<path d={path(line)} class="coast" style="stroke-width:{1.2 / zoom}" />
-			{/each}
-			{#each reading.basemap.lakes as line, i (i)}
-				<path d={path(line) + 'Z'} class="lake" style="stroke-width:{0.6 / zoom}" />
-			{/each}
-			{#each reading.basemap.rivers as r, i (i)}
-				<path d={path(r.line)} class="river" class:major={r.major} style="stroke-width:{(r.major ? 1.6 : 0.9) / zoom}"><title>{r.name}</title></path>
-			{/each}
-		{/if}
-
-		{#each reading.places as p (p.id)}
-			{@const hot = near.has(p.id) || eventPlaces.has(p.id) || app.place === p.id}
-			{@const x = px(p.lon)}
-			{@const y = py(p.lat)}
-			<g
-				class="place"
-				class:hot
-				class:ev={eventPlaces.has(p.id)}
-				class:sel={app.place === p.id}
-				class:dim={!hot && !mentionsInChapter[p.id]}
-				onclick={() => (app.place = p.id)}
-				role="button"
-				tabindex="-1"
-				onkeydown={() => {}}
-			>
-				<circle cx={x} cy={y} r={(hot ? 3.4 : 2) / Math.sqrt(zoom)} />
-				{#if hot || zoom > 2.2}
-					<text x={x + 5 / zoom} y={y + 4 / zoom} style="font-size:{(hot ? 13 : 10) / zoom}px">{name(p)}</text>
+	<p class="purpose">
+		{t
+			? '此圖隨所讀之處而變：方框是當年諸侯的國都，顏色分秦、楚、漢與其他諸侯；藍點是本段前後提到的地方，紅點是本事發生之地。山川、海岸依秦漢之際的形勢。點地名看詳情。'
+			: '此图随所读之处而变：方框是当年诸侯的国都，颜色分秦、楚、汉与其他诸侯；蓝点是本段前后提到的地方，红点是本事发生之地。山川、海岸依秦汉之际的形势。点地名看详情。'}
+	</p>
+	<div class="frame" bind:clientWidth={cw} bind:clientHeight={ch}>
+		<svg
+			bind:this={svg}
+			viewBox={vb.join(' ')}
+			preserveAspectRatio="xMidYMid meet"
+			onwheel={onWheel}
+			onpointerdown={onDown}
+			onpointermove={onMove}
+			onpointerup={() => (drag = null)}
+			role="img"
+			aria-label="秦汉之际形势图"
+		>
+			<defs>
+				{#each ['qin', 'chu', 'han', 'other'] as side (side)}
+					<radialGradient id="halo-{side}">
+						<stop offset="0" style="stop-color:var(--{side});stop-opacity:0.42" />
+						<stop offset="0.6" style="stop-color:var(--{side});stop-opacity:0.16" />
+						<stop offset="1" style="stop-color:var(--{side});stop-opacity:0" />
+					</radialGradient>
+				{/each}
+				{#if reading.basemap}
+					<clipPath id="han-sea">
+						{#each reading.basemap.hanSea as h (h.name)}<path d={ring(h.ring)} />{/each}
+					</clipPath>
+					<mask id="not-han-sea">
+						<rect x="-2000" y="-2000" width={W + 4000} height={H + 4000} fill="#fff" />
+						{#each reading.basemap.hanSea as h (h.name)}<path d={ring(h.ring)} fill="#000" />{/each}
+					</mask>
 				{/if}
-			</g>
-		{/each}
-
-		{#each polities as pol (pol.name)}
-			{@const cap = reading.placeById.get(pol.capital)}
-			{#if cap}
-				<g class="polity" style="--c:{sideColor(pol.side)}">
-					<rect x={px(cap.lon) - 6 / zoom} y={py(cap.lat) - 6 / zoom} width={12 / zoom} height={12 / zoom} style="stroke-width:{1.5 / zoom}" />
-					<text x={px(cap.lon)} y={py(cap.lat) - 9 / zoom} style="font-size:{15 / zoom}px;stroke-width:{3 / zoom}">{pol.name}</text>
+			</defs>
+			<rect x="-2000" y="-2000" width={W + 4000} height={H + 4000} class="sea" />
+			{#if reading.basemap}
+				{#each reading.basemap.land as l, i (i)}
+					<path d={ring(l)} class="land" />
+				{/each}
+				<!-- land built out since: sea in 200 BC, with today's shore dashed -->
+				{#each reading.basemap.hanSea as h (h.name)}
+					<path d={ring(h.ring)} class="sea" />
+				{/each}
+				<g mask="url(#not-han-sea)">
+					{#each reading.basemap.coast as line, i (i)}
+						<path d={path(line)} class="coast" style="stroke-width:{1.3 * u}" />
+					{/each}
 				</g>
+				<g clip-path="url(#han-sea)">
+					{#each reading.basemap.coast as line, i (i)}
+						<path d={path(line)} class="coast now" style="stroke-width:{0.9 * u};stroke-dasharray:{4 * u} {3 * u}" />
+					{/each}
+				</g>
+				{#each reading.basemap.hanSea as h (h.name)}
+					<path d={path(h.coast)} class="coast" style="stroke-width:{1.3 * u}"><title>{t ? '秦漢之際海岸（約略）' : '秦汉之际海岸（约略）'}</title></path>
+				{/each}
+				{#each reading.basemap.lakes as line, i (i)}
+					<path d={ring(line)} class="lake" style="stroke-width:{0.7 * u}" />
+				{/each}
+				{#each reading.basemap.marshes as m (m.name)}
+					<path d={ring(m.ring)} class="marsh" style="stroke-width:{0.8 * u};stroke-dasharray:{2 * u} {2 * u}"><title>{m.name}</title></path>
+				{/each}
 			{/if}
-		{/each}
-	</svg>
 
+			{#each polities as pol (pol.name)}
+				{@const cap = reading.placeById.get(pol.capital)}
+				{#if cap}
+					<circle cx={px(cap.lon)} cy={py(cap.lat)} r={K * 1.1} fill="url(#halo-{pol.side})" class="halo" />
+				{/if}
+			{/each}
+
+			{#if reading.basemap}
+				{#each reading.basemap.rivers as r, i (i)}
+					<path d={path(r.line)} class="river" class:major={r.major} style="stroke-width:{(r.major ? 2.1 : 1.2) * u}"><title>{r.name}</title></path>
+				{/each}
+				{#each riverLabels as l (l.name)}
+					<text x={l.x} y={l.y} class="rlabel" style="font-size:{12.5 * u}px;stroke-width:{3 * u}">{t ? l.t : l.name}</text>
+				{/each}
+				{#each reading.basemap.marshes as m (m.name)}
+					{#if detail || m.name === '大野泽' || m.name === '云梦泽'}
+						<text x={px(m.c[0])} y={py(m.c[1]) + 4 * u} class="mlabel" style="font-size:{12 * u}px;stroke-width:{3 * u}">{t ? m.t : m.name}</text>
+					{/if}
+				{/each}
+				{#each reading.basemap.mountains as m (m.name)}
+					<g class="mount">
+						<path d="M{px(m.lon) - 5 * u},{py(m.lat) + 4 * u}L{px(m.lon)},{py(m.lat) - 5 * u}L{px(m.lon) + 5 * u},{py(m.lat) + 4 * u}Z" />
+						<text x={px(m.lon) + 7 * u} y={py(m.lat) + 4 * u} style="font-size:{12.5 * u}px;stroke-width:{3 * u}">{t ? m.t : m.name}</text>
+					</g>
+				{/each}
+			{/if}
+
+			{#each reading.places as p (p.id)}
+				{@const hot = near.has(p.id) || eventPlaces.has(p.id) || app.place === p.id}
+				{@const x = px(p.lon)}
+				{@const y = py(p.lat)}
+				<g
+					class="place"
+					class:hot
+					class:ev={eventPlaces.has(p.id)}
+					class:sel={app.place === p.id}
+					class:dim={!hot && !mentionsInChapter[p.id]}
+					onclick={() => (app.place = p.id)}
+					role="button"
+					tabindex="-1"
+					onkeydown={() => {}}
+				>
+					<circle cx={x} cy={y} r={(hot ? 4.6 : 2.6) * u} style="stroke-width:{1.2 * u}" />
+					{#if hot || detail}
+						<text x={x + 6 * u} y={y + 5 * u} style="font-size:{(hot ? 16 : 13) * u}px;stroke-width:{3.5 * u}">{name(p)}</text>
+					{/if}
+				</g>
+			{/each}
+
+			{#each polities as pol (pol.name)}
+				{@const cap = reading.placeById.get(pol.capital)}
+				{#if cap}
+					<g class="polity" style="--c:{sideColor(pol.side)}">
+						<rect x={px(cap.lon) - 7 * u} y={py(cap.lat) - 7 * u} width={14 * u} height={14 * u} style="stroke-width:{2 * u}" />
+						<text x={px(cap.lon)} y={py(cap.lat) - 11 * u} style="font-size:{19 * u}px;stroke-width:{4 * u}">{pol.name}</text>
+					</g>
+				{/if}
+			{/each}
+		</svg>
+	</div>
 	<div class="legend">
 		{#if polities.length}
 			<div class="pols">
@@ -175,8 +273,10 @@
 		</div>
 	{/if}
 	<div class="key">
-		<span style="--c:var(--qin)">{SIDE_LABEL.qin}</span><span style="--c:var(--chu)">{SIDE_LABEL.chu}</span><span style="--c:var(--han)">{SIDE_LABEL.han}</span><span style="--c:var(--other)">{SIDE_LABEL.other}</span>
-		<i>{t ? '河、濟、淮依西漢故道' : '河、济、淮依西汉故道'}</i>
+		<span class="side" style="--c:var(--qin)">{SIDE_LABEL.qin}</span><span class="side" style="--c:var(--chu)">{SIDE_LABEL.chu}</span><span class="side" style="--c:var(--han)">{SIDE_LABEL.han}</span><span class="side" style="--c:var(--other)">{SIDE_LABEL.other}</span>
+		<span class="dot" style="--c:var(--accent)">{t ? '本事' : '本事'}</span><span class="dot" style="--c:var(--place-line)">{t ? '本段' : '本段'}</span>
+		<span class="dash">{t ? '今海岸' : '今海岸'}</span>
+		<i>{t ? '河、淮、泗、睢、鴻溝與海岸依秦漢故道，約略' : '河、淮、泗、睢、鸿沟与海岸依秦汉故道，约略'}</i>
 	</div>
 </div>
 
@@ -186,73 +286,136 @@
 		flex-direction: column;
 		height: 100%;
 		min-height: 0;
+		font-size: 14.5px;
 	}
 	.head {
 		display: flex;
 		align-items: baseline;
 		gap: 8px;
-		padding: 6px 10px;
+		padding: 8px 10px 2px;
 	}
 	.year {
 		font-weight: 600;
+		font-size: 16px;
 		color: var(--accent);
 	}
 	.hint {
-		font-size: 11px;
+		font-size: 12.5px;
 		color: var(--ink-soft);
 		flex: 1;
 	}
-	.reset,
+	.btn,
 	.row button {
-		border: 1px solid var(--chrome-edge);
+		border: 1px solid var(--panel-edge);
 		background: var(--paper);
 		border-radius: 3px;
-		padding: 1px 8px;
+		padding: 2px 9px;
 		cursor: pointer;
-		font-size: 12px;
+		font-size: 13.5px;
 	}
-	svg {
+	.purpose {
+		margin: 2px 10px 6px;
+		font-size: 13px;
+		line-height: 1.6;
+		color: var(--ink-note);
+	}
+	.wide .purpose {
+		font-size: 14.5px;
+	}
+	.frame {
 		flex: 1;
 		min-height: 0;
+		position: relative;
+		margin: 0 8px;
+		border: 1px solid var(--panel-edge);
+		border-radius: 4px;
+		overflow: hidden;
+	}
+	svg {
+		position: absolute;
+		inset: 0;
 		width: 100%;
+		height: 100%;
 		cursor: grab;
 		touch-action: none;
-		background: #ebe4d2;
+		background: var(--map-sea);
+		display: block;
 	}
 	.sea {
-		fill: #ebe4d2;
+		fill: var(--map-sea);
+	}
+	.land {
+		fill: var(--map-land);
 	}
 	.coast {
 		fill: none;
-		stroke: #8c8676;
+		stroke: var(--map-coast);
+		stroke-linejoin: round;
+	}
+	.coast.now {
+		stroke: var(--map-coast-now);
 	}
 	.lake {
-		fill: #cfd9d6;
-		stroke: #7f9894;
+		fill: var(--map-water);
+		stroke: var(--map-river);
+	}
+	.marsh {
+		fill: var(--map-marsh);
+		stroke: var(--map-river);
+	}
+	.halo {
+		pointer-events: none;
 	}
 	.river {
 		fill: none;
-		stroke: #6d93a6;
+		stroke: var(--map-river);
 		stroke-linecap: round;
 		stroke-linejoin: round;
+	}
+	.rlabel,
+	.mlabel {
+		fill: var(--map-river-ink);
+		font-style: italic;
+		letter-spacing: 0.15em;
+		paint-order: stroke;
+		stroke: var(--map-land);
+		pointer-events: none;
+	}
+	.mlabel {
+		text-anchor: middle;
+	}
+	.mount path {
+		fill: var(--map-mount);
+	}
+	.mount text {
+		fill: var(--map-mount);
+		paint-order: stroke;
+		stroke: var(--map-land);
+		letter-spacing: 0.1em;
+	}
+	.mount {
+		pointer-events: none;
 	}
 	.place {
 		cursor: pointer;
 	}
 	.place circle {
 		fill: var(--ink-soft);
+		stroke: var(--map-land);
 	}
 	.place text {
 		fill: var(--ink);
 		paint-order: stroke;
-		stroke: #efe8d8;
-		stroke-width: 0.25em;
+		stroke: var(--map-land);
 	}
 	.place.dim circle {
-		opacity: 0.4;
+		opacity: 0.45;
 	}
 	.place.hot circle {
 		fill: var(--place-line);
+	}
+	.place.hot text {
+		font-weight: 600;
 	}
 	.place.ev circle {
 		fill: var(--accent);
@@ -260,38 +423,37 @@
 	.place.sel circle {
 		fill: var(--accent);
 		stroke: #fff;
-		stroke-width: 0.6;
 	}
 	.place.sel text {
-		font-weight: 600;
 		fill: var(--accent);
 	}
 	.polity rect {
-		fill: none;
+		fill: var(--map-land);
 		stroke: var(--c);
 	}
 	.polity text {
 		fill: var(--c);
-		font-weight: 600;
+		font-weight: 700;
+		font-family: var(--font-kai);
 		text-anchor: middle;
 		paint-order: stroke;
-		stroke: #efe8d8;
+		stroke: var(--map-land);
 		pointer-events: none;
 	}
 	.legend {
-		padding: 6px 10px 2px;
+		padding: 8px 10px 2px;
 	}
 	.pols {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 4px;
+		gap: 5px;
 	}
 	.pol {
 		border: none;
-		border-left: 3px solid var(--c);
+		border-left: 4px solid var(--c);
 		background: var(--paper);
-		padding: 1px 6px;
-		font-size: 12px;
+		padding: 2px 7px;
+		font-size: 14px;
 		cursor: pointer;
 	}
 	.pol b {
@@ -299,53 +461,79 @@
 		margin-right: 4px;
 	}
 	.note {
-		font-size: 12px;
+		font-size: 14px;
 		color: var(--ink-soft);
 	}
 	.card {
 		margin: 6px 10px;
 		padding: 8px 10px;
 		background: var(--paper);
-		border: 1px solid var(--chrome-edge);
+		border: 1px solid var(--panel-edge);
 		border-radius: 4px;
 	}
+	.wide .card {
+		position: absolute;
+		right: 24px;
+		top: 96px;
+		width: 340px;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+	}
 	.card .title b {
-		font-size: 17px;
+		font-size: 18px;
 		color: var(--place-line);
 		margin-right: 8px;
 	}
 	.card .title span {
-		font-size: 12px;
+		font-size: 13.5px;
 		color: var(--ink-soft);
 	}
 	.card p {
 		margin: 6px 0;
-		font-size: 13px;
+		font-size: 15px;
 		line-height: 1.6;
 	}
 	.row {
 		display: flex;
 		gap: 8px;
 		align-items: center;
-		font-size: 12px;
+		font-size: 13.5px;
 		color: var(--ink-soft);
 	}
 	.key {
 		display: flex;
-		gap: 10px;
+		flex-wrap: wrap;
+		gap: 4px 10px;
 		padding: 4px 10px 8px;
-		font-size: 11px;
+		font-size: 13px;
 		color: var(--ink-soft);
 		align-items: center;
 	}
-	.key span::before {
+	.key .side::before {
 		content: '';
 		display: inline-block;
-		width: 8px;
-		height: 8px;
-		border: 1.5px solid var(--c);
+		width: 9px;
+		height: 9px;
+		border: 2px solid var(--c);
 		margin-right: 3px;
 		vertical-align: -1px;
+	}
+	.key .dot::before {
+		content: '';
+		display: inline-block;
+		width: 9px;
+		height: 9px;
+		border-radius: 50%;
+		background: var(--c);
+		margin-right: 3px;
+		vertical-align: -1px;
+	}
+	.key .dash::before {
+		content: '';
+		display: inline-block;
+		width: 16px;
+		border-top: 1.5px dashed var(--map-coast-now);
+		margin-right: 3px;
+		vertical-align: 3px;
 	}
 	.key i {
 		margin-left: auto;

@@ -147,10 +147,16 @@
 
 <style>
 	.tl {
+		/* the strip is dark; its text uses light ink */
+		--ink: var(--chrome-ink);
+		--ink-note: #dccba6;
+		--ink-soft: var(--chrome-soft);
+		--paper: var(--chrome-2);
 		position: relative;
 		height: 172px;
 		background: var(--chrome);
-		border-top: 1px solid var(--chrome-edge);
+		color: var(--chrome-ink);
+		border-top: 2px solid var(--accent);
 		overflow: hidden;
 	}
 	svg {
@@ -188,7 +194,7 @@
 		opacity: 0.5;
 	}
 	.ev.here circle {
-		fill: var(--ink);
+		fill: var(--gold);
 		opacity: 1;
 	}
 	.ev.cur circle {
@@ -201,21 +207,21 @@
 		stroke: var(--chrome-edge);
 	}
 	.lab text {
-		font-size: 12px;
+		font-size: 13.5px;
 		fill: var(--ink-note);
 		text-anchor: end;
 	}
 	.lab.cur text {
-		fill: var(--accent);
+		fill: #ff8a6a;
 		font-weight: 600;
 	}
 	.lab:hover text {
-		fill: var(--accent);
+		fill: var(--gold);
 	}
 	.now {
-		stroke: var(--accent);
-		stroke-width: 1.5;
-		opacity: 0.7;
+		stroke: #ff6b4a;
+		stroke-width: 2;
+		opacity: 0.9;
 	}
 	.life {
 		stroke: var(--c);
@@ -258,9 +264,9 @@
 		position: absolute;
 		right: 12px;
 		bottom: 4px;
-		font-size: 13px;
-		font-weight: 600;
-		color: var(--accent);
+		font-size: 16px;
+		font-weight: 700;
+		color: var(--gold);
 		background: var(--chrome);
 		padding-left: 6px;
 	}

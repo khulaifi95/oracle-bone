@@ -29,7 +29,9 @@
 		"#lib/*": "./src/lib/*"
 	},
 	"dependencies": {
+		"@fontsource/ma-shan-zheng": "^5.3.1",
 		"@fontsource/noto-serif-sc": "^5.3.1",
-		"@fontsource/noto-serif-tc": "^5.3.1"
+		"@fontsource/noto-serif-tc": "^5.3.1",
+		"lxgw-wenkai-webfont": "^1.7.0"
 	}
 }

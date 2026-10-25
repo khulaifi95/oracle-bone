@@ -112,6 +112,8 @@ export interface Person {
 	titles?: [string, string, string][];
 	bio: string;
 	bioT: string;
+	/** a public-domain portrait (woodcut or painting) and where it comes from */
+	portrait?: { image: string; source: string; page?: string };
 	chapter?: string;
 }
 
@@ -132,6 +134,8 @@ export interface Account {
 	at: string;
 	paras: [number, number];
 	segs?: [string, string];
+	/** found by shared wording with the 史記 accounts, not anchored by hand */
+	auto?: boolean;
 }
 
 export interface HistEvent {
@@ -145,6 +149,8 @@ export interface HistEvent {
 	places: string[];
 	people: string[];
 	accounts: Account[];
+	/** books that do not tell the event, with a note */
+	absent?: Record<string, string>;
 }
 
 export interface Polity {
@@ -158,5 +164,10 @@ export interface Basemap {
 	bbox: [number, number, number, number];
 	coast: [number, number][][];
 	lakes: [number, number][][];
-	rivers: { name: string; major?: boolean; ancient?: boolean; line: [number, number][] }[];
+	rivers: { name: string; t: string; major?: boolean; ancient?: boolean; line: [number, number][] }[];
+	land: [number, number][][];
+	/** land built out since about 200 BC, shown as sea: `coast` is the old shore */
+	hanSea: { name: string; coast: [number, number][]; ring: [number, number][] }[];
+	marshes: { name: string; t: string; c: [number, number]; ring: [number, number][] }[];
+	mountains: { name: string; t: string; lon: number; lat: number }[];
 }

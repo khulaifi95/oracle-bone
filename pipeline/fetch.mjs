@@ -9,7 +9,7 @@ import path from 'node:path';
 const ROOT = path.resolve(import.meta.dirname, '..');
 const SRC = path.join(ROOT, 'sources');
 const CACHE = path.join(SRC, 'cache');
-const UA = 'OracleBoneReader/0.1 (personal, non-commercial reading tool)';
+const UA = 'OracleBoneReader/0.1 (https://github.com/khulaifi95/oracle-bone; personal non-commercial reading tool)';
 
 const SHIJI = [7, 8, 48, 55, 92];
 const WIKISOURCE = [
@@ -18,10 +18,10 @@ const WIKISOURCE = [
 	['漢書/卷031', 'wikisource/hanshu-031.wiki'],
 	['漢書/卷034', 'wikisource/hanshu-034.wiki'],
 	['漢書/卷040', 'wikisource/hanshu-040.wiki'],
-	...[7, 8, 9, 10, 11].map((n) => [`資治通鑑/卷${pad(n)}`, `wikisource/tongjian-${pad(n)}.wiki`])
+	...[7, 8, 9, 10, 11, 12].map((n) => [`資治通鑑/卷${pad(n)}`, `wikisource/tongjian-${pad(n)}.wiki`])
 ];
 const NATURAL_EARTH = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/';
-const GEO = ['ne_10m_rivers_lake_centerlines.geojson', 'ne_50m_coastline.geojson', 'ne_50m_lakes.geojson'];
+const GEO = ['ne_10m_rivers_lake_centerlines.geojson', 'ne_50m_coastline.geojson', 'ne_50m_lakes.geojson', 'ne_50m_land.geojson'];
 
 function pad(n) {
 	return String(n).padStart(3, '0');

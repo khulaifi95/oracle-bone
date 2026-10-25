@@ -7,6 +7,7 @@
 	import Reader from '#lib/components/Reader.svelte';
 	import Timeline from '#lib/components/Timeline.svelte';
 	import ParallelPanel from '#lib/components/ParallelPanel.svelte';
+	import MapPanel from '#lib/components/MapPanel.svelte';
 
 	const s = app.settings;
 
@@ -40,6 +41,7 @@
 
 	$effect(() => {
 		document.documentElement.dataset.script = s.script;
+		document.documentElement.dataset.face = s.face;
 		document.documentElement.lang = s.script === 't' ? 'zh-Hant' : 'zh-Hans';
 	});
 	$effect(() => {
@@ -56,6 +58,8 @@
 			<Reader />
 			{#if app.parallelWide}
 				<div class="overlay"><ParallelPanel wide /></div>
+			{:else if app.mapWide}
+				<div class="overlay"><MapPanel wide /></div>
 			{/if}
 		</div>
 	</main>
@@ -70,11 +74,12 @@
 	}
 	main {
 		display: grid;
-		grid-template-columns: minmax(300px, 380px) 1fr;
+		grid-template-columns: minmax(320px, 420px) 1fr;
 		min-height: 0;
 	}
 	.stage {
 		position: relative;
+		background: var(--stage);
 		min-width: 0;
 		min-height: 0;
 	}

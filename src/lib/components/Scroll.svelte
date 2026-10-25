@@ -28,6 +28,7 @@
 			script: s.script,
 			punct: s.punct,
 			notes: s.notes,
+			notesMode: s.notesMode,
 			rows,
 			noteH: 0.62,
 			frontMatter: false,
@@ -139,12 +140,16 @@
 		right: 14px;
 		z-index: 3;
 		font-size: 12px;
-		color: var(--ink-soft);
+		color: var(--chrome-ink);
+		background: var(--accent);
+		padding: 1px 8px;
+		border-radius: 2px;
 		letter-spacing: 0.2em;
 	}
 	.track {
 		position: absolute;
-		inset: 0;
+		inset: 12px 0;
+		box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
 		overflow-x: auto;
 		overflow-y: hidden;
 		scrollbar-width: thin;

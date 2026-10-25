@@ -210,7 +210,81 @@ if (misses.length) {
 	process.exitCode = 1;
 }
 
-const peopleOut = people.map((p) => ({ ...p, bioT: toTraditional(p.bio), t: p.t ?? toTraditional(p.name) }));
+// Match the parallel accounts by wording. The hand anchors fix one sentence of each account;
+// the 史記 accounts then serve as the reference text. Each account is widened over the
+// neighbouring paragraphs that share enough wording with the 史記, and paragraphs elsewhere
+// that retell the same passage are added as accounts of their own (marked `auto`).
+const GRAM = 4;
+const gramsOf = (s) => {
+	const c = [...key(s)];
+	const g = new Set();
+	for (let i = 0; i + GRAM <= c.length; i++) g.add(c.slice(i, i + GRAM).join(''));
+	return g;
+};
+const paraGrams = {};
+for (const [id, ix] of Object.entries(shijiIndex)) paraGrams[id] = [...ix.paraText.keys()].sort((x, y) => x - y).map((p) => gramsOf(ix.paraText.get(p)));
+for (const [id, paras] of Object.entries(plain)) paraGrams[id] = paras.map((p) => gramsOf(p.s));
+const shared = (g, base) => {
+	let n = 0;
+	for (const x of g) if (base.has(x)) n++;
+	return { n, r: g.size ? n / g.size : 0 };
+};
+// a neighbour joins an account when a quarter of its wording is in the 史記; a new account needs more
+const joins = ({ n, r }) => n >= 12 && r >= 0.25;
+const starts = ({ n, r }) => n >= 30 && r >= 0.3;
+const shijiSegs = (ref, [p0, p1]) => {
+	const segs = shijiIndex[ref].segs.filter((s) => s.para >= p0 && s.para <= p1);
+	return [segs[0].id, segs[segs.length - 1].id];
+};
+let widened = 0;
+let added = 0;
+for (const e of events) {
+	const reference = (except) => {
+		const base = new Set();
+		for (const a of e.accounts) if (a.ref.startsWith('shiji') && a.ref !== except && a.paras[0] >= 0)
+			for (let p = a.paras[0]; p <= a.paras[1]; p++) for (const g of paraGrams[a.ref][p]) base.add(g);
+		return base;
+	};
+	const covered = new Set(e.accounts.flatMap((a) => Array.from({ length: a.paras[1] - a.paras[0] + 1 }, (_, k) => `${a.ref}:${a.paras[0] + k}`)));
+	const widen = (a, base) => {
+		const pg = paraGrams[a.ref];
+		const before = a.paras.join();
+		while (a.paras[0] > 0 && !covered.has(`${a.ref}:${a.paras[0] - 1}`) && joins(shared(pg[a.paras[0] - 1], base))) covered.add(`${a.ref}:${--a.paras[0]}`);
+		while (a.paras[1] < pg.length - 1 && !covered.has(`${a.ref}:${a.paras[1] + 1}`) && joins(shared(pg[a.paras[1] + 1], base))) covered.add(`${a.ref}:${++a.paras[1]}`);
+		if (a.paras.join() !== before) widened++;
+		if (a.ref.startsWith('shiji')) a.segs = shijiSegs(a.ref, a.paras);
+	};
+	for (const a of [...e.accounts]) {
+		const base = reference(a.ref);
+		if (base.size && a.paras[0] >= 0) widen(a, base);
+	}
+	for (const [ref, pg] of Object.entries(paraGrams)) {
+		const base = reference(ref);
+		if (!base.size) continue;
+		pg.forEach((g, p) => {
+			if (covered.has(`${ref}:${p}`) || !starts(shared(g, base))) return;
+			const a = { ref, at: '', paras: [p, p], auto: true };
+			covered.add(`${ref}:${p}`);
+			widen(a, base);
+			e.accounts.push(a);
+			added++;
+		});
+	}
+	const order = ['shiji', 'hanshu', 'tongjian'];
+	const juanOf = (r) => Number(r.split('-')[1]);
+	e.accounts.sort((x, y) => order.indexOf(x.ref.split('-')[0]) - order.indexOf(y.ref.split('-')[0]) || juanOf(x.ref) - juanOf(y.ref) || x.paras[0] - y.paras[0]);
+}
+console.log(`parallels: ${widened} accounts widened, ${added} found by wording`);
+if (process.env.PARALLEL_REPORT)
+	for (const e of events) for (const a of e.accounts) if (a.auto) console.log(`  + ${e.id} ${a.ref} p${a.paras[0]}-${a.paras[1]} ${(plain[a.ref]?.[a.paras[0]].s ?? shijiIndex[a.ref].paraText.get(a.paras[0])).slice(0, 30)}`);
+
+const portraits = await readJson('data/portraits.json');
+const peopleOut = people.map((p) => ({
+	...p,
+	bioT: toTraditional(p.bio),
+	t: p.t ?? toTraditional(p.name),
+	...(portraits[p.id] ? { portrait: { image: portraits[p.id].image, source: portraits[p.id].source, page: portraits[p.id].page } } : {})
+}));
 const placesOut = places.map((p) => ({ ...p, t: toTraditional(p.name) }));
 
 await write('catalog.json', {
@@ -226,4 +300,6 @@ await write('people.json', peopleOut);
 await write('places.json', placesOut);
 await write('events.json', events);
 await write('polities.json', polities);
-await write('basemap.json', await buildBasemap());
+const basemap = await buildBasemap();
+for (const k of ['rivers', 'marshes', 'mountains']) for (const x of basemap[k]) x.t = toTraditional(x.name);
+await write('basemap.json', basemap);

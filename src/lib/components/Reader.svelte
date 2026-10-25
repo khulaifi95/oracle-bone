@@ -42,7 +42,7 @@
 	.reader.pair {
 		grid-template-rows: 1fr 1fr;
 		gap: 4px;
-		background: var(--chrome-edge);
+		background: var(--chrome);
 	}
 	/* 線裝 對照: one 半葉 of each edition, 殿本 on the right */
 	.reader.side {

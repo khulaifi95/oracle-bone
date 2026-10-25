@@ -1,0 +1,98 @@
+{
+	"xiang-yu": {
+		"image": "portraits/xiang-yu.jpg",
+		"source": "晚笑堂竹庄画传（清上官周绘，乾隆八年刊），哈佛燕京图书馆藏本",
+		"page": "https://commons.wikimedia.org/wiki/File:Harvard_drs_26478654_晚笑堂竹莊画傳_v.1.pdf?page=15",
+		"licence": "Public domain"
+	},
+	"liu-bang": {
+		"image": "portraits/liu-bang.jpg",
+		"source": "晚笑堂竹庄画传（清上官周绘，乾隆八年刊），哈佛燕京图书馆藏本",
+		"page": "https://commons.wikimedia.org/wiki/File:Harvard_drs_26478654_晚笑堂竹莊画傳_v.1.pdf?page=14",
+		"licence": "Public domain"
+	},
+	"fan-zeng": {
+		"image": "portraits/fan-zeng.jpg",
+		"source": "新镌绘像东西汉全传，早稻田大学图书馆藏本",
+		"page": "https://commons.wikimedia.org/wiki/File:WUL-he21_01467_%E6%96%B0%E9%90%AB%E7%B9%AA%E5%83%8F%E6%9D%B1%E8%A5%BF%E6%BC%A2%E5%85%A8%E5%82%B3_01_(%E8%8C%83%E5%A2%9E).jpg",
+		"licence": "Public domain"
+	},
+	"ying-bu": {
+		"image": "portraits/ying-bu.jpg",
+		"source": "新镌绘像东西汉全传，早稻田大学图书馆藏本",
+		"page": "https://commons.wikimedia.org/wiki/File:WUL-he21_01467_%E6%96%B0%E9%90%AB%E7%B9%AA%E5%83%8F%E6%9D%B1%E8%A5%BF%E6%BC%A2%E5%85%A8%E5%82%B3_01_(%E8%8B%B1%E5%B8%83).jpg",
+		"licence": "Public domain"
+	},
+	"yu-ji": {
+		"image": "portraits/yu-ji.jpg",
+		"source": "晚笑堂竹庄画传（清上官周绘，乾隆八年刊），哈佛燕京图书馆藏本",
+		"page": "https://commons.wikimedia.org/wiki/File:Harvard_drs_26478654_晚笑堂竹莊画傳_v.1.pdf?page=16",
+		"licence": "Public domain"
+	},
+	"zhang-liang": {
+		"image": "portraits/zhang-liang.jpg",
+		"source": "晚笑堂竹庄画传（清上官周绘，乾隆八年刊），哈佛燕京图书馆藏本",
+		"page": "https://commons.wikimedia.org/wiki/File:Harvard_drs_26478654_晚笑堂竹莊画傳_v.1.pdf?page=17",
+		"licence": "Public domain"
+	},
+	"huang-shi-gong": {
+		"image": "portraits/huang-shi-gong.jpg",
+		"source": "黄石公像",
+		"page": "https://commons.wikimedia.org/wiki/File:%E9%BB%84%E7%9F%B3%E5%85%AC.jpg",
+		"licence": "Public domain"
+	},
+	"xiao-he": {
+		"image": "portraits/xiao-he.jpg",
+		"source": "萧何像",
+		"page": "https://commons.wikimedia.org/wiki/File:%E6%B1%89%E7%9B%B8%E5%9B%BD%E9%85%82%E4%BE%AF%E8%90%A7%E4%BD%95.jpg",
+		"licence": "Public domain"
+	},
+	"cao-can": {
+		"image": "portraits/cao-can.jpg",
+		"source": "三才图会（明王圻、王思义编）",
+		"page": "https://commons.wikimedia.org/wiki/File:Cao_Shen.jpg",
+		"licence": "Public domain"
+	},
+	"peng-yue": {
+		"image": "portraits/peng-yue.jpg",
+		"source": "新镌绘像东西汉全传，早稻田大学图书馆藏本",
+		"page": "https://commons.wikimedia.org/wiki/File:WUL-he21_01467_%E6%96%B0%E9%90%AB%E7%B9%AA%E5%83%8F%E6%9D%B1%E8%A5%BF%E6%BC%A2%E5%85%A8%E5%82%B3_01_(%E5%BD%AD%E8%B6%8A).jpg",
+		"licence": "Public domain"
+	},
+	"ji-xin": {
+		"image": "portraits/ji-xin.jpg",
+		"source": "新镌绘像东西汉全传，早稻田大学图书馆藏本",
+		"page": "https://commons.wikimedia.org/wiki/File:WUL-he21_01467_%E6%96%B0%E9%90%AB%E7%B9%AA%E5%83%8F%E6%9D%B1%E8%A5%BF%E6%BC%A2%E5%85%A8%E5%82%B3_01_(%E7%B4%80%E4%BF%A1).jpg",
+		"licence": "Public domain"
+	},
+	"lü-zhi": {
+		"image": "portraits/lü-zhi.jpg",
+		"source": "新镌绘像东西汉全传，早稻田大学图书馆藏本",
+		"page": "https://commons.wikimedia.org/wiki/File:WUL-he21_01467_%E6%96%B0%E9%90%AB%E7%B9%AA%E5%83%8F%E6%9D%B1%E8%A5%BF%E6%BC%A2%E5%85%A8%E5%82%B3_01_(%E5%91%82%E5%90%8E).jpg",
+		"licence": "Public domain"
+	},
+	"han-xin": {
+		"image": "portraits/han-xin.jpg",
+		"source": "晚笑堂竹庄画传（清上官周绘，乾隆八年刊），哈佛燕京图书馆藏本",
+		"page": "https://commons.wikimedia.org/wiki/File:Harvard_drs_26478654_晚笑堂竹莊画傳_v.1.pdf?page=18",
+		"licence": "Public domain"
+	},
+	"wu-rui": {
+		"image": "portraits/wu-rui.jpg",
+		"source": "诒安堂《吴氏宗谱》（1929）",
+		"page": "https://commons.wikimedia.org/wiki/File:Wu_Rui.jpg",
+		"licence": "Public domain"
+	},
+	"qin-shihuang": {
+		"image": "portraits/qin-shihuang.jpg",
+		"source": "秦始皇像",
+		"page": "https://commons.wikimedia.org/wiki/File:Qinshihuang.jpg",
+		"licence": "Public domain"
+	},
+	"wang-jian": {
+		"image": "portraits/wang-jian.jpg",
+		"source": "王翦像（明人绘）",
+		"page": "https://commons.wikimedia.org/wiki/File:%E7%A7%A6%E5%A4%A7%E5%B0%86%E5%86%9B%E7%8E%8B%E7%BF%A6.jpg",
+		"licence": "Public domain"
+	}
+}

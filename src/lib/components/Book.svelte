@@ -30,6 +30,7 @@
 			script: s.script,
 			punct: s.punct,
 			notes: s.notes,
+			notesMode: s.notesMode,
 			rows: L.rows,
 			noteH: L.rows / L.noteRows,
 			frontMatter: true,

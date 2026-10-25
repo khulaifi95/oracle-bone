@@ -38,7 +38,7 @@
 		app.variant = v.id;
 		app.goto(v.seg);
 	}
-	const read = (x: { s: string; t: string }) => (t ? x.t : x.s) || '—';
+	const read = (x: { s: string; t: string }) => t ? x.t : x.s;
 </script>
 
 <div class="var">
@@ -58,8 +58,12 @@
 			<li class:sel={v.id === app.variant} data-id={v.id}>
 				<button onclick={() => pick(v)}>
 					<span class="kind {v.kind}">{VARIANT_LABEL[v.kind]}</span>
-					<span class="ctx">{c.before}<b class="d">{read(v.d)}</b>{c.after}</span>
-					<span class="pair"><em>殿</em>{read(v.d)}<em>金</em>{read(v.j)}</span>
+					<span class="ctx">{c.before}<b class="d">{read(v.d) || '‸'}</b>{c.after}</span>
+					<span class="pair"
+						><em>殿</em>{#if read(v.d)}<b>{read(v.d)}</b>{:else}<i class="none">{t ? '無' : '无'}</i>{/if}<em>金</em>{#if read(v.j)}<b
+								>{read(v.j)}</b
+							>{:else}<i class="none">{t ? '無' : '无'}</i>{/if}</span
+					>
 				</button>
 			</li>
 		{:else}
@@ -84,12 +88,12 @@
 		padding: 8px 10px 4px;
 	}
 	.filters button {
-		border: 1px solid var(--chrome-edge);
+		border: 1px solid var(--panel-edge);
 		background: var(--paper);
 		border-radius: 3px;
 		padding: 2px 8px;
 		cursor: pointer;
-		font-size: 12px;
+		font-size: 13px;
 		opacity: 0.55;
 	}
 	.filters button.on {
@@ -100,7 +104,7 @@
 		color: var(--ink-soft);
 	}
 	.stats {
-		font-size: 12px;
+		font-size: 13px;
 		color: var(--ink-soft);
 		padding: 2px 10px 6px;
 		line-height: 1.6;
@@ -124,13 +128,13 @@
 		text-align: left;
 		padding: 4px;
 		cursor: pointer;
-		border-bottom: 1px dotted var(--chrome-edge);
+		border-bottom: 1px dotted var(--panel-edge);
 	}
 	li.sel button {
 		background: var(--var-sel);
 	}
 	.kind {
-		font-size: 11px;
+		font-size: 12px;
 		color: var(--var-dot);
 	}
 	.kind.taboo {
@@ -141,7 +145,7 @@
 	}
 	.ctx {
 		color: var(--ink-note);
-		font-size: 13px;
+		font-size: 14.5px;
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
@@ -150,7 +154,19 @@
 		color: var(--ink);
 	}
 	.pair {
-		font-size: 14px;
+		font-size: 15px;
+	}
+	.pair b {
+		font-weight: 400;
+		color: var(--ink);
+	}
+	.none {
+		font-style: normal;
+		font-size: 12px;
+		color: var(--ink-soft);
+		border: 1px solid var(--panel-edge);
+		border-radius: 2px;
+		padding: 0 3px;
 	}
 	.pair em {
 		font-style: normal;
@@ -163,7 +179,7 @@
 		padding: 10px;
 	}
 	.foot {
-		font-size: 11px;
+		font-size: 12px;
 		color: var(--ink-soft);
 		padding: 6px 10px;
 		line-height: 1.6;

@@ -1,7 +1,7 @@
 <script lang="ts">
 	// One vertical column of the text: cells are absolutely placed on a row grid.
 	import type { Column } from '#lib/layout.js';
-	import { app } from '#lib/state.svelte.js';
+	import { app, NOTE_LABEL, NOTE_INFO } from '#lib/state.svelte.js';
 
 	let {
 		col,
@@ -42,9 +42,12 @@
 			data-v={c.v ?? c.vgap}
 			data-note={c.note}
 			data-add={c.add}
-			title={c.add ? `点校本补「${c.add}」` : c.del ? '点校本删去此字' : c.r ? '四库录文缺此字，据金陵本补' : c.qb ? '原刻缺末笔，避清讳' : undefined}
-			style="top:{c.y * unit}px;height:{c.h * unit}px;{c.x === 2 ? `width:${width}px;font-size:${c.k === 'p' ? unit * 0.62 : unit * 0.86}px` : `width:${width / 2}px;left:${c.x === 0 ? width / 2 : 0}px;font-size:${Math.min(width / 2, unit * c.h) * 0.92}px;--stretch:${noteStretch}`}"
-			>{c.ch}{#if c.mark}<i class="mark" class:stop={c.mark === '。'}></i>{/if}</span
+			title={c.add ? `点校本补「${c.add}」` : c.del ? '点校本删去此字' : c.r ? '四库录文缺此字，据金陵本补' : c.qb ? '原刻缺末笔，避清讳' : c.kinds ? `${c.kinds.map((k) => NOTE_LABEL[k]).join('、')}（点击查看）` : c.k === 'l' && c.nk ? `${NOTE_LABEL[c.nk]}：${NOTE_INFO[c.nk].who}` : undefined}
+			style="top:{c.y * unit}px;height:{c.h * unit}px;{c.x === 2 ? `width:${width}px;font-size:${c.k === 'p' ? unit * 0.62 : unit * 0.86}px` : `width:${width / 2}px;left:${c.x === 0 ? width / 2 : 0}px;font-size:${Math.min(width / 2, unit * c.h) * 0.92}px;--stretch:${noteStretch}`}{c.nk ? `;--nc:var(--n-${c.nk})` : ''}"
+			>{c.ch}{#if c.mark}<i class="mark" class:stop={c.mark === '。'}></i>{/if}{#if c.kinds}{#each c.kinds as nk (nk)}<i
+					class="dot"
+					style="background:var(--n-{nk})"
+				></i>{/each}{/if}</span
 		>
 	{/each}
 </div>
@@ -55,6 +58,7 @@
 	}
 	.c {
 		position: absolute;
+		font-family: var(--text-font);
 		left: 0;
 		display: flex;
 		align-items: center;
@@ -72,8 +76,19 @@
 		letter-spacing: 0;
 	}
 	.c.n {
-		color: var(--ink-note);
+		color: var(--nc, var(--ink-note));
 		cursor: pointer;
+	}
+	/* a note reduced to a mark: one dot per commentary, coloured like its label */
+	.c.k {
+		cursor: pointer;
+		gap: 2px;
+	}
+	.dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		box-shadow: 0 0 0 1px var(--paper);
 	}
 	.c.n.half {
 		transform: scaleY(var(--stretch, 1));
@@ -81,7 +96,7 @@
 	/* 陰文: the commentary's name cut in white on black */
 	.c.l {
 		color: var(--paper);
-		background: var(--ink-note);
+		background: var(--nc, var(--ink-note));
 		box-shadow: inset 0 0 0 1px var(--paper);
 		border-radius: 2px;
 		cursor: pointer;
@@ -119,22 +134,28 @@
 	.c.on {
 		color: var(--accent);
 	}
-	.c.v::before,
-	.c.vgap::before {
+	/* 異文: a short orange bar beside the character (kept clear of the round 句讀 marks);
+	   text present in only the other edition: an orange wedge between two characters */
+	.c.v::before {
 		content: '';
 		position: absolute;
-		right: 2px;
-		top: 50%;
-		width: 5px;
-		height: 5px;
-		margin-top: -2.5px;
-		border-radius: 50%;
+		right: 0;
+		top: 18%;
+		bottom: 18%;
+		width: 3px;
+		border-radius: 2px;
 		background: var(--var-dot);
 	}
 	.c.vgap::before {
-		top: 100%;
-		background: transparent;
-		border: 1px solid var(--var-dot);
+		content: '';
+		position: absolute;
+		right: -1px;
+		bottom: -4px;
+		width: 0;
+		height: 0;
+		border-top: 4px solid transparent;
+		border-bottom: 4px solid transparent;
+		border-right: 7px solid var(--var-dot);
 	}
 	.c.vsel {
 		background: var(--var-sel);

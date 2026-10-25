@@ -2,7 +2,7 @@
 // main text one character per cell, commentary as 雙行小注 (two half-width sub-columns),
 // and optional punctuation either as 句讀 marks beside characters or as cells of its own.
 import type { Chapter, Ed, NoteKind, Script, Segment } from './types';
-import type { Punct } from './state.svelte';
+import type { NotesMode, Punct } from './state.svelte';
 import { NOTE_LABEL, NOTE_LABEL_T } from './state.svelte';
 
 export interface Cell {
@@ -13,8 +13,8 @@ export interface Cell {
 	/** 2: full width; 0: right half; 1: left half */
 	x: 0 | 1 | 2;
 	ch: string;
-	/** m: main text, n: note text, l: note label (陰文), p: punctuation, h: heading */
-	k: 'm' | 'n' | 'l' | 'p' | 'h';
+	/** m: main text, n: note text, l: note label (陰文), p: punctuation, h: heading, k: note mark */
+	k: 'm' | 'n' | 'l' | 'p' | 'h' | 'k';
 	seg?: string;
 	i?: number;
 	tag?: 'p' | 'l';
@@ -32,6 +32,8 @@ export interface Cell {
 	mark?: '。' | '、';
 	note?: string;
 	nk?: NoteKind;
+	/** for a note mark: the commentaries in the note */
+	kinds?: NoteKind[];
 }
 
 export interface Column {
@@ -54,6 +56,7 @@ export interface LayoutOptions {
 	script: Script;
 	punct: Punct;
 	notes: Record<NoteKind, boolean>;
+	notesMode: NotesMode;
 	rows: number;
 	/** height of a note character, in rows */
 	noteH: number;
@@ -120,6 +123,11 @@ export function layoutChapter(ch: Chapter, o: LayoutOptions): Layout {
 	const placeNote = (id: string, seg: string) => {
 		const note = notesOf(id);
 		if (!note) return;
+		if (o.notesMode === 'mark') {
+			const kinds = [...new Set(note.parts.map((p) => p.k))].filter((k) => o.notes[k]);
+			if (kinds.length) place({ h: 0.42, x: 2, ch: '', k: 'k', kinds, note: id, seg });
+			return;
+		}
 		const chars: { ch: string; k: 'n' | 'l'; nk: NoteKind }[] = [];
 		for (const part of note.parts) {
 			if (!o.notes[part.k]) continue;

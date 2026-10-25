@@ -25,6 +25,9 @@
 		title: string;
 		paras: { text: string; mark: boolean[] }[];
 		here: boolean;
+		where: string;
+		/** share of the wording found in the primary account */
+		sim: number | null;
 	}
 	let told = $state<Told[]>([]);
 	let loading = $state(false);
@@ -60,6 +63,7 @@
 			const [book, juan] = a.ref.split('-');
 			let texts: string[];
 			let title: string;
+			let heading = '';
 			if (book === 'shiji') {
 				const ch = await loadChapter(a.ref);
 				texts = a.segs ? segText(ch, a.segs[0], a.segs[1]) : [];
@@ -68,9 +72,14 @@
 				const ch: PlainChapter = await loadPlain(a.ref);
 				texts = ch.paras.slice(a.paras[0], a.paras[1] + 1).map((p) => (t ? p.t : p.s));
 				title = (t ? ch.title.t : ch.title.s) || `卷${juan}`;
+				heading = ch.paras[a.paras[0]]?.h ?? '';
 			}
 			if (s.punct === 'none') texts = texts.map((x) => [...x].filter((c) => !PUNCT.test(c)).join(''));
-			res.push({ a, book, title, paras: texts.map((text) => ({ text, mark: [] })), here: a.ref === reading.chapter?.id });
+			// 通鑑 headings are year lines such as 高帝元年（乙未，公元前二〇六年）: keep the reign year
+			heading = heading.replace(/（.*$/, '');
+			const [p0, p1] = a.paras;
+			const where = `${heading ? heading + ' ' : ''}第${p0 + 1}${p1 > p0 ? '–' + (p1 + 1) : ''}段`;
+			res.push({ a, book, title, paras: texts.map((text) => ({ text, mark: [] })), here: a.ref === reading.chapter?.id, where, sim: null });
 		}
 		// mark wording that differs from the primary 史記 account
 		const primary = res.find((r) => r.here) ?? res.find((r) => r.book === 'shiji');
@@ -87,14 +96,19 @@
 				if (r === primary) continue;
 				const k = key(r);
 				let n = 0;
+				let marked = 0;
 				for (const part of diffArrays(base.chars, k.chars)) {
 					if (part.removed) continue;
-					if (part.added) for (let q = 0; q < part.count!; q++) {
-						const [pi, ci] = k.at[n + q];
-						r.paras[pi].mark[ci] = true;
+					if (part.added) {
+						marked += part.count!;
+						for (let q = 0; q < part.count!; q++) {
+							const [pi, ci] = k.at[n + q];
+							r.paras[pi].mark[ci] = true;
+						}
 					}
 					n += part.count!;
 				}
+				r.sim = k.chars.length ? 1 - marked / k.chars.length : null;
 			}
 		}
 		told = res;
@@ -117,6 +131,23 @@
 		else reading.open(r.a.ref, r.a.segs[0]).then(() => app.goto(r.a.segs![0]));
 	}
 	const chapterEvents = $derived(reading.chapterEvents);
+	const BOOKS = ['shiji', 'hanshu', 'tongjian'] as const;
+	const chapterTitle = (ref: string) => {
+		const [b] = ref.split('-');
+		const c = reading.catalog?.books[b]?.chapters.find((x) => x.id === ref);
+		return c ? (t ? c.t : c.title) : ref;
+	};
+	// which books tell this event, and where
+	const coverage = $derived(
+		event
+			? BOOKS.map((b) => ({
+					b,
+					titles: [...new Set(event.accounts.filter((a) => a.ref.startsWith(b + '-')).map((a) => a.ref))].map(chapterTitle),
+					absent: event.absent?.[b]
+				}))
+			: []
+	);
+	let how = $state(false);
 	function pick(id: string) {
 		const x = chapterEvents.find((c) => c.e.id === id);
 		if (!x) return;
@@ -138,14 +169,33 @@
 			{#if between}<span class="when soft">{t ? '前事' : '前事'}</span>{/if}
 			<span class="when">{eraLabel(event.ey)}{monthLabel(event.m)}{event.approx ? '前后' : ''} · 前{bceOf(event.ey, event.m)}</span>
 		{/if}
+		<button class="how-btn" class:open={how} onclick={() => (how = !how)} aria-label="对读如何系联">?</button>
 		<button class="wide-btn" onclick={() => (app.parallelWide = !app.parallelWide)}>{wide ? (t ? '收起' : '收起') : t ? '展開' : '展开'}</button>
 	</div>
+	{#if how}
+		<div class="how">
+			{t
+				? '每一事先由人工在《史記》《漢書》《資治通鑑》中各定一句起句（及止句），找到所在段落；再以本事的《史記》原文為準，凡前後段落與之四字連文相合達四分之一者併入，他處重述此事的段落也照此找出，標為「同文」。比照以當前所讀之篇為底本：標色之字是措辭不同處，百分數是該段文字見於底本的比例。'
+				: '每一事先由人工在《史记》《汉书》《资治通鉴》中各定一句起句（及止句），找到所在段落；再以本事的《史记》原文为准，凡前后段落与之四字连文相合达四分之一者并入，他处重述此事的段落也照此找出，标为“同文”。比照以当前所读之篇为底本：标色之字是措辞不同处，百分数是该段文字见于底本的比例。'}
+		</div>
+	{/if}
 	{#if event}
+		<div class="cov">
+			{#each coverage as c (c.b)}
+				<span class="book" class:none={!c.titles.length} title={c.absent ?? ''}>
+					<b>{BOOK[c.b][t ? 1 : 0]}</b>
+					{#if c.titles.length}{c.titles.join('、')}{:else}{t ? '未載' : '未载'}{/if}
+				</span>
+			{/each}
+		</div>
 		<div class="accounts">
-			{#each told as r (r.a.ref + r.a.at)}
+			{#each told as r (r.a.ref + ":" + r.a.paras[0])}
 				<section class="acc" class:here={r.here}>
 					<div class="label">
 						<b>{BOOK[r.book][t ? 1 : 0]}</b>·{r.title}
+						<span class="where">{r.where}</span>
+						{#if r.a.auto}<span class="tag" title="按文字相合找到的段落">同文</span>{/if}
+						{#if r.here}<span class="tag base">底本</span>{:else if r.sim !== null}<span class="sim" title={t ? '此段文字見於底本的比例' : '此段文字见于底本的比例'}>{Math.round(r.sim * 100)}%</span>{/if}
 						{#if r.book === 'shiji' && !r.here}<button onclick={() => open(r)}>{t ? '往讀' : '往读'}</button>{/if}
 					</div>
 					<div class="vt">
@@ -157,7 +207,10 @@
 			{/each}
 			{#if loading && !told.length}<div class="msg">……</div>{/if}
 		</div>
-		<div class="foot">{t ? '標色之字為與史記所述措辭不同處' : '标色之字为与史记所述措辞不同处'}</div>
+		{#each coverage.filter((c) => c.absent) as c (c.b)}
+			<div class="foot">{BOOK[c.b][t ? 1 : 0]}{t ? '未載' : '未载'}：{c.absent}</div>
+		{/each}
+		<div class="foot">{t ? '標色之字為與底本措辭不同處' : '标色之字为与底本措辞不同处'}</div>
 	{:else}
 		<div class="msg">{t ? '移至敘事段落，或從上方選擇事件。' : '移至叙事段落，或从上方选择事件。'}</div>
 	{/if}
@@ -179,24 +232,91 @@
 	}
 	.head select {
 		background: var(--paper);
-		border: 1px solid var(--chrome-edge);
+		border: 1px solid var(--panel-edge);
 		border-radius: 3px;
 		max-width: 220px;
 	}
 	.when {
-		font-size: 12px;
+		font-size: 13px;
 		color: var(--accent);
 	}
 	.when.soft {
 		color: var(--ink-soft);
 	}
-	.wide-btn {
+	.how-btn {
 		margin-left: auto;
-		border: 1px solid var(--chrome-edge);
+		width: 22px;
+		height: 22px;
+		border-radius: 50%;
+		border: 1px solid var(--panel-edge);
+		background: var(--paper);
+		cursor: pointer;
+		font-size: 12px;
+		padding: 0;
+	}
+	.how-btn.open {
+		background: var(--accent);
+		border-color: var(--accent);
+		color: #fff8ee;
+	}
+	.how {
+		margin: 0 10px 8px;
+		padding: 8px 10px;
+		background: var(--paper);
+		border-left: 3px solid var(--accent);
+		font-size: 13.5px;
+		line-height: 1.7;
+		color: var(--ink-note);
+	}
+	.cov {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		padding: 0 10px 8px;
+		font-size: 13px;
+	}
+	.cov .book {
+		background: var(--paper);
+		border: 1px solid var(--panel-edge);
+		border-radius: 3px;
+		padding: 1px 7px;
+		color: var(--ink-note);
+	}
+	.cov .book b {
+		color: var(--accent);
+		margin-right: 3px;
+	}
+	.cov .book.none {
+		opacity: 0.6;
+		border-style: dashed;
+	}
+	.cov .book.none b {
+		color: var(--ink-soft);
+	}
+	.where {
+		color: var(--ink-soft);
+		font-size: 12px;
+	}
+	.tag {
+		font-size: 11.5px;
+		padding: 0 5px;
+		border-radius: 2px;
+		background: var(--n-suoyin);
+		color: #fff;
+	}
+	.tag.base {
+		background: var(--accent);
+	}
+	.sim {
+		font-size: 12px;
+		color: var(--n-jijie);
+	}
+	.wide-btn {
+		border: 1px solid var(--panel-edge);
 		background: var(--paper);
 		border-radius: 3px;
 		cursor: pointer;
-		font-size: 12px;
+		font-size: 13px;
 	}
 	.accounts {
 		flex: 1;
@@ -215,7 +335,7 @@
 	}
 	.acc {
 		background: var(--paper);
-		border: 1px solid var(--chrome-edge);
+		border: 1px solid var(--panel-edge);
 		border-radius: 4px;
 		padding: 6px 8px;
 		display: flex;
@@ -230,7 +350,7 @@
 		border-color: var(--accent);
 	}
 	.label {
-		font-size: 12px;
+		font-size: 13px;
 		color: var(--ink-soft);
 		margin-bottom: 4px;
 		display: flex;
@@ -246,10 +366,11 @@
 		background: none;
 		color: var(--place-line);
 		cursor: pointer;
-		font-size: 12px;
+		font-size: 13px;
 	}
 	.vt {
 		writing-mode: vertical-rl;
+		font-family: var(--text-font);
 		height: 250px;
 		overflow-x: auto;
 		overflow-y: hidden;
@@ -279,7 +400,7 @@
 	}
 	.foot,
 	.msg {
-		font-size: 12px;
+		font-size: 13px;
 		color: var(--ink-soft);
 		padding: 6px 10px;
 	}

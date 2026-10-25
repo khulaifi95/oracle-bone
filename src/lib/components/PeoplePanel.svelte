@@ -5,6 +5,7 @@
 	import { reading } from '#lib/reading.svelte.js';
 	import { occurrences } from '#lib/find.js';
 	import type { Person } from '#lib/types.js';
+	import Seal from './Seal.svelte';
 
 	const s = app.settings;
 	const t = $derived(s.script === 't');
@@ -69,17 +70,33 @@
 <div class="people">
 	{#if person}
 		<article class="card" style="--c:var(--{person.side})">
-			<header>
-				<h2>{nm(person)}</h2>
-				{#if person.zi}<span class="zi">{t ? '字' : '字'}{person.zi}</span>{/if}
-				<span class="side">{SIDE_LABEL[person.side]}</span>
-				<button class="x" onclick={() => (app.person = null)} aria-label="关闭">×</button>
-			</header>
-			<div class="facts">
-				{#if lifeLine(person)}<span>{lifeLine(person)}</span>{/if}
-				{#if date && status(person)}<span class="age">{eraLabel(date.ey)}{status(person)}</span>{/if}
-				{#if titleAt(person, date?.ey)}<span class="now">{titleAt(person, date?.ey)}</span>{/if}
+			<div class="top">
+				<figure class="pic">
+					{#if person.portrait}
+						<img src="./{person.portrait.image}" alt={nm(person)} />
+					{:else}
+						<Seal name={person.t} size={92} color="var(--{person.side})" />
+					{/if}
+				</figure>
+				<div class="who">
+					<header>
+						<h2>{nm(person)}</h2>
+						{#if person.zi}<span class="zi">字{person.zi}</span>{/if}
+						<span class="side">{SIDE_LABEL[person.side]}</span>
+						<button class="x" onclick={() => (app.person = null)} aria-label="关闭">×</button>
+					</header>
+					<div class="facts">
+						{#if lifeLine(person)}<span>{lifeLine(person)}</span>{/if}
+						{#if date && status(person)}<span class="age">{eraLabel(date.ey)}{status(person)}</span>{/if}
+					</div>
+					{#if titleAt(person, date?.ey)}<div class="now">{titleAt(person, date?.ey)}</div>{/if}
+				</div>
 			</div>
+			{#if person.portrait}
+				<div class="credit">
+					{t ? '圖' : '图'}：{#if person.portrait.page}<a href={person.portrait.page} target="_blank" rel="noreferrer">{person.portrait.source}</a>{:else}{person.portrait.source}{/if}
+				</div>
+			{/if}
 			{#if person.bornNote}<div class="small">{person.bornNote}</div>{/if}
 			{#if person.aliases.length > 1}
 				<div class="small">{t ? '文中稱' : '文中称'}：{person.aliases.join('、')}</div>
@@ -117,7 +134,7 @@
 		<div class="chips">
 			{#each nearby as p (p.id)}
 				<button class="chip" class:on={p.id === app.person} style="--c:var(--{p.side})" onclick={() => (app.person = p.id)}>
-					{nm(p)}{#if status(p)}<small>{status(p)}</small>{/if}
+					{#if p.portrait}<img class="av" src="./{p.portrait.image}" alt="" />{/if}{nm(p)}{#if status(p)}<small>{status(p)}</small>{/if}
 				</button>
 			{:else}
 				<span class="small">—</span>
@@ -129,7 +146,7 @@
 		<div class="chips">
 			{#each inChapter as { p, n } (p.id)}
 				<button class="chip" class:on={p.id === app.person} style="--c:var(--{p.side})" onclick={() => (app.person = p.id)}>
-					{nm(p)}<small>{n}</small>
+					{#if p.portrait}<img class="av" src="./{p.portrait.image}" alt="" />{/if}{nm(p)}<small>{n}</small>
 				</button>
 			{/each}
 		</div>
@@ -144,7 +161,7 @@
 	}
 	.card {
 		background: var(--paper);
-		border: 1px solid var(--chrome-edge);
+		border: 1px solid var(--panel-edge);
 		border-top: 3px solid var(--c);
 		border-radius: 4px;
 		padding: 10px 12px;
@@ -157,14 +174,14 @@
 	}
 	h2 {
 		margin: 0;
-		font-size: 22px;
+		font-size: 26px;
 		letter-spacing: 0.1em;
 	}
 	.zi {
 		color: var(--ink-note);
 	}
 	.side {
-		font-size: 12px;
+		font-size: 13px;
 		color: var(--c);
 		border: 1px solid var(--c);
 		padding: 0 4px;
@@ -183,29 +200,31 @@
 		flex-wrap: wrap;
 		gap: 10px;
 		margin: 6px 0 2px;
-		font-size: 13px;
+		font-size: 14.5px;
 	}
 	.age {
 		color: var(--accent);
 	}
 	.now {
-		font-weight: 600;
+		font-weight: 700;
+		color: var(--c);
+		margin-top: 4px;
 	}
 	.small {
-		font-size: 12px;
+		font-size: 13px;
 		color: var(--ink-soft);
 		margin: 2px 0;
 	}
 	p {
 		line-height: 1.75;
-		font-size: 13.5px;
+		font-size: 15px;
 		margin: 8px 0;
 	}
 	.titles {
 		list-style: none;
 		padding: 0;
 		margin: 6px 0;
-		font-size: 12.5px;
+		font-size: 13.5px;
 	}
 	.titles li {
 		display: flex;
@@ -234,18 +253,18 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		font-size: 12px;
+		font-size: 13px;
 		color: var(--ink-soft);
-		border-top: 1px solid var(--chrome-edge);
+		border-top: 1px solid var(--panel-edge);
 		padding-top: 6px;
 		margin-top: 6px;
 	}
 	.occ-head button {
-		border: 1px solid var(--chrome-edge);
+		border: 1px solid var(--panel-edge);
 		background: var(--panel);
 		border-radius: 3px;
 		cursor: pointer;
-		font-size: 12px;
+		font-size: 13px;
 	}
 	.occ {
 		list-style: none;
@@ -260,7 +279,7 @@
 		text-align: left;
 		padding: 3px 2px;
 		cursor: pointer;
-		font-size: 13px;
+		font-size: 14.5px;
 		color: var(--ink-note);
 		width: 100%;
 	}
@@ -272,7 +291,7 @@
 		background: var(--sel);
 	}
 	h3 {
-		font-size: 13px;
+		font-size: 14.5px;
 		color: var(--ink-soft);
 		font-weight: 400;
 		margin: 10px 0 6px;
@@ -283,14 +302,54 @@
 		flex-wrap: wrap;
 		gap: 5px;
 	}
+	.top {
+		display: flex;
+		gap: 12px;
+		align-items: flex-start;
+	}
+	.pic {
+		margin: 0;
+		flex-shrink: 0;
+	}
+	.pic img {
+		display: block;
+		width: 110px;
+		height: 140px;
+		object-fit: cover;
+		object-position: top;
+		border: 1px solid var(--panel-edge);
+		border-radius: 3px;
+		background: #efe4c8;
+	}
+	.who {
+		flex: 1;
+		min-width: 0;
+	}
+	.credit {
+		font-size: 11.5px;
+		color: var(--ink-soft);
+		margin-top: 4px;
+	}
+	.credit a {
+		color: inherit;
+	}
+	.av {
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		object-fit: cover;
+		object-position: top;
+		vertical-align: -5px;
+		margin-right: 4px;
+	}
 	.chip {
-		border: 1px solid var(--chrome-edge);
+		border: 1px solid var(--panel-edge);
 		border-left: 3px solid var(--c);
 		background: var(--paper);
 		border-radius: 3px;
 		padding: 2px 7px;
 		cursor: pointer;
-		font-size: 13px;
+		font-size: 14.5px;
 	}
 	.chip.on {
 		background: var(--accent-soft);
@@ -298,6 +357,6 @@
 	.chip small {
 		color: var(--ink-soft);
 		margin-left: 4px;
-		font-size: 11px;
+		font-size: 12px;
 	}
 </style>

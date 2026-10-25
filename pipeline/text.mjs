@@ -8,7 +8,7 @@ import { parseSiku, splitNote, QUEBI, isPUA, fixPUA } from './siku.mjs';
 import { normChar, toSimplified, toTraditional, PUNCT_AFTER, PUNCT_BEFORE } from './script.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const PLACEHOLDER = new Set(['防', '□', '�']);
+const PLACEHOLDER = new Set(['防', '□', '�', '〓']);
 const isPlaceholder = (c) => PLACEHOLDER.has(c) || isPUA(c);
 // Kinds of difference between the editions. 'form': variant glyphs of one word (異體字);
 // 'taboo': the Qing 殿本 avoiding an emperor's or Confucius' name (避諱); 'graphic': look-alike
@@ -158,6 +158,17 @@ function tradVia(sText, tRef) {
 	return s.map((c, i) => (aToB[i] >= 0 ? t[aToB[i]] : fallback[i])).join('');
 }
 
+/** Placeholder glyphs in a 四庫 note, filled from the aligned 金陵本 note where the two run the same length. */
+function restoreNote(sText, tRef) {
+	const s = [...sText];
+	if (!tRef || !s.some(isPlaceholder)) return sText;
+	const t = [...toSimplified(tRef)];
+	const { regions } = align(s, t);
+	for (const r of regions)
+		if (r.a1 - r.a0 === r.b1 - r.b0) for (let k = r.a0; k < r.a1; k++) if (isPlaceholder(s[k])) s[k] = normChar(t[r.b0 + k - r.a0]);
+	return s.join('');
+}
+
 const SENTENCE_END = /[。？！]/;
 
 export async function buildShijiChapter(juan) {
@@ -256,7 +267,7 @@ export function assemble({ juan, J, D, header, titles, kaozheng: kzList, splitD 
 	// Notes of the 金陵本.
 	const jNotes = {};
 	for (const note of J.notes) {
-		jNotes[note.id] = { parts: note.parts.map((p) => ({ k: p.k, s: toSimplified(p.t), t: p.t, ...(p.src ? { src: p.src } : {}) })) };
+		jNotes[note.id] = { parts: note.parts.map((p) => ({ k: p.k, s: toSimplified(p.t), t: p.t, ...(p.src ? { src: p.src, srcS: toSimplified(p.src) } : {}) })) };
 	}
 	// Notes of the 四庫/殿本, labelled and traditionalised with help from the aligned 金陵本 notes.
 	const dNotes = {};
@@ -273,8 +284,8 @@ export function assemble({ juan, J, D, header, titles, kaozheng: kzList, splitD 
 		const refText = refParts.map((p) => p.t.replace(/[，。、；：？！「」『』《》〈〉（）　]/g, '')).join('');
 		dNotes[note.id] = {
 			parts: splitD(note, refParts).map((p) => {
-				const s = [...p.text].map(normChar).join('');
-				return { k: p.kind, s, t: tradVia(s, refText), ...(p.src ? { src: p.src } : {}) };
+				const s = restoreNote([...p.text].map(normChar).join(''), refText);
+				return { k: p.kind, s, t: tradVia(s, refText), ...(p.src ? { src: p.src, srcS: toSimplified(p.src) } : {}) };
 			})
 		};
 	}

@@ -304,7 +304,13 @@ function similarity(a, b) {
 }
 
 /** For each 左氏 經 entry, the 公羊 or 穀梁 entry of the same year that reads most like it. */
-export function matchSanzhuan(zuoEntries, pageEntries) {
+export function matchSanzhuan(zuoEntries, rawEntries) {
+	// a line can hold several 經 with one 傳 after them: the 傳 goes with the last, the others have none
+	const pageEntries = rawEntries.flatMap((e) => {
+		if (!e.split) return [e];
+		const parts = e.jing.split(/(?<=。)/).filter((x) => x.trim());
+		return parts.length < 2 ? [e] : parts.map((jing, k) => ({ ...e, jing, zhuan: k === parts.length - 1 ? e.zhuan : null }));
+	});
 	const out = new Map();
 	const used = new Set();
 	for (const z of zuoEntries) {

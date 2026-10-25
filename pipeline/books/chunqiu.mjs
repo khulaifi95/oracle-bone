@@ -220,6 +220,8 @@ export const book = {
 	title: '春秋',
 	t: '春秋',
 	cluster: { s: '晋文之霸', t: '晉文之霸' },
+	// the title the edition prints in the 卷首 and the 版心
+	printed: { s: '春秋左传注疏', t: '春秋左傳注疏' },
 	notes: [
 		{
 			k: 'du', s: '注', t: '注', color: '#285f93', on: true, who: '晋 杜预',
@@ -302,11 +304,11 @@ export const book = {
 	],
 	// 隱公's first years and 僖公's last twelve are drawn wide, the years between folded
 	timeline: {
-		breaks: [[-723, 0], [-719, 0.16], [-639, 0.2], [-626, 1]],
+		breaks: [[-723, 0], [-719, 0.12], [-640, 0.2], [-626, 1]],
 		from: -722,
 		to: -627,
 		major: [-638, -627],
-		minor: [-722, -721, -720, -700, -680, -660],
+		minor: [-722, -720, -680],
 		marks: [
 			{ ey: -722, s: '隐公元年', t: '隱公元年' },
 			{ ey: -659, s: '僖公', t: '僖公' },

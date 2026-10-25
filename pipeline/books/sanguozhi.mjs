@@ -20,11 +20,15 @@ export const chapters = [
 
 // The 裴注 quotes other books by name: each quotation becomes a part of its own, with its source.
 const QUOTE = /(?<=[。」』？！])(?=《[^》]{1,12}》(?:曰|云|載|稱|說|注)|臣松之|孫盛曰|習鑿齒曰)/;
-function sourceOf(t) {
-	const book = t.match(/^《([^》]{1,12})》/);
-	if (book) return book[1];
+// those quoted by name rather than by book
+const WHO = /^(孫盛|習鑿齒|傅子|袁宏|干寶|袁子|司馬彪|郭沖|魚豢|張璠|華嶠|虞喜|王隱|徐眾|臣松之)(?:曰|以為|按|案|評|難)?/;
+function sourceOf(text) {
+	// 〔〕: words the 點校本 restores
+	const t = text.replace(/^〔/, '');
+	const book = t.match(/^(?:按|案)?(謝承|司馬彪|張璠|袁暐|郭沖|虞溥|華嶠|王沈|韋昭|魚豢)?《([^》]{1,12})》/);
+	if (book) return (book[1] ?? '') + book[2];
 	if (t.startsWith('臣松之')) return '臣松之';
-	const who = t.match(/^(孫盛|習鑿齒|傅子|袁宏)曰/);
+	const who = t.match(WHO);
 	return who ? who[1] : null;
 }
 const splitParts = (p) =>
@@ -138,11 +142,13 @@ export const book = {
 	title: '三国志',
 	t: '三國志',
 	cluster: { s: '赤壁三分', t: '赤壁三分' },
+	// the title the edition prints in the 卷首 and the 版心
+	printed: { s: '三国志', t: '三國志' },
 	// a 卷 can hold several lives, each under its own heading
 	subheadings: true,
 	notes: [
 		{
-			k: 'pei', s: '裴注', t: '裴注', color: '#285f93', on: false, who: '南朝宋 裴松之',
+			k: 'pei', s: '裴注', t: '裴注', color: '#285f93', on: true, who: '南朝宋 裴松之',
 			info: {
 				s: '宋文帝元嘉六年（429）奏上。不重训诂而重补阙：广引《魏书》《魏略》《江表传》《汉晋春秋》《英雄记》等二百余种书，有异同者并存，又以“臣松之案”“臣松之以为”评断是非。所引之书多已亡佚，赖此得存。',
 				t: '宋文帝元嘉六年（429）奏上。不重訓詁而重補闕：廣引《魏書》《魏略》《江表傳》《漢晉春秋》《英雄記》等二百餘種書，有異同者並存，又以「臣松之案」「臣松之以為」評斷是非。所引之書多已亡佚，賴此得存。'

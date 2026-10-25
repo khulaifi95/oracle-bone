@@ -6,7 +6,7 @@
 		"short": "四库本",
 		"full": "文渊阁四库全书本《春秋左传注疏》六十卷，据乾隆四年武英殿刊《十三经注疏》缮写，附考证",
 		"date": "1739／1781",
-		"layout": { "cols": 8, "rows": 21, "noteRows": 21, "frame": "四周双边", "mouth": "白口", "fishtail": 1, "desc": "半叶八行，行二十一字，小字双行同；白口，单鱼尾，四周双边" },
+		"layout": { "cols": 8, "rows": 21, "noteRows": 21, "frame": "四周双边", "mouth": "白口", "fishtail": 1, "desc": "半叶八行，行二十一字，小字双行同；白口，单鱼尾，四周双边" , "top": "欽定四庫全書" },
 		"commentary": ["du", "yinyi", "shu", "kaozheng"],
 		"source": {
 			"name": "维基文库《春秋左傳注疏 (四庫全書本)》",

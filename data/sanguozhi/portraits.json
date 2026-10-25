@@ -1,62 +1,290 @@
 {
 	"cao-cao": {
-		"article": "曹操",
-		"file": "Cao_Cao_scth.jpg",
-		"licence": "Public domain",
-		"artist": "Wang Qi",
-		"description": "A portrait of Cao Cao from Sancai Tuhui.",
+		"image": "portraits/cao-cao.jpg",
+		"source": "三才图会（明王圻、王思义编，万历三十七年刊）",
 		"page": "https://commons.wikimedia.org/wiki/File:Cao_Cao_scth.jpg",
-		"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Cao_Cao_scth.jpg/250px-Cao_Cao_scth.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-		"image": "portraits/cao-cao.jpg"
+		"licence": "Public domain"
 	},
 	"liu-bei": {
-		"article": "刘备",
-		"file": "Liu_Bei_Tang.jpg",
-		"licence": "Public domain",
-		"artist": "Yan Liben (閻立本)",
-		"description": "",
+		"image": "portraits/liu-bei.jpg",
+		"source": "历代帝王图（传唐阎立本绘），波士顿美术馆藏",
 		"page": "https://commons.wikimedia.org/wiki/File:Liu_Bei_Tang.jpg",
-		"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Liu_Bei_Tang.jpg/250px-Liu_Bei_Tang.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-		"image": "portraits/liu-bei.jpg"
+		"licence": "Public domain"
 	},
 	"sun-quan": {
-		"article": "孙权",
-		"file": "Sun_Quan_Tang.jpg",
-		"licence": "Public domain",
-		"artist": "Yan Liben",
-		"description": "",
+		"image": "portraits/sun-quan.jpg",
+		"source": "历代帝王图（传唐阎立本绘），波士顿美术馆藏",
 		"page": "https://commons.wikimedia.org/wiki/File:Sun_Quan_Tang.jpg",
-		"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Sun_Quan_Tang.jpg/250px-Sun_Quan_Tang.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-		"image": "portraits/sun-quan.jpg"
-	},
-	"zhuge-liang": {
-		"article": "诸葛亮",
-		"file": "蜀汉丞相忠武侯诸葛亮.jpg",
-		"licence": "Public domain",
-		"artist": "Unknown authorUnknown author",
-		"description": "Zhuge Liang",
-		"page": "https://commons.wikimedia.org/wiki/File:%E8%9C%80%E6%B1%89%E4%B8%9E%E7%9B%B8%E5%BF%A0%E6%AD%A6%E4%BE%AF%E8%AF%B8%E8%91%9B%E4%BA%AE.jpg",
-		"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/%E8%9C%80%E6%B1%89%E4%B8%9E%E7%9B%B8%E5%BF%A0%E6%AD%A6%E4%BE%AF%E8%AF%B8%E8%91%9B%E4%BA%AE.jpg/250px-%E8%9C%80%E6%B1%89%E4%B8%9E%E7%9B%B8%E5%BF%A0%E6%AD%A6%E4%BE%AF%E8%AF%B8%E8%91%9B%E4%BA%AE.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-		"image": "portraits/zhuge-liang.jpg"
+		"licence": "Public domain"
 	},
 	"zhou-yu": {
-		"article": "周瑜",
-		"file": "ZhouYu.jpg",
-		"licence": "Public domain",
-		"artist": "Unknown authorUnknown author",
-		"description": "Portrait of the general Zhou Yu from a Qing Dynasty edition of The Romance of the Three Kingdoms.",
+		"image": "portraits/zhou-yu.jpg",
+		"source": "清刊《三国演义》绣像",
 		"page": "https://commons.wikimedia.org/wiki/File:ZhouYu.jpg",
-		"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/ZhouYu.jpg/250px-ZhouYu.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-		"image": "portraits/zhou-yu.jpg"
+		"licence": "Public domain"
 	},
 	"lu-su": {
-		"article": "鲁肃",
-		"file": "LuSu.jpg",
-		"licence": "Public domain",
-		"artist": "Unknown authorUnknown author",
-		"description": "Portrait of the advisor Lu Su from a Qing Dynasty edition of The Romance of the Three Kingdoms.",
+		"image": "portraits/lu-su.jpg",
+		"source": "清刊《三国演义》绣像",
 		"page": "https://commons.wikimedia.org/wiki/File:LuSu.jpg",
-		"thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/LuSu.jpg/250px-LuSu.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-		"image": "portraits/lu-su.jpg"
+		"licence": "Public domain"
+	},
+	"lu-meng": {
+		"image": "portraits/lu-meng.jpg",
+		"source": "清光绪间刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Lu_Meng.jpg",
+		"licence": "Public domain"
+	},
+	"sun-ce": {
+		"image": "portraits/sun-ce.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Sun_Ce_Portrait.jpg",
+		"licence": "Public domain"
+	},
+	"sun-jian": {
+		"image": "portraits/sun-jian.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Sun_Jian_Qing_dynasty_illustration.jpg",
+		"licence": "Public domain"
+	},
+	"guan-yu": {
+		"image": "portraits/guan-yu.jpg",
+		"source": "旧刻本画像",
+		"page": "https://commons.wikimedia.org/wiki/File:Guanyu-1.jpg",
+		"licence": "Public domain"
+	},
+	"zhang-fei": {
+		"image": "portraits/zhang-fei.jpg",
+		"source": "故宫南薰殿旧藏明人画像",
+		"page": "https://commons.wikimedia.org/wiki/File:%E6%95%85%E5%AE%AB%E5%8D%97%E8%96%B0%E6%AE%BF%E5%BC%A0%E9%A3%9E%E7%94%BB%E5%83%8F.jpg",
+		"licence": "Public domain"
+	},
+	"zhao-yun": {
+		"image": "portraits/zhao-yun.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:ZhaoYun.jpg",
+		"licence": "Public domain"
+	},
+	"pang-tong": {
+		"image": "portraits/pang-tong.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:PangTong.jpg",
+		"licence": "Public domain"
+	},
+	"fa-zheng": {
+		"image": "portraits/fa-zheng.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:FaZheng.jpg",
+		"licence": "Public domain"
+	},
+	"ma-chao": {
+		"image": "portraits/ma-chao.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:MaChao.jpg",
+		"licence": "Public domain"
+	},
+	"huang-zhong": {
+		"image": "portraits/huang-zhong.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Huang_Zhong_Portrait.jpg",
+		"licence": "Public domain"
+	},
+	"wei-yan": {
+		"image": "portraits/wei-yan.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Wei_Yan_Qing_dynasty_illustration.jpg",
+		"licence": "Public domain"
+	},
+	"ma-su": {
+		"image": "portraits/ma-su.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Ma_Su_Portrait.jpg",
+		"licence": "Public domain"
+	},
+	"liu-shan": {
+		"image": "portraits/liu-shan.jpg",
+		"source": "旧刻本画像",
+		"page": "https://commons.wikimedia.org/wiki/File:Liu_Shan.jpg",
+		"licence": "Public domain"
+	},
+	"jiang-wei": {
+		"image": "portraits/jiang-wei.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:JiangWei.jpg",
+		"licence": "Public domain"
+	},
+	"xu-shu": {
+		"image": "portraits/xu-shu.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:XuShu.jpg",
+		"licence": "Public domain"
+	},
+	"liu-biao": {
+		"image": "portraits/liu-biao.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Liu_Biao_Qing_portait.jpg",
+		"licence": "Public domain"
+	},
+	"liu-zhang": {
+		"image": "portraits/liu-zhang.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Liu_Zhang_Qing_portrait.jpg",
+		"licence": "Public domain"
+	},
+	"yuan-shao": {
+		"image": "portraits/yuan-shao.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Yuan_Shao_Portrait.jpg",
+		"licence": "Public domain"
+	},
+	"yuan-shu": {
+		"image": "portraits/yuan-shu.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Yuan_Shu_Qing_portrait.jpg",
+		"licence": "Public domain"
+	},
+	"lu-bu": {
+		"image": "portraits/lu-bu.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:L%C3%BC_Bu_Portrait.jpg",
+		"licence": "Public domain"
+	},
+	"dong-zhuo": {
+		"image": "portraits/dong-zhuo.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Dong_Zhuo_Portrait.jpg",
+		"licence": "Public domain"
+	},
+	"han-xiandi": {
+		"image": "portraits/han-xiandi.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Emperor_Xian_Qing_illustration.jpg",
+		"licence": "Public domain"
+	},
+	"cao-pi": {
+		"image": "portraits/cao-pi.jpg",
+		"source": "历代帝王图（传唐阎立本绘），波士顿美术馆藏",
+		"page": "https://commons.wikimedia.org/wiki/File:Cao_Pi_Tang.jpg",
+		"licence": "Public domain"
+	},
+	"cao-rui": {
+		"image": "portraits/cao-rui.png",
+		"source": "刘锡永等绘《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:%E9%AD%8F%E6%98%8E%E5%B8%9D.png",
+		"licence": "Public domain"
+	},
+	"cao-ren": {
+		"image": "portraits/cao-ren.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Cao_Ren_Qing_illustration.jpg",
+		"licence": "Public domain"
+	},
+	"xiahou-dun": {
+		"image": "portraits/xiahou-dun.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Xiahou_Dun_Portrait.jpg",
+		"licence": "Public domain"
+	},
+	"xiahou-yuan": {
+		"image": "portraits/xiahou-yuan.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Xiahou_Yuan_Portrait.jpg",
+		"licence": "Public domain"
+	},
+	"zhang-liao": {
+		"image": "portraits/zhang-liao.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Zhang_Liao_Portrait.jpg",
+		"licence": "Public domain"
+	},
+	"xun-yu": {
+		"image": "portraits/xun-yu.jpg",
+		"source": "清雍正十二年刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Portrait_of_Xun_Yu.jpg",
+		"licence": "Public domain"
+	},
+	"guo-jia": {
+		"image": "portraits/guo-jia.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:GuoJia.jpg",
+		"licence": "Public domain"
+	},
+	"sima-yi": {
+		"image": "portraits/sima-yi.jpg",
+		"source": "历代古人像赞（明朱天然编，弘治十一年刊）",
+		"page": "https://commons.wikimedia.org/wiki/File:%E9%AD%8F%C2%B7%E5%A4%AA%E5%82%85_%E5%8F%B8%E9%A6%AC%E6%87%BF.jpg",
+		"licence": "Public domain"
+	},
+	"yu-jin": {
+		"image": "portraits/yu-jin.jpg",
+		"source": "旧刻本画像",
+		"page": "https://commons.wikimedia.org/wiki/File:YuJin.jpg",
+		"licence": "CC0"
+	},
+	"zhang-he": {
+		"image": "portraits/zhang-he.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Zhang_He_Portrait.jpg",
+		"licence": "Public domain"
+	},
+	"cao-zhen": {
+		"image": "portraits/cao-zhen.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Cao_Zhen_Qing_illustration.jpg",
+		"licence": "Public domain"
+	},
+	"huang-gai": {
+		"image": "portraits/huang-gai.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:HuangGai.jpg",
+		"licence": "Public domain"
+	},
+	"gan-ning": {
+		"image": "portraits/gan-ning.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:GanNing.jpg",
+		"licence": "Public domain"
+	},
+	"taishi-ci": {
+		"image": "portraits/taishi-ci.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Taishi_Ci_Qing_illustration.jpg",
+		"licence": "Public domain"
+	},
+	"zhuge-jin": {
+		"image": "portraits/zhuge-jin.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Zhuge_Jin_Qing_illustration.jpg",
+		"licence": "Public domain"
+	},
+	"gongsun-zan": {
+		"image": "portraits/gongsun-zan.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Gongsun_Zan_Qing_illustration.jpg",
+		"licence": "Public domain"
+	},
+	"zhang-jiao": {
+		"image": "portraits/zhang-jiao.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Zhang_Jue_Qing_portrait.jpg",
+		"licence": "Public domain"
+	},
+	"zhang-xiu": {
+		"image": "portraits/zhang-xiu.jpg",
+		"source": "清刊《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:Zhang_Xiu_Qing_portrait.jpg",
+		"licence": "Public domain"
+	},
+	"yuan-tan": {
+		"image": "portraits/yuan-tan.png",
+		"source": "刘锡永等绘《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:%E8%A2%81%E8%B0%AD.png",
+		"licence": "Public domain"
+	},
+	"yuan-shang": {
+		"image": "portraits/yuan-shang.png",
+		"source": "刘锡永等绘《三国演义》绣像",
+		"page": "https://commons.wikimedia.org/wiki/File:%E8%A2%81%E5%B0%9A.png",
+		"licence": "Public domain"
 	}
 }

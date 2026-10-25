@@ -5,7 +5,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { loadPlain, PARALLEL_BOOKS, BOOK_NAMES } from './plain.mjs';
 import { buildBasemap } from './geo.mjs';
-import { normChar, toTraditional } from './script.mjs';
+import { normChar, toSimplified, toTraditional } from './script.mjs';
 import * as shiji from './books/shiji.mjs';
 import * as sanguozhi from './books/sanguozhi.mjs';
 import * as chunqiu from './books/chunqiu.mjs';
@@ -156,7 +156,7 @@ for (const B of BOOKS) {
 			juan: c.juan,
 			title: { s: c.title, t: c.t },
 			heading: { d: built.titles.d, j: built.titles.j },
-			header: built.header.map((h) => ({ s: h, t: toTraditional(h) })),
+			header: built.header.map((h) => ({ s: toSimplified(h), t: toTraditional(h) })),
 			...(B.book.subheadings && built.sub?.length > 1 ? { sub: built.sub.map(([seg, h]) => ({ seg, s: normHeading(h), t: h })) } : {}),
 			segs: built.segs,
 			notes: built.notes,

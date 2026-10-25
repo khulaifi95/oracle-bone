@@ -25,6 +25,8 @@ export const book = {
 	title: '史记',
 	t: '史記',
 	cluster: { s: '秦汉之际', t: '秦漢之際' },
+	// the title the edition prints in the 卷首 and the 版心
+	printed: { s: '史记', t: '史記' },
 	notes: [
 		{
 			k: 'jijie', s: '集解', t: '集解', color: '#285f93', on: false, who: '南朝宋 裴骃',

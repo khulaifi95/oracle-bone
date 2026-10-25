@@ -12,8 +12,25 @@ const CACHE = path.join(SRC, 'cache');
 const UA = 'OracleBoneReader/0.1 (https://github.com/khulaifi95/oracle-bone; personal non-commercial reading tool)';
 
 const SHIJI = [7, 8, 48, 55, 92];
+const SANGUOZHI = [1, 32, 35, 47, 54];
+const CHUNQIU = [1, 14, 15, 16];
+const SIKU = [...SHIJI.map((n) => `shiji#${n}`), ...SANGUOZHI.map((n) => `sanguozhi#${n}`)];
 const WIKISOURCE = [
-	...SHIJI.map((n) => [`史記三家註/卷${String(n).padStart(3, '0')}`, `wikisource/shiji-${pad(n)}.wiki`]),
+	// 史記: the reading chapters, and the 秦/晉/楚/鄭 chapters read beside the 春秋
+	...[...SHIJI, 5, 39, 40, 42].map((n) => [`史記三家註/卷${pad(n)}`, `wikisource/shiji-${pad(n)}.wiki`]),
+	...SANGUOZHI.map((n) => [`三國志/卷${String(n).padStart(2, '0')}`, `wikisource/sanguozhi-${pad(n)}.wiki`]),
+	// 春秋: the 四庫 注疏 (殿本) and the punctuated 正義, both cut into the same 卷
+	...CHUNQIU.map((n) => [`春秋左傳注疏 (四庫全書本)/卷${String(n).padStart(2, '0')}`, `wikisource/zhushu-${pad(n)}.wiki`]),
+	...CHUNQIU.map((n) => [`春秋左傳正義/卷${String(n).padStart(2, '0')}`, `wikisource/zhengyi-${pad(n)}.wiki`]),
+	...['隱公', '僖公'].flatMap((g) => [
+		[`春秋公羊傳/${g}`, `wikisource/gongyang-${g === '隱公' ? 'yin' : 'xi'}.wiki`],
+		[`春秋穀梁傳/${g}`, `wikisource/guliang-${g === '隱公' ? 'yin' : 'xi'}.wiki`]
+	]),
+	['國語/卷10', 'wikisource/guoyu-010.wiki'],
+	['後漢書/卷9', 'wikisource/houhanshu-009.wiki'],
+	['後漢書/卷74上', 'wikisource/houhanshu-074a.wiki'],
+	['後漢書/卷74下', 'wikisource/houhanshu-074b.wiki'],
+	...[62, 63, 64, 65, 66, 67, 68, 69].map((n) => [`資治通鑑/卷${pad(n)}`, `wikisource/tongjian-${pad(n)}.wiki`]),
 	['漢書/卷001', 'wikisource/hanshu-001.wiki'],
 	['漢書/卷031', 'wikisource/hanshu-031.wiki'],
 	['漢書/卷034', 'wikisource/hanshu-034.wiki'],
@@ -69,11 +86,15 @@ async function corpus() {
 		const url = 'https://huggingface.co/datasets/gujilab/chinese-classical-corpus/resolve/main/corpus.jsonl';
 		await writeFile(file, Buffer.from(await (await get(url)).arrayBuffer()));
 	}
-	const want = new Set(SHIJI.map((n) => `shiji#${n}`));
+	const want = new Set(SIKU);
 	const lines = createInterface({ input: createReadStream(file, 'utf8') });
 	for await (const line of lines) {
 		const d = JSON.parse(line);
-		if (want.has(d.id)) await save(`siku/shiji-${pad(d.volume)}.txt`, d.content);
+		// ids number the 卷 through the whole book (三國志 `volume` restarts in each 志)
+		if (!want.has(d.id)) continue;
+		const [book, n] = d.id.split('#');
+		const rel = `siku/${book}-${pad(Number(n))}.txt`;
+		if (!(await exists(path.join(SRC, rel)))) await save(rel, d.content);
 	}
 }
 

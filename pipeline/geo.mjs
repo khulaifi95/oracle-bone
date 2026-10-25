@@ -158,7 +158,7 @@ function ellipse({ c, r, rot }) {
 const round = (l) => l.map(([x, y]) => [Math.round(x * 100) / 100, Math.round(y * 100) / 100]);
 const linesOf = (g) => (g.type === 'LineString' ? [g.coordinates] : g.type === 'MultiLineString' ? g.coordinates : g.type === 'Polygon' ? g.coordinates : g.type === 'MultiPolygon' ? g.coordinates.flat() : []);
 
-export async function buildBasemap() {
+export async function buildBasemap(period = 'qinhan') {
 	const load = async (n) => JSON.parse(await readFile(path.join(ROOT, 'sources/cache', n), 'utf8'));
 	const rivers = await load('ne_10m_rivers_lake_centerlines.geojson');
 	const coast = await load('ne_50m_coastline.geojson');

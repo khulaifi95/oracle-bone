@@ -49,13 +49,13 @@ Settings persist in the browser. Positions can be linked as `#shiji-7/7.16.6`, `
 
 **Context layers.** The left panel and the bottom strip hold the context layers:
 
-- 舆图: a map of the book's period. It marks the states of the current year at their capitals, coloured by side, and the places named around the passage. Each book has its own map. 史记: about 200 BC, with the 河 on its Western Han course, the 泗, 睢 and 鸿沟, and the 大野、云梦、彭蠡 marshes. 三国志: the 东汉 河 after 王景's works, the 汴渠 and 白沟, a smaller 云梦泽. 春秋: the 河 on its northern course to the sea near today's 天津, no 鸿沟, the larger 云梦泽. The old coast is drawn with today's coast dashed. The map can be enlarged to fill the reading area.
-- 人物: who is on stage now, and a card for each person. The card gives 名, 字, side, and the title they held in the current year. It also gives their age (虚岁) at the current date and every mention in the chapter.
+- 舆图: a map of the book's period. It shades the land each state held in the current year, coloured by side, with dashed lines where two holders meet; city dots take their holder's colour, and the states are marked at their capitals. Each city's holder year by year is in `data/<book>/territory.json`, written by hand from the histories; the shaded areas are the Voronoi cells of the held cities, clipped to the land. Names are placed so that none overlaps another, the passage's places first. It also marks the places named around the passage. Each book has its own map. 史记: about 200 BC, with the 河 on its Western Han course, the 泗, 睢 and 鸿沟, and the 大野、云梦、彭蠡 marshes. 三国志: the 东汉 河 after 王景's works, the 汴渠 and 白沟, a smaller 云梦泽. 春秋: the 河 on its northern course to the sea near today's 天津, no 鸿沟, the larger 云梦泽. The old coast is drawn with today's coast dashed. The map can be enlarged to fill the reading area.
+- 人物: who is on stage now, and a card for each person. The card gives 名, 字, side, and the title they held in the current year. It also gives their age (虚岁) at the current date and every mention in the chapter. Under 人物关系 it lists what other people were to them, from `data/<book>/relations.json`: kin, lord and vassal, friends and allies, enemies. Each relation is split into phases (英布 is 项羽's general, then his enemy), the phase of the year being read is marked, and a line from the text says where the relation turns. The card also lists who appears in the same passages most often in the chapter.
 - 对读: the same event as told in other books, set side by side, with a line showing which books and chapters tell it. 史记 is read against 汉书 and 资治通鉴; 三国志 against 后汉书 and 资治通鉴; 左传 against the 史记 (秦本纪, 晋世家, 楚世家, 郑世家) and 国语·晋语四. Each event is anchored by hand to a sentence in each book. The build then grows every account sentence by sentence, for as long as the next sentences share enough wording with the other books' accounts of the event, and adds sentences elsewhere that retell it closely (marked 同文). A sentence belongs to one event only, and an account in a long 通鉴 or 后汉书 paragraph shows just its own sentences, with …… where the paragraph goes on. The 左传 is the exception: its accounts keep the whole 传 entry. Wording that differs from the chapter being read is marked, with the share of shared wording.
 - 三传 (春秋 only): each 经 entry of the year, with whether and where the 左传 tells it, and the 公羊 and 穀梁 readings. Words where their 经 text differs from the 左氏 one are marked.
 - 校勘: every place where the two editions differ. Each is classed as 异文, 形近, 避讳 or 异体.
 - 注: the full commentary at a point, next to the other edition's note at the same place. For the 三国志, each 裴注 passage is labelled with the book it quotes, and the panel lists the books this chapter's 裴注 quotes, with every passage from each.
-- 时间轴: runs right to left like the text. It shows the book's events, the current date, and the life spans of the people in the passage.
+- 时间轴: runs right to left like the text. It shows the book's events, the current date, and the life spans of the people in the passage. The chapter's events are titled in up to three rows; each title hangs to the left of its own line down to its dot, and no title covers another or another's line.
 
 Each book keeps its own calendar. 史记: the 秦/汉初 calendar, in which the year begins in the tenth month, so 汉元年十月 falls in the winter of 前207. 三国志: 年号, with the other courts' years alongside (黄武五年 · 魏黄初七年 · 蜀建兴四年). 春秋: the years of the 鲁 dukes in the 周正, whose first month falls around December of the year before, with the years of the states whose people are on stage.
 
@@ -85,7 +85,7 @@ The site reads only the JSON in `static/data/`, which is committed. To rebuild i
 
 ```sh
 npm run fetch      # download the sources into sources/ (skips what is already there)
-npm run data       # build static/data/ from sources/ and data/
+npm run data       # build static/data/ from sources/ and data/, then the font subsets
 ```
 
 | File | What it does |
@@ -98,8 +98,9 @@ npm run data       # build static/data/ from sources/ and data/
 | `pipeline/text.mjs` | Aligns the two editions character by character, then restores placeholders, classifies variants and anchors notes and 考证. It also cuts the text into sentences. |
 | `pipeline/build.mjs` | Tags people and places, finds dates in the text and anchors every event to its passage in each book. It writes the chapter, catalogue and context files. |
 | `pipeline/geo.mjs` | Clips and simplifies the base map, gives the rivers their classical names, and redraws the rivers, marshes and coast of each period. |
+| `pipeline/fonts.mjs` | Downloads 霞鹜文楷 (regular and medium) and cuts each down to the characters the site uses, as `static/fonts/wenkai-*.woff2`. One file per weight replaces about a hundred web-font pieces, so text does not appear piece by piece. Run it (`npm run fonts`) after adding text. |
 | `pipeline/portraits.mjs` | `node pipeline/portraits.mjs <book>` finds a public-domain portrait for each person on Wikimedia Commons. The source line for each picture is then checked and written by hand. |
-| `data/<book>/*.json` | Hand-compiled people, places, events, states by year, edition descriptions and portrait sources for each book. |
+| `data/<book>/*.json` | Hand-compiled people, relations between them, places, events, states by year, who held each place by year (`territory.json`), edition descriptions and portrait sources for each book. |
 
 `npm run data` fails if any event's passage can no longer be found in a text, so edits to `data/<book>/events.json` are checked against the books. `BOOK=chunqiu npm run data` rebuilds one book's chapters and keeps the others as they are.
 

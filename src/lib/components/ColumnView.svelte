@@ -10,8 +10,9 @@
 		width,
 		x,
 		top = 0,
-		noteStretch = 1
-	}: { col: Column; unit: number; width: number; x: number; top?: number; noteStretch?: number } = $props();
+		noteStretch = 1,
+		noteScale = 0.92
+	}: { col: Column; unit: number; width: number; x: number; top?: number; noteStretch?: number; noteScale?: number } = $props();
 
 	const s = app.settings;
 	const zh = (a: string, b: string) => (s.script === 't' ? b : a);
@@ -47,7 +48,7 @@
 			data-add={c.add}
 			data-k={c.k === 'j' ? c.nk : undefined}
 			title={c.add ? zh(`点校本补「${c.add}」`, `點校本補「${c.add}」`) : c.del ? zh('点校本删去此字', '點校本刪去此字') : c.r ? zh('底本录文缺此字，据另一本补', '底本錄文缺此字，據另一本補') : c.qb ? zh('原刻缺末笔，避清讳', '原刻缺末筆，避清諱') : c.kinds ? `${c.kinds.map((k) => reading.noteLabel(k, s.script)).join('、')}${zh('（点击查看）', '（點擊查看）')}` : c.k === 'j' ? (c.nk === 'jing' ? zh('春秋经文', '春秋經文') : zh('左氏传文', '左氏傳文')) : c.k === 'l' && c.nk ? noteTitle(c.nk) : undefined}
-			style="top:{c.y * unit}px;height:{c.h * unit}px;{c.x === 2 ? `width:${width}px;font-size:${c.k === 'p' ? unit * 0.62 : unit * 0.86}px` : `width:${width / 2}px;left:${c.x === 0 ? width / 2 : 0}px;font-size:${Math.min(width / 2, unit * c.h) * 0.92}px;--stretch:${noteStretch}`}{c.nk ? `;--nc:var(--n-${c.nk})` : ''}"
+			style="top:{c.y * unit}px;height:{c.h * unit}px;{c.x === 2 ? `width:${width}px;font-size:${c.k === 'p' ? unit * 0.62 : unit * 0.86}px` : `width:${width / 2}px;left:${c.x === 0 ? width / 2 : 0}px;font-size:${Math.min(width / 2, unit * c.h) * noteScale}px;--stretch:${noteStretch}`}{c.nk ? `;--nc:var(--n-${c.nk})` : ''}"
 			>{c.ch}{#if c.mark}<i class="mark" class:stop={c.mark === '。'}></i>{/if}{#if c.kinds}{#each c.kinds as nk (nk)}<i
 					class="dot"
 					style="background:var(--n-{nk})"
@@ -59,6 +60,8 @@
 <style>
 	.col {
 		position: absolute;
+		/* a change inside one column (the current sentence, a highlighted name) lays out only that column */
+		contain: layout style;
 	}
 	.c {
 		position: absolute;

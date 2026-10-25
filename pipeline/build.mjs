@@ -363,8 +363,29 @@ for (const B of BOOKS) {
 			}
 	for (const e of events) for (const a of e.accounts) delete a.span;
 
+	// Who was what to whom, and when (data/<book>/relations.json): each pair is written once and
+	// shown on both cards, every phase with its own label for each side.
+	const relations = (await readJson(`${dir}/relations.json`).catch(() => null))?.relations ?? [];
+	const relOf = new Map();
+	const known = new Set(people.map((p) => p.id));
+	for (const r of relations) {
+		if (!known.has(r.a) || !known.has(r.b)) {
+			console.error(`relations.json in ${id}: unknown person in ${r.a} ${r.b}`);
+			process.exit(1);
+		}
+		const noteT = r.note ? toTraditional(r.note) : undefined;
+		for (const [me, other, side] of [[r.a, r.b, 3], [r.b, r.a, 4]]) {
+			if (!relOf.has(me)) relOf.set(me, []);
+			relOf.get(me).push({
+				id: other,
+				p: r.p.map((x) => [x[0], x[1], x[2], x[side], toTraditional(x[side])]),
+				...(r.note ? { note: r.note, noteT } : {})
+			});
+		}
+	}
 	const peopleOut = people.map((p) => ({
 		...p,
+		...(relOf.has(p.id) ? { rel: relOf.get(p.id) } : {}),
 		bioT: toTraditional(p.bio),
 		t: p.t ?? toTraditional(p.name),
 		...(portraits[p.id]?.image ? { portrait: { image: portraits[p.id].image, source: portraits[p.id].source, page: portraits[p.id].page } } : {})
@@ -373,7 +394,35 @@ for (const B of BOOKS) {
 	await write(`${id}/people.json`, peopleOut);
 	await write(`${id}/places.json`, placesOut);
 	await write(`${id}/events.json`, events);
-	await write(`${id}/polities.json`, polities);
+	// Who held what: each place goes to the polity of that year whose line holds it (data/<book>/territory.json).
+	const territory = await readJson(`${dir}/territory.json`).catch(() => null);
+	const holderAt = (place, year) => {
+		let line = null;
+		for (const [y, l] of territory.held[place] ?? territory.default ?? []) if (y <= year) line = l;
+		return line;
+	};
+	if (territory) {
+		const ids = new Set(places.map((p) => p.id));
+		const bad = Object.keys(territory.held).filter((p) => !ids.has(p));
+		const unnamed = [...new Set(Object.values(polities).flat().map((p) => p.name))].filter((n) => !territory.lines[n]);
+		if (bad.length || unnamed.length) {
+			console.error(`territory.json in ${id}: unknown places ${bad.join(' ')}; polities without a line ${unnamed.join(' ')}`);
+			process.exitCode = 1;
+		}
+	}
+	await write(
+		`${id}/polities.json`,
+		Object.fromEntries(
+			Object.entries(polities).map(([y, list]) => [
+				y,
+				list.map((p) => {
+					const line = territory?.lines[p.name];
+					const holds = line ? places.filter((pl) => holderAt(pl.id, Number(y)) === line).map((pl) => pl.id) : [];
+					return { ...p, t: toTraditional(p.name), ...(p.who ? { whoT: toTraditional(p.who) } : {}), ...(territory ? { holds } : {}) };
+				})
+			])
+		)
+	);
 
 	catalogBooks[id] = {
 		...B.book,

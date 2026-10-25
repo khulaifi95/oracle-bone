@@ -19,9 +19,22 @@
 {@render children()}
 
 <style>
+	/* 霞鶩文楷 cut to the characters the site uses (pipeline/fonts.mjs): one file per weight */
+	@font-face {
+		font-family: 'WenKai Text';
+		font-weight: 400;
+		font-display: block;
+		src: url('/fonts/wenkai-400.woff2') format('woff2');
+	}
+	@font-face {
+		font-family: 'WenKai Text';
+		font-weight: 600 700;
+		font-display: block;
+		src: url('/fonts/wenkai-600.woff2') format('woff2');
+	}
 	:global(:root) {
 		/* 楷書 by default; 宋體 (the printed-book face) can be chosen in the top bar */
-		--font-kai: 'LXGW WenKai', 'Kaiti SC', 'STKaiti', 'KaiTi', serif;
+		--font-kai: 'WenKai Text', 'LXGW WenKai', 'Kaiti SC', 'STKaiti', 'KaiTi', serif;
 		--font-song: 'Noto Serif SC', 'Noto Serif TC', 'Source Han Serif SC', 'Songti SC', 'SimSun', serif;
 		--font-brush: 'Ma Shan Zheng', 'LXGW WenKai', serif;
 		--font: var(--font-kai);

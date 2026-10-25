@@ -55,7 +55,9 @@
 	// 白口 books print 卷 in the 版心 title, 黑口 ones only the number
 	const juanZh = $derived(reading.info?.juanZh ?? '');
 	const juanShort = $derived(black ? juanZh.replace('卷', '') : juanZh);
-	const noteStretch = $derived(Math.min(1.9, unit / (colW / 2 * 0.92)));
+	// 雙行小注 in a printed book are cut smaller than the text and only a little taller than wide
+	const NOTE = 0.8;
+	const noteStretch = $derived(Math.min(1.15, unit / (colW / 2 * NOTE)));
 
 	const colsOf = (h: 0 | 1) => {
 		const start = leaf * perLeaf + h * L.cols;
@@ -137,7 +139,7 @@
 						<div class="rule" style="left:{textX - (k + 1) * colW}px"></div>
 					{/each}
 					{#each colsOf(0) as { c, k } (k)}
-						<ColumnView col={c} {unit} width={colW} x={textX - (k + 1) * colW} {noteStretch} />
+						<ColumnView col={c} {unit} width={colW} x={textX - (k + 1) * colW} {noteStretch} noteScale={NOTE} />
 					{/each}
 					<div class="banxin half" style="left:{side === 0 ? 0 : halfW}px;width:{bxW / 2}px">
 						{#if black}<div class="xiangbi top"></div><div class="xiangbi bottom"></div>{/if}
@@ -152,7 +154,7 @@
 							<div class="rule" style="left:{right - (k + 1) * colW}px"></div>
 						{/each}
 						{#each colsOf(h as 0 | 1) as { c, k } (k)}
-							<ColumnView col={c} {unit} width={colW} x={right - (k + 1) * colW} {noteStretch} />
+							<ColumnView col={c} {unit} width={colW} x={right - (k + 1) * colW} {noteStretch} noteScale={NOTE} />
 						{/each}
 					{/each}
 					<div class="banxin" style="left:{halfW}px;width:{bxW}px">

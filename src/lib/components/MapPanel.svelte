@@ -4,6 +4,7 @@
 	import { app } from '#lib/state.svelte.js';
 	import { reading } from '#lib/reading.svelte.js';
 	import { occurrences } from '#lib/find.js';
+	import { Delaunay } from 'd3-delaunay';
 
 	let { wide = false }: { wide?: boolean } = $props();
 
@@ -96,6 +97,48 @@
 		for (const k of polityYears) if (k <= y) best = k;
 		return best == null ? [] : (reading.polities[String(best)] ?? []);
 	});
+	// Territory: each place stands for the land nearer to it than to any other place (its Voronoi
+	// cell), coloured by who held it that year. Cells are cut to the land and to a reach around
+	// the held places, and a line is drawn where neighbouring cells change hands.
+	const REACH = 1.7 * K;
+	// place → the colour of the side holding it
+	const heldBy = $derived(new Map(polities.flatMap((pol) => (pol.holds ?? []).map((id) => [id, sideColor(pol.side)] as [string, string]))));
+	const cells = $derived.by(() => {
+		const pts = reading.places.map((p) => [px(p.lon), py(p.lat)] as [number, number]);
+		if (pts.length < 3) return null;
+		const d = Delaunay.from(pts);
+		const v = d.voronoi([-REACH, -REACH, W + REACH, H + REACH]);
+		return { d, v, index: new Map(reading.places.map((p, i) => [p.id, i])) };
+	});
+	const territory = $derived.by(() => {
+		if (!cells) return { areas: [], borders: '', reach: [] as [number, number][] };
+		const owner = new Map<number, number>();
+		polities.forEach((pol, k) => (pol.holds ?? []).forEach((id) => cells.index.has(id) && owner.set(cells.index.get(id)!, k)));
+		const areas = polities.map((pol, k) => {
+			let d = '';
+			// two places on one spot share a cell: the second has none
+			for (const [i, o] of owner) if (o === k) d += cells.v.renderCell(i) ?? '';
+			// states on one side (the eighteen kingdoms of 前206 are mostly 楚's) take lighter and darker tints of its colour
+			const n = polities.slice(0, k).filter((x) => x.side === pol.side).length;
+			const fill = `color-mix(in srgb, var(--${pol.side}) ${[100, 62, 82, 45][n % 4]}%, ${n % 2 ? '#fff' : '#000'} )`;
+			return { pol, d, fill };
+		}).filter((a) => a.d);
+		// borders: the shared edge of two neighbouring cells held by different hands
+		let borders = '';
+		const close = (a: number[], b: number[]) => Math.abs(a[0] - b[0]) < 0.01 && Math.abs(a[1] - b[1]) < 0.01;
+		for (const [i, o] of owner)
+			for (const j of cells.d.neighbors(i)) {
+				const oj = owner.get(j);
+				if (oj === o || (oj != null && j < i)) continue;
+				const a = cells.v.cellPolygon(i);
+				const b = cells.v.cellPolygon(j);
+				if (!a || !b) continue;
+				const shared = a.filter((p) => b.some((q) => close(p, q)));
+				if (shared.length >= 2) borders += `M${shared[0][0].toFixed(1)},${shared[0][1].toFixed(1)}L${shared[1][0].toFixed(1)},${shared[1][1].toFixed(1)}`;
+			}
+		const reach = [...owner.keys()].map((i) => [px(reading.places[i].lon), py(reading.places[i].lat)] as [number, number]);
+		return { areas, borders, reach };
+	});
 	const eventPlaces = $derived(new Set(reading.event?.places ?? []));
 	const near = $derived(reading.nearby.places);
 	const place = $derived(app.place ? reading.placeById.get(app.place) : null);
@@ -120,6 +163,67 @@
 	}
 	const sideColor = (side: string) => `var(--${side})`;
 	const name = (p: { name: string; t: string }) => (t ? p.t : p.name);
+
+	// Labels are placed in order of importance; one that would cover a label already placed tries
+	// the other side of its point, then above and below, and is left out if all four are taken.
+	type Label = { key: string; x: number; y: number; text: string; size: number; anchor: 'start' | 'middle' | 'end'; cls: string; c?: string };
+	type Want = { key: string; x: number; y: number; text: string; size: number; cls: string; gap: number; spacing?: number; centred?: boolean; c?: string };
+	const labels = $derived.by(() => {
+		const placed: Label[] = [];
+		const boxes: [number, number, number, number][] = [];
+		const free = (b: [number, number, number, number]) => boxes.every((o) => b[2] <= o[0] || b[0] >= o[2] || b[3] <= o[1] || b[1] >= o[3]);
+		const pad = 2 * u;
+		// keep the capitals' squares clear
+		for (const pol of polities) {
+			const cap = reading.placeById.get(pol.capital);
+			if (cap) boxes.push([px(cap.lon) - 8 * u, py(cap.lat) - 8 * u, px(cap.lon) + 8 * u, py(cap.lat) + 8 * u]);
+		}
+		const put = (w: Want) => {
+			const size = w.size * u;
+			const len = [...w.text].length * size * (1 + (w.spacing ?? 0));
+			const g = w.gap * u;
+			const tries: [number, number, Label['anchor']][] = w.centred
+				? [
+						[w.x, w.y - g, 'middle'],
+						[w.x, w.y + g + size * 0.85, 'middle']
+					]
+				: [
+						[w.x + g, w.y + size * 0.36, 'start'],
+						[w.x - g, w.y + size * 0.36, 'end'],
+						[w.x, w.y - g, 'middle'],
+						[w.x, w.y + g + size * 0.85, 'middle']
+					];
+			for (const [x, y, anchor] of tries) {
+				const x0 = anchor === 'start' ? x : anchor === 'end' ? x - len : x - len / 2;
+				const box: [number, number, number, number] = [x0 - pad, y - size * 0.9 - pad, x0 + len + pad, y + size * 0.15 + pad];
+				if (!free(box)) continue;
+				boxes.push(box);
+				placed.push({ key: w.key, x, y, text: w.text, size, anchor, cls: w.cls, c: w.c });
+				return;
+			}
+		};
+		const sel = app.place ? reading.placeById.get(app.place) : null;
+		if (sel) put({ key: 'p:' + sel.id, x: px(sel.lon), y: py(sel.lat), text: name(sel), size: 16, gap: 7, cls: 'place-l sel' });
+		const ranked = reading.places
+			.filter((p) => p.id !== app.place)
+			.map((p) => ({ p, rank: eventPlaces.has(p.id) ? 3 : near.has(p.id) ? 2 : detail ? (mentionsInChapter[p.id] ? 1 : 0) : -1 }))
+			.filter((x) => x.rank >= 0)
+			.sort((a, b) => b.rank - a.rank || (mentionsInChapter[b.p.id] ?? 0) - (mentionsInChapter[a.p.id] ?? 0));
+		// the event's places first, then the states, then the places named nearby
+		for (const { p } of ranked.filter((x) => x.rank === 3)) put({ key: 'p:' + p.id, x: px(p.lon), y: py(p.lat), text: name(p), size: 16, gap: 7, cls: 'place-l hot ev' });
+		for (const pol of polities) {
+			const cap = reading.placeById.get(pol.capital);
+			if (cap) put({ key: 'pol:' + pol.name, x: px(cap.lon), y: py(cap.lat), text: t ? (pol.t ?? pol.name) : pol.name, size: 19, gap: 11, cls: 'pol-l', centred: true, c: sideColor(pol.side) });
+		}
+		for (const { p } of ranked.filter((x) => x.rank === 2))
+			put({ key: 'p:' + p.id, x: px(p.lon), y: py(p.lat), text: name(p), size: 16, gap: 7, cls: 'place-l hot' });
+		for (const m of reading.basemap?.mountains ?? []) put({ key: 'm:' + m.name, x: px(m.lon), y: py(m.lat), text: t ? m.t : m.name, size: 12.5, gap: 7, spacing: 0.1, cls: 'mount-l' });
+		for (const l of riverLabels) put({ key: 'r:' + l.name, x: l.x, y: l.y, text: t ? l.t : l.name, size: 12.5, gap: 0, spacing: 0.15, cls: 'river-l' });
+		for (const m of reading.basemap?.marshes ?? [])
+			if (detail || MARSH_NAMED.has(m.name)) put({ key: 'w:' + m.name, x: px(m.c[0]), y: py(m.c[1]), text: t ? m.t : m.name, size: 12, gap: 0, spacing: 0.15, cls: 'river-l', centred: true });
+		for (const { p } of ranked.filter((x) => x.rank < 2)) put({ key: 'p:' + p.id, x: px(p.lon), y: py(p.lat), text: name(p), size: 13, gap: 6, cls: 'place-l' });
+		return placed;
+	});
 </script>
 
 <svelte:window onkeydown={onKey} />
@@ -145,14 +249,14 @@
 			aria-label={t ? '形勢圖' : '形势图'}
 		>
 			<defs>
-				{#each sides as { id: side } (side)}
-					<radialGradient id="halo-{side}">
-						<stop offset="0" style="stop-color:var(--{side});stop-opacity:0.42" />
-						<stop offset="0.6" style="stop-color:var(--{side});stop-opacity:0.16" />
-						<stop offset="1" style="stop-color:var(--{side});stop-opacity:0" />
-					</radialGradient>
-				{/each}
+				<mask id="reach">
+					<rect x="-2000" y="-2000" width={W + 4000} height={H + 4000} fill="#000" />
+					{#each territory.reach as [x, y], i (i)}<circle cx={x} cy={y} r={REACH} fill="#fff" />{/each}
+				</mask>
 				{#if reading.basemap}
+					<clipPath id="land-clip">
+						{#each reading.basemap.land as l, i (i)}<path d={ring(l)} />{/each}
+					</clipPath>
 					<clipPath id="han-sea">
 						{#each reading.basemap.hanSea as h (h.name)}<path d={ring(h.ring)} />{/each}
 					</clipPath>
@@ -192,30 +296,25 @@
 				{/each}
 			{/if}
 
-			{#each polities as pol (pol.name)}
-				{@const cap = reading.placeById.get(pol.capital)}
-				{#if cap}
-					<circle cx={px(cap.lon)} cy={py(cap.lat)} r={K * 1.1} fill="url(#halo-{pol.side})" class="halo" />
-				{/if}
-			{/each}
+			{#if reading.basemap && territory.areas.length}
+				<g clip-path="url(#land-clip)">
+					<g mask="url(#not-han-sea)">
+						<g mask="url(#reach)" class="territory">
+							<g class="areas">
+								{#each territory.areas as a (a.pol.name)}<path d={a.d} style="fill:{a.fill}" />{/each}
+							</g>
+							<path d={territory.borders} class="border" style="stroke-width:{1.4 * u};stroke-dasharray:{5 * u} {2.5 * u}" />
+						</g>
+					</g>
+				</g>
+			{/if}
 
 			{#if reading.basemap}
 				{#each reading.basemap.rivers as r, i (i)}
 					<path d={path(r.line)} class="river" class:major={r.major} style="stroke-width:{(r.major ? 2.1 : 1.2) * u}"><title>{r.name}</title></path>
 				{/each}
-				{#each riverLabels as l (l.name)}
-					<text x={l.x} y={l.y} class="rlabel" style="font-size:{12.5 * u}px;stroke-width:{3 * u}">{t ? l.t : l.name}</text>
-				{/each}
-				{#each reading.basemap.marshes as m (m.name)}
-					{#if detail || MARSH_NAMED.has(m.name)}
-						<text x={px(m.c[0])} y={py(m.c[1]) + 4 * u} class="mlabel" style="font-size:{12 * u}px;stroke-width:{3 * u}">{t ? m.t : m.name}</text>
-					{/if}
-				{/each}
 				{#each reading.basemap.mountains as m (m.name)}
-					<g class="mount">
-						<path d="M{px(m.lon) - 5 * u},{py(m.lat) + 4 * u}L{px(m.lon)},{py(m.lat) - 5 * u}L{px(m.lon) + 5 * u},{py(m.lat) + 4 * u}Z" />
-						<text x={px(m.lon) + 7 * u} y={py(m.lat) + 4 * u} style="font-size:{12.5 * u}px;stroke-width:{3 * u}">{t ? m.t : m.name}</text>
-					</g>
+					<path class="mount" d="M{px(m.lon) - 5 * u},{py(m.lat) + 4 * u}L{px(m.lon)},{py(m.lat) - 5 * u}L{px(m.lon) + 5 * u},{py(m.lat) + 4 * u}Z" />
 				{/each}
 			{/if}
 
@@ -234,10 +333,7 @@
 					tabindex="-1"
 					onkeydown={() => {}}
 				>
-					<circle cx={x} cy={y} r={(hot ? 4.6 : 2.6) * u} style="stroke-width:{1.2 * u}" />
-					{#if hot || detail}
-						<text x={x + 6 * u} y={y + 5 * u} style="font-size:{(hot ? 16 : 13) * u}px;stroke-width:{3.5 * u}">{name(p)}</text>
-					{/if}
+					<circle cx={x} cy={y} r={(hot ? 4.6 : 2.6) * u} style="stroke-width:{1.2 * u}{heldBy.has(p.id) && !hot ? `;fill:${heldBy.get(p.id)}` : ''}" />
 				</g>
 			{/each}
 
@@ -246,9 +342,22 @@
 				{#if cap}
 					<g class="polity" style="--c:{sideColor(pol.side)}">
 						<rect x={px(cap.lon) - 7 * u} y={py(cap.lat) - 7 * u} width={14 * u} height={14 * u} style="stroke-width:{2 * u}" />
-						<text x={px(cap.lon)} y={py(cap.lat) - 11 * u} style="font-size:{19 * u}px;stroke-width:{4 * u}">{pol.name}</text>
 					</g>
 				{/if}
+			{/each}
+
+			{#each labels as l (l.key)}
+				<text
+					x={l.x}
+					y={l.y}
+					class={l.cls}
+					text-anchor={l.anchor}
+					style="font-size:{l.size}px;stroke-width:{l.size * 0.24}px{l.c ? `;--c:${l.c}` : ''}"
+					onclick={() => l.key.startsWith('p:') && (app.place = l.key.slice(2))}
+					role="button"
+					tabindex="-1"
+					onkeydown={() => {}}>{l.text}</text
+				>
 			{/each}
 		</svg>
 	</div>
@@ -258,7 +367,7 @@
 				{#each polities as pol (pol.name)}
 					{@const ruler = reading.personById.get(pol.ruler)}
 					<button class="pol" style="--c:{sideColor(pol.side)}" disabled={!ruler} onclick={() => ruler && ((app.person = ruler.id), (s.panel = 'people'))}>
-						<b>{pol.name}</b>{ruler ? name(ruler) : (pol.who ?? '')}
+						<b>{t ? (pol.t ?? pol.name) : pol.name}</b>{ruler ? name(ruler) : ((t ? pol.whoT : null) ?? pol.who ?? '')}
 					</button>
 				{/each}
 			</div>
@@ -372,8 +481,17 @@
 		fill: var(--map-marsh);
 		stroke: var(--map-river);
 	}
-	.halo {
+	.territory {
 		pointer-events: none;
+	}
+	.areas {
+		opacity: 0.3;
+	}
+	.border {
+		fill: none;
+		stroke: var(--ink-soft);
+		stroke-linecap: round;
+		opacity: 0.75;
 	}
 	.river {
 		fill: none;
@@ -381,28 +499,41 @@
 		stroke-linecap: round;
 		stroke-linejoin: round;
 	}
-	.rlabel,
-	.mlabel {
+	text {
+		paint-order: stroke;
+		stroke: var(--map-land);
+		stroke-linejoin: round;
+	}
+	.river-l {
 		fill: var(--map-river-ink);
 		font-style: italic;
 		letter-spacing: 0.15em;
-		paint-order: stroke;
-		stroke: var(--map-land);
 		pointer-events: none;
 	}
-	.mlabel {
-		text-anchor: middle;
-	}
-	.mount path {
-		fill: var(--map-mount);
-	}
-	.mount text {
-		fill: var(--map-mount);
-		paint-order: stroke;
-		stroke: var(--map-land);
-		letter-spacing: 0.1em;
-	}
 	.mount {
+		fill: var(--map-mount);
+		pointer-events: none;
+	}
+	.mount-l {
+		fill: var(--map-mount);
+		letter-spacing: 0.1em;
+		pointer-events: none;
+	}
+	.place-l {
+		fill: var(--ink);
+		cursor: pointer;
+	}
+	.place-l.hot {
+		font-weight: 600;
+	}
+	.place-l.sel {
+		fill: var(--accent);
+		font-weight: 600;
+	}
+	.pol-l {
+		fill: var(--c);
+		font-weight: 700;
+		font-family: var(--font-kai);
 		pointer-events: none;
 	}
 	.place {
@@ -412,19 +543,11 @@
 		fill: var(--ink-soft);
 		stroke: var(--map-land);
 	}
-	.place text {
-		fill: var(--ink);
-		paint-order: stroke;
-		stroke: var(--map-land);
-	}
 	.place.dim circle {
 		opacity: 0.45;
 	}
 	.place.hot circle {
 		fill: var(--place-line);
-	}
-	.place.hot text {
-		font-weight: 600;
 	}
 	.place.ev circle {
 		fill: var(--accent);
@@ -433,21 +556,9 @@
 		fill: var(--accent);
 		stroke: #fff;
 	}
-	.place.sel text {
-		fill: var(--accent);
-	}
 	.polity rect {
 		fill: var(--map-land);
 		stroke: var(--c);
-	}
-	.polity text {
-		fill: var(--c);
-		font-weight: 700;
-		font-family: var(--font-kai);
-		text-anchor: middle;
-		paint-order: stroke;
-		stroke: var(--map-land);
-		pointer-events: none;
 	}
 	.legend {
 		padding: 8px 10px 2px;

@@ -217,6 +217,16 @@ export interface Person {
 	/** a public-domain portrait (woodcut or painting) and where it comes from */
 	portrait?: { image: string; source: string; page?: string };
 	chapter?: string;
+	/** who this person was to others: per phase [from, to, kind, what the other was to this person (简, 繁)] */
+	rel?: Relation[];
+}
+
+export type RelKind = 'kin' | 'lord' | 'ally' | 'foe' | 'other';
+export interface Relation {
+	id: string;
+	p: [number | null, number | null, RelKind, string, string][];
+	note?: string;
+	noteT?: string;
 }
 
 export interface Place {
@@ -259,6 +269,11 @@ export interface HistEvent {
 
 export interface Polity {
 	name: string;
+	/** the name in traditional characters */
+	t?: string;
+	whoT?: string;
+	/** the places it held that year (from data/<book>/territory.json) */
+	holds?: string[];
 	ruler: string;
 	/** the ruler's name when the people list has no card for them */
 	who?: string;

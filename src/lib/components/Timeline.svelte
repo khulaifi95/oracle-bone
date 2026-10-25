@@ -46,18 +46,29 @@
 	const inChapter = $derived(new Set(reading.chapterEvents.map((c) => c.e.id)));
 	const current = $derived(reading.event?.id ?? null);
 
-	// labels for this chapter's events, laid in lanes so they do not overlap
+	// labels for this chapter's events, in three rows above the axis. Each label sits just left of
+	// its leader line, which runs from the row down to the event's dot. A label is placed only where
+	// it covers no other label in its row and no leader line coming down from a row above, and where
+	// its own leader crosses no label in a row below; the current event is placed first.
+	const LANES = 3;
 	const labelled = $derived.by(() => {
 		const evs = reading.events.filter((e) => inChapter.has(e.id)).map((e) => ({ e, x: X(timeOf(e.ey, e.m)) }));
-		evs.sort((a, b) => b.x - a.x);
-		const laneEnd = [Infinity, Infinity, Infinity];
+		evs.sort((a, b) => (b.e.id === current ? 1 : 0) - (a.e.id === current ? 1 : 0) || b.x - a.x);
+		const spans: [number, number][][] = Array.from({ length: LANES }, () => []);
+		const leaders: [number, number][] = []; // [x, lane]
 		const out: { e: HistEvent; x: number; lane: number }[] = [];
 		for (const v of evs) {
 			const title = t ? v.e.t : v.e.title;
-			const w = title.length * 12 + 8;
-			const lane = laneEnd.findIndex((end) => v.x + 4 <= end);
-			if (lane < 0) continue;
-			laneEnd[lane] = v.x - w;
+			const span: [number, number] = [v.x - 3 - title.length * 12.5 - 4, v.x + 3];
+			const fits = (lane: number) =>
+				spans[lane].every(([a, b]) => span[1] <= a || span[0] >= b) &&
+				leaders.every(([x, l]) => l >= lane || x < span[0] || x > span[1]) &&
+				spans.every((row, l) => l <= lane || row.every(([a, b]) => v.x < a || v.x > b));
+			// the row nearest the axis first, so leaders stay short
+			const lane = [2, 1, 0].find(fits);
+			if (lane == null) continue;
+			spans[lane].push(span);
+			leaders.push([v.x, lane]);
 			out.push({ ...v, lane });
 		}
 		return out;
@@ -220,8 +231,18 @@
 	.lab {
 		cursor: pointer;
 	}
+	/* each title hangs like a flag to the left of its own leader, which runs down to the event's dot */
 	.lab line {
-		stroke: var(--chrome-edge);
+		stroke: var(--ink-note);
+		opacity: 0.55;
+	}
+	.lab.cur line {
+		stroke: #ff8a6a;
+		opacity: 0.9;
+	}
+	.lab:hover line {
+		stroke: var(--gold);
+		opacity: 1;
 	}
 	.lab text {
 		font-size: 13.5px;

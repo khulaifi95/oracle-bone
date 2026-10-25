@@ -234,6 +234,8 @@ export interface Account {
 	at: string;
 	paras: [number, number];
 	segs?: [string, string];
+	/** in a plain text: where the account starts in its first paragraph and ends in its last */
+	cut?: [number, number];
 	/** found by shared wording with the reading book's accounts, not anchored by hand */
 	auto?: boolean;
 }

@@ -14,6 +14,7 @@
 	const t = $derived(s.script === 't');
 	const ed = $derived(s.edition === 'j' ? 'j' : 'd');
 	const PUNCT = /[，。、；：？！「」『』《》〈〉（）…—·]/;
+	const NOTE = /^注/;
 
 	const picked = $derived(app.event ? (reading.events.find((e) => e.id === app.event) ?? null) : null);
 	// the event of the current passage; between events, the one picked or the last one told
@@ -75,7 +76,17 @@
 				title = t ? ch.title.t : ch.title.s;
 			} else {
 				const ch: PlainChapter = await loadPlain(a.ref);
-				texts = ch.paras.slice(a.paras[0], a.paras[1] + 1).map((p) => (t ? p.t : p.s));
+				// only the sentences that tell the event, without the 後漢書's notes between them
+				const [p0, p1] = a.paras;
+				texts = [];
+				for (let p = p0; p <= p1; p++) {
+					let x = t ? ch.paras[p].t : ch.paras[p].s;
+					if (p > p0 && p < p1 && NOTE.test(x)) continue;
+					const end = p === p1 && a.cut ? a.cut[1] : x.length;
+					const start = p === p0 && a.cut ? a.cut[0] : 0;
+					x = (start > 0 ? '……' : '') + x.slice(start, end).replace(/^[，、；：]/, '') + (end < x.length ? '……' : '');
+					texts.push(x);
+				}
 				title = (t ? ch.title.t : ch.title.s) || `卷${juan}`;
 				heading = ch.paras[a.paras[0]]?.h ?? '';
 			}
@@ -199,12 +210,12 @@
 			{/each}
 		</div>
 		<div class="accounts">
-			{#each told as r (r.a.ref + ":" + r.a.paras[0])}
+			{#each told as r (r.a.ref + ":" + (r.a.segs?.[0] ?? r.a.paras[0]) + ":" + (r.a.cut?.[0] ?? ""))}
 				<section class="acc" class:here={r.here}>
 					<div class="label">
 						<b>{bookName(r.book)}</b>·{r.title}
 						<span class="where">{r.where}</span>
-						{#if r.a.auto}<span class="tag" title="按文字相合找到的段落">同文</span>{/if}
+						{#if r.a.auto}<span class="tag" title="按文字相合找到的文句">同文</span>{/if}
 						{#if r.base}<span class="tag base">底本</span>{:else if r.sim !== null}<span class="sim" title={t ? '此段文字見於底本的比例' : '此段文字见于底本的比例'}>{Math.round(r.sim * 100)}%</span>{/if}
 						{#if isReading(r.a.ref) && !r.base}<button onclick={() => open(r)}>{t ? '往讀' : '往读'}</button>{/if}
 					</div>

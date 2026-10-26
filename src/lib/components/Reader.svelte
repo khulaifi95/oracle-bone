@@ -8,19 +8,18 @@
 
 	const s = app.settings;
 	const eds = $derived<Ed[]>(s.edition === 'both' ? ['d', 'j'] : [s.edition]);
-	const info = $derived(reading.chapter ? reading.catalog?.books.shiji.chapters.find((c) => c.id === reading.chapter!.id) : null);
 </script>
 
 <div class="reader" class:pair={eds.length === 2} class:side={eds.length === 2 && s.form === 'book'}>
-	{#if reading.chapter && reading.catalog}
+	{#if reading.chapter && reading.book}
 		{#key reading.chapter.id}
 			{#each eds as ed (ed)}
-				{@const edition = reading.catalog.editions[ed]}
+				{@const edition = (reading.editions ?? reading.book.editions)[ed]}
 				<div class="pane">
 					{#if s.form === 'scroll'}
 						<Scroll chapter={reading.chapter} {ed} id={ed} label={eds.length === 2 ? edition.short : ''} />
 					{:else}
-						<Book chapter={reading.chapter} {ed} {edition} juanZh={info?.juanZh ?? ''} half={eds.length === 2} />
+						<Book chapter={reading.chapter} {ed} {edition} half={eds.length === 2} />
 					{/if}
 				</div>
 			{/each}

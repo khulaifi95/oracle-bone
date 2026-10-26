@@ -1,5 +1,5 @@
 <script lang="ts">
-	// 校勘: where 殿本 and 金陵本 read differently, by kind.
+	// 校勘: where the two editions read differently, by kind.
 	import { app, VARIANT_LABEL } from '#lib/state.svelte.js';
 	import { reading } from '#lib/reading.svelte.js';
 	import type { Variant } from '#lib/types.js';
@@ -39,6 +39,8 @@
 		app.goto(v.seg);
 	}
 	const read = (x: { s: string; t: string }) => t ? x.t : x.s;
+	const eds = $derived(reading.editions);
+	const jName = $derived(eds ? eds.j.short : '');
 </script>
 
 <div class="var">
@@ -49,7 +51,7 @@
 	</div>
 	{#if stats?.chars}
 		<div class="stats">
-			{t ? '殿本' : '殿本'} {stats.chars.d} {t ? '字' : '字'}，{t ? '金陵本' : '金陵本'} {stats.chars.j} {t ? '字' : '字'}；{t ? '四庫錄文缺字據金陵本補' : '四库录文缺字据金陵本补'} {stats.restored ?? 0}，{t ? '考證' : '考证'} {stats.kaozheng ?? 0} {t ? '條' : '条'}。
+			{eds?.d.short} {stats.chars.d} {t ? '字' : '字'}，{jName} {stats.chars.j} {t ? '字' : '字'}；{t ? `${eds?.d.short}錄文缺字據${jName}補` : `${eds?.d.short}录文缺字据${jName}补`} {stats.restored ?? 0}{#if stats.kaozheng}，{t ? '考證' : '考证'} {stats.kaozheng} {t ? '條' : '条'}{/if}。
 		</div>
 	{/if}
 	<ul bind:this={listEl}>
@@ -60,7 +62,7 @@
 					<span class="kind {v.kind}">{VARIANT_LABEL[v.kind]}</span>
 					<span class="ctx">{c.before}<b class="d">{read(v.d) || '‸'}</b>{c.after}</span>
 					<span class="pair"
-						><em>殿</em>{#if read(v.d)}<b>{read(v.d)}</b>{:else}<i class="none">{t ? '無' : '无'}</i>{/if}<em>金</em>{#if read(v.j)}<b
+						><em>{eds?.d.short.slice(0, 1)}</em>{#if read(v.d)}<b>{read(v.d)}</b>{:else}<i class="none">{t ? '無' : '无'}</i>{/if}<em>{jName.slice(0, 1)}</em>{#if read(v.j)}<b
 								>{read(v.j)}</b
 							>{:else}<i class="none">{t ? '無' : '无'}</i>{/if}</span
 					>

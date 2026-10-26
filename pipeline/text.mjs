@@ -8,7 +8,7 @@ import { parseSiku, splitNote, QUEBI, isPUA, fixPUA } from './siku.mjs';
 import { normChar, toSimplified, toTraditional, PUNCT_AFTER, PUNCT_BEFORE } from './script.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const PLACEHOLDER = new Set(['防', '□', '�']);
+const PLACEHOLDER = new Set(['防', '□', '�', '〓']);
 const isPlaceholder = (c) => PLACEHOLDER.has(c) || isPUA(c);
 // Kinds of difference between the editions. 'form': variant glyphs of one word (異體字);
 // 'taboo': the Qing 殿本 avoiding an emperor's or Confucius' name (避諱); 'graphic': look-alike
@@ -21,7 +21,11 @@ const FORMS = ['间闲閒', '奈柰', '钜巨', '巵卮', '羙美', '舎舍', '�
 	'乆久', '杰桀', '圗图', '貎貌', '廐厩', '胷匈', '佣庸', '弊獘', '亨烹', '臈腊', '岀出', '辨辩', '禇褚', '最冣', '觧解',
 	'鬪斗', '皓晧', '着著', '镒溢', '戯戏', '塲场', '邉边', '寜宁', '綘绛', '兎兔', '杂襍', '熟孰', '戮勠', '袴胯', '局跼',
 	'阵陈', '凖准', '劵券', '妬妒', '陜陕', '罢獘', '睂眉', '虚墟', '墬地', '凖準', '蔾藜', '雝雍', '頴颍', '颕颍'];
-const VERTICAL_PUNCT = { '︰': '：', '︓': '：', '︐': '，', '︑': '、', '︒': '。', '︔': '；', '︕': '！', '︖': '？' };
+// vertical and small presentation forms, and ASCII marks, in the transcriptions are ordinary punctuation
+const VERTICAL_PUNCT = {
+	'︰': '：', '︓': '：', '︐': '，', '︑': '、', '︒': '。', '︔': '；', '︕': '！', '︖': '？',
+	'﹐': '，', '﹑': '、', '﹒': '。', '﹔': '；', '﹕': '：', '﹖': '？', '﹗': '！', '?': '？', '!': '！', ',': '，', ';': '；', ':': '：'
+};
 const TABOO = [['邱', '丘'], ['元', '玄'], ['宏', '弘'], ['', '玄'], ['歴', '曆'], ['厯', '曆']];
 function kindOf(a, b) {
 	if (TABOO.some(([x, y]) => a === x && b === y)) return 'taboo';
@@ -33,8 +37,8 @@ function kindOf(a, b) {
 	return 'text';
 }
 
-/** Character stream of the 金陵本 (Wikisource 史記三家註), 底本 readings. */
-function jinlingStream(parsed) {
+/** Character stream of the punctuated edition (Wikisource), 底本 readings. */
+export function jinlingStream(parsed) {
 	const chars = [];
 	const notes = [];
 	let pendingBefore = '';
@@ -43,7 +47,7 @@ function jinlingStream(parsed) {
 		for (const tok of para) {
 			if (tok.t === 'note') {
 				const id = `j${notes.length}`;
-				notes.push({ id, parts: tok.parts.map((p) => ({ k: p.kind, t: p.text, marks: p.marks })) });
+				notes.push({ id, parts: tok.parts.map((p) => ({ k: p.kind, t: p.text, marks: p.marks, ...(p.src ? { src: p.src } : {}) })) });
 				const last = chars[chars.length - 1];
 				if (last && last.para === pi) last.notes.push(id);
 				else pendingNotes.push(id);
@@ -56,6 +60,7 @@ function jinlingStream(parsed) {
 				const c = VERTICAL_PUNCT[c0] ?? c0;
 				const here = edits.filter((e) => e.at === pos);
 				pos++;
+				if (/[\s　]/.test(c)) continue;
 				if (PUNCT_BEFORE.has(c)) {
 					pendingBefore += c;
 					continue;
@@ -66,6 +71,8 @@ function jinlingStream(parsed) {
 					continue;
 				}
 				const ch = { c, para: pi, before: pendingBefore, after: '', notes: [], notesBefore: pendingNotes, edits: [] };
+				if (tok.k) ch.k = tok.k;
+				if (tok.y != null) ch.y = tok.y;
 				for (const e of here) ch.edits.push(e);
 				pendingBefore = '';
 				pendingNotes = [];
@@ -83,11 +90,11 @@ function jinlingStream(parsed) {
 			for (let k = i; left > 0 && k < chars.length; k++, left--) chars[k].del = true;
 		}
 	}
-	return { chars, notes };
+	return { chars, notes, headings: parsed.headings };
 }
 
 /** Character stream of the 四庫/殿本 text. */
-function sikuStream(parsed) {
+export function sikuStream(parsed) {
 	const chars = [];
 	const notes = [];
 	for (const tok of parsed.tokens) {
@@ -151,16 +158,46 @@ function tradVia(sText, tRef) {
 	return s.map((c, i) => (aToB[i] >= 0 ? t[aToB[i]] : fallback[i])).join('');
 }
 
+/** Placeholder glyphs in a 四庫 note, filled from the aligned 金陵本 note where the two run the same length. */
+function restoreNote(sText, tRef) {
+	const s = [...sText];
+	if (!tRef || !s.some(isPlaceholder)) return sText;
+	const t = [...toSimplified(tRef)];
+	const { regions } = align(s, t);
+	for (const r of regions)
+		if (r.a1 - r.a0 === r.b1 - r.b0) for (let k = r.a0; k < r.a1; k++) if (isPlaceholder(s[k])) s[k] = normChar(t[r.b0 + k - r.a0]);
+	return s.join('');
+}
+
 const SENTENCE_END = /[。？！]/;
 
 export async function buildShijiChapter(juan) {
 	const n = String(juan).padStart(3, '0');
 	const wiki = await readFile(path.join(ROOT, 'sources/wikisource', `shiji-${n}.wiki`), 'utf8');
 	const siku = await readFile(path.join(ROOT, 'sources/siku', `shiji-${n}.txt`), 'utf8');
-	const J = jinlingStream(parseSanjiazhu(wiki));
+	const jParsed = parseSanjiazhu(wiki);
 	const sikuParsed = parseSiku(siku);
-	const D = sikuStream(sikuParsed);
+	return assemble({
+		juan,
+		J: jinlingStream(jParsed),
+		D: sikuStream(sikuParsed),
+		header: sikuParsed.header,
+		titles: { d: sikuParsed.title, j: jParsed.title },
+		kaozheng: sikuParsed.kaozheng,
+		// a lone 索 marks a 索隱 note when what follows matches the start of the 金陵本 索隱 note
+		splitD: (note, refParts) =>
+			splitNote(note.raw, refParts.filter((p) => p.k === 'suoyin').map((p) => p.s.replace(/[，。、；：？！「」『』《》]/g, '').slice(0, 4)))
+	});
+}
 
+/**
+ * Builds a chapter from two aligned character streams: J, the punctuated edition (it gives the
+ * sentences and the punctuation), and D, the 殿本 as copied into the 四庫全書.
+ *   J: { chars: [{c, para, before, after, notes, notesBefore, edits, del?, k?, y?}], notes: [{id, parts}], headings? }
+ *   D: { chars: [{c, notes, quebi?}], notes: [{id, raw?, parts?}] }
+ * `splitD(note, refParts)` divides a 殿本 note into labelled parts, with the aligned J note's parts to go by.
+ */
+export function assemble({ juan, J, D, header, titles, kaozheng: kzList, splitD }) {
 	const bChars = J.chars.map((c) => c.c);
 	let aChars = D.chars.map((c) => c.c);
 	const al = align(aChars, bChars);
@@ -230,7 +267,7 @@ export async function buildShijiChapter(juan) {
 	// Notes of the 金陵本.
 	const jNotes = {};
 	for (const note of J.notes) {
-		jNotes[note.id] = { parts: note.parts.map((p) => ({ k: p.k, s: toSimplified(p.t), t: p.t })) };
+		jNotes[note.id] = { parts: note.parts.map((p) => ({ k: p.k, s: toSimplified(p.t), t: p.t, ...(p.src ? { src: p.src, srcS: toSimplified(p.src) } : {}) })) };
 	}
 	// Notes of the 四庫/殿本, labelled and traditionalised with help from the aligned 金陵本 notes.
 	const dNotes = {};
@@ -244,12 +281,11 @@ export async function buildShijiChapter(juan) {
 		for (let k = a; b < 0 && k >= 0; k--) b = al.aToB[k];
 		const ref = b >= 0 ? J.chars[b].notes.map((id) => jNotes[id]) : [];
 		const refParts = ref.flatMap((x) => x.parts);
-		const suoyinStarts = refParts.filter((p) => p.k === 'suoyin').map((p) => p.s.replace(/[，。、；：？！「」『』《》]/g, '').slice(0, 4));
 		const refText = refParts.map((p) => p.t.replace(/[，。、；：？！「」『』《》〈〉（）　]/g, '')).join('');
 		dNotes[note.id] = {
-			parts: splitNote(note.raw, suoyinStarts).map((p) => {
-				const s = [...p.text].map(normChar).join('');
-				return { k: p.kind, s, t: tradVia(s, refText) };
+			parts: splitD(note, refParts).map((p) => {
+				const s = restoreNote([...p.text].map(normChar).join(''), refText);
+				return { k: p.kind, s, t: tradVia(s, refText), ...(p.src ? { src: p.src, srcS: toSimplified(p.src) } : {}) };
 			})
 		};
 	}
@@ -264,7 +300,7 @@ export async function buildShijiChapter(juan) {
 	};
 	let searchFrom = 0;
 	const kaozheng = [];
-	for (const kz of sikuParsed.kaozheng) {
+	for (const kz of kzList) {
 		const lemma = [...kz.lemma].map(normChar);
 		let pos = -1;
 		for (let len = lemma.length; len >= 3 && pos < 0; len--) {
@@ -305,7 +341,11 @@ export async function buildShijiChapter(juan) {
 	}
 
 	// Per-segment edition records.
-	const out = segs.map((s) => ({ id: s.id, para: s.para, d: rec('d', s), j: rec('j', s) }));
+	// 春秋: each segment is 經 or 傳 and belongs to a year
+	const out = segs.map((s) => {
+		const first = J.chars[s.b0];
+		return { id: s.id, para: s.para, ...(first.k ? { k: first.k } : {}), ...(first.y != null ? { y: first.y } : {}), d: rec('d', s), j: rec('j', s) };
+	});
 	function rec(ed, s) {
 		const isD = ed === 'd';
 		const i0 = isD ? s.a0 : s.b0;
@@ -347,8 +387,10 @@ export async function buildShijiChapter(juan) {
 		segs: out,
 		notes: { d: dNotes, j: jNotes },
 		variants: vars,
-		header: sikuParsed.header,
-		titles: { d: sikuParsed.title, j: parseSanjiazhu(wiki).title },
+		header,
+		titles,
+		// sub-headings, for a 卷 that holds several lives: [segment id, heading]
+		sub: (J.headings ?? []).map((h) => [segs.find((x) => x.para >= h.para)?.id, h.text]).filter((h) => h[0]),
 		stats: {
 			chars: { d: aChars.length, j: bChars.length },
 			aligned: al.aToB.filter((x) => x >= 0).length,

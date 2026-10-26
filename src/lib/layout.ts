@@ -2,8 +2,7 @@
 // main text one character per cell, commentary as 雙行小注 (two half-width sub-columns),
 // and optional punctuation either as 句讀 marks beside characters or as cells of its own.
 import type { Chapter, Ed, NoteKind, Script, Segment } from './types';
-import type { NotesMode, Punct } from './state.svelte';
-import { NOTE_LABEL, NOTE_LABEL_T } from './state.svelte';
+import type { JingZhuan, NotesMode, Punct } from './state.svelte';
 
 export interface Cell {
 	/** top, in rows */
@@ -13,8 +12,8 @@ export interface Cell {
 	/** 2: full width; 0: right half; 1: left half */
 	x: 0 | 1 | 2;
 	ch: string;
-	/** m: main text, n: note text, l: note label (陰文), p: punctuation, h: heading, k: note mark */
-	k: 'm' | 'n' | 'l' | 'p' | 'h' | 'k';
+	/** m: main text, n: note text, l: note label (陰文), p: punctuation, h: heading, k: note mark, j: 經/傳 mark (陰文) */
+	k: 'm' | 'n' | 'l' | 'p' | 'h' | 'k' | 'j';
 	seg?: string;
 	i?: number;
 	tag?: 'p' | 'l';
@@ -42,7 +41,7 @@ export interface Column {
 	seg?: string;
 	/** segment active at the column's top */
 	segAt?: string;
-	kind?: 'title' | 'text';
+	kind?: 'title' | 'sub' | 'text';
 }
 
 export interface Layout {
@@ -56,7 +55,11 @@ export interface LayoutOptions {
 	script: Script;
 	punct: Punct;
 	notes: Record<NoteKind, boolean>;
+	/** each commentary's name as cut in 陰文 */
+	labels: Record<NoteKind, string>;
 	notesMode: NotesMode;
+	/** 春秋: 經 and 傳 together, or one of them */
+	jz?: JingZhuan;
 	rows: number;
 	/** height of a note character, in rows */
 	noteH: number;
@@ -64,6 +67,8 @@ export interface LayoutOptions {
 	frontMatter: boolean;
 	bookTitle: string;
 	juanZh: string;
+	/** the number after the chapter title: 第七 */
+	headingNo: string;
 }
 
 const VERTICAL: Record<string, string> = {
@@ -82,7 +87,7 @@ export function layoutChapter(ch: Chapter, o: LayoutOptions): Layout {
 	let currentSeg: string | undefined;
 
 	const newCol = (kind: Column['kind'] = 'text') => {
-		if (col.cells.length || col.kind === 'title') cols.push(col);
+		if (col.cells.length || col.kind !== 'text') cols.push(col);
 		col = { cells: [], kind, segAt: currentSeg };
 		y = 0;
 	};
@@ -109,7 +114,7 @@ export function layoutChapter(ch: Chapter, o: LayoutOptions): Layout {
 		}
 	}
 	col = { cells: [], kind: 'text' };
-	const heading = [...(o.script === 's' ? ch.title.s : ch.title.t) + headingNo(ch, o.ed)];
+	const heading = [...(o.script === 's' ? ch.title.s : ch.title.t) + o.headingNo];
 	heading.forEach((c, k) => col.cells.push({ y: 1 + k, h: 1, x: 2, ch: c, k: 'h' }));
 	// the text starts on the column after the heading, as in the printed book
 	col.kind = 'title';
@@ -118,7 +123,7 @@ export function layoutChapter(ch: Chapter, o: LayoutOptions): Layout {
 	y = 0;
 
 	const notesOf = (id: string) => ch.notes[o.ed][id];
-	const label = o.script === 's' ? NOTE_LABEL : NOTE_LABEL_T;
+	const label = (k: NoteKind) => o.labels[k] ?? k;
 
 	const placeNote = (id: string, seg: string) => {
 		const note = notesOf(id);
@@ -131,7 +136,7 @@ export function layoutChapter(ch: Chapter, o: LayoutOptions): Layout {
 		const chars: { ch: string; k: 'n' | 'l'; nk: NoteKind }[] = [];
 		for (const part of note.parts) {
 			if (!o.notes[part.k]) continue;
-			for (const c of label[part.k]) chars.push({ ch: c, k: 'l', nk: part.k });
+			for (const c of label(part.k)) chars.push({ ch: c, k: 'l', nk: part.k });
 			for (const c of o.script === 's' ? part.s : part.t) chars.push({ ch: c, k: 'n', nk: part.k });
 		}
 		if (!chars.length) return;
@@ -155,14 +160,32 @@ export function layoutChapter(ch: Chapter, o: LayoutOptions): Layout {
 		}
 	};
 
+	// where each of the lives in a 卷 begins (after the first, which the heading names)
+	const subAt = new Map((ch.sub ?? []).slice(1).map((x) => [x.seg, o.script === 's' ? x.s : x.t]));
+	const JZ = { jing: o.script === 's' ? '经' : '經', zhuan: o.script === 's' ? '传' : '傳' };
+
 	let lastPara = -1;
+	let lastJZ = '';
 	for (const seg of ch.segs) {
+		if (o.jz && o.jz !== 'all' && seg.k && seg.k !== o.jz) continue;
 		const t = seg[o.ed];
 		const text = [...(o.script === 's' ? t.s : t.t)];
-		if (seg.para !== lastPara && lastPara !== -1) newCol();
+		const sub = subAt.get(seg.id);
+		if (sub) {
+			newCol('sub');
+			[...sub].forEach((c, k) => col.cells.push({ y: 2 + k, h: 1, x: 2, ch: c, k: 'h' }));
+			newCol();
+		} else if (seg.para !== lastPara && lastPara !== -1) newCol();
 		lastPara = seg.para;
 		currentSeg = seg.id;
 		if (!col.segAt) col.segAt = seg.id;
+		// 經 and 傳 each begin with their name in 陰文, as the 注疏 editions print them
+		if (seg.k && `${seg.k}${seg.y}` !== lastJZ) {
+			lastJZ = `${seg.k}${seg.y}`;
+			place({ h: 1, x: 2, ch: JZ[seg.k], k: 'j', seg: seg.id, nk: seg.k });
+			segCol.set(seg.id, cols.length);
+			col.seg ??= seg.id;
+		}
 
 		const after = new Map(t.p ?? []);
 		const before = new Map(t.q ?? []);
@@ -225,12 +248,6 @@ export function layoutChapter(ch: Chapter, o: LayoutOptions): Layout {
 	}
 	if (col.cells.length) cols.push(col);
 	return { cols, segCol, rows: R };
-}
-
-function headingNo(ch: Chapter, ed: Ed): string {
-	const h = ch.heading[ed] ?? '';
-	const m = h.match(/第.+$/);
-	return m ? m[0] : '';
 }
 
 /** The segment shown at a column (for mapping a scroll position back to the text). */

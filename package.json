@@ -4,21 +4,26 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
+		"predev": "node pipeline/local-portraits.mjs",
 		"dev": "vite dev",
+		"prebuild": "node pipeline/local-portraits.mjs",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"fetch": "node pipeline/fetch.mjs",
-		"data": "node pipeline/build.mjs"
+		"data": "node pipeline/build.mjs && node pipeline/fonts.mjs",
+		"fonts": "node pipeline/fonts.mjs"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^4.0.0",
 		"@sveltejs/kit": "^3.0.0",
 		"@sveltejs/vite-plugin-svelte": "^7.2.0",
+		"d3-contour": "^4.0.2",
 		"diff": "^9.0.0",
 		"opencc-js": "^1.4.2",
+		"subset-font": "^2.9.0",
 		"svelte": "^5.57.1",
 		"svelte-check": "^4.6.0",
 		"typescript": "^6.0.3",

@@ -1,0 +1,34 @@
+{
+	"d": {
+		"id": "d",
+		"name": "武英殿本",
+		"t": "武英殿本",
+		"short": "殿本",
+		"full": "清乾隆四年武英殿刊《三国志》（四库全书本据以缮写），附考证",
+		"date": "1739",
+		"layout": { "cols": 10, "rows": 21, "noteRows": 21, "frame": "四周双边", "mouth": "白口", "fishtail": 1, "desc": "半叶十行，行二十一字，小字双行同；白口，单鱼尾，四周双边" , "top": "乾隆四年校刊" },
+		"commentary": ["pei", "kaozheng"],
+		"source": {
+			"name": "gujilab/chinese-classical-corpus",
+			"url": "https://huggingface.co/datasets/gujilab/chinese-classical-corpus",
+			"licence": "CC0 1.0",
+			"basis": "文渊阁四库全书本《三国志》录文：简体，无标点，裴注夹于正文，卷末附考证。录文中的缺字据点校本对应位置回补，并在字下标记。"
+		}
+	},
+	"j": {
+		"id": "j",
+		"name": "中华书局点校本",
+		"t": "中華書局點校本",
+		"short": "点校本",
+		"full": "中华书局1959年初版、1982年第二版《三国志》，陈乃乾校点；以百衲本（宋绍兴、绍熙本）、殿本、金陵活字本、江南书局本互校",
+		"date": "1959／1982",
+		"layout": { "cols": 10, "rows": 19, "noteRows": 19, "frame": "左右双边", "mouth": "白口", "fishtail": 1, "desc": "点校本为排印本，无线装行款；此处借百衲本所据宋刊本的行款排出：半叶十行，行十九字，小字双行同" },
+		"commentary": ["pei"],
+		"source": {
+			"name": "维基文库《三國志》",
+			"url": "https://zh.wikisource.org/wiki/三國志",
+			"licence": "录文 CC BY-SA 4.0；底本属公有领域",
+			"basis": "按中华书局1982年第二版校对的录文：繁体，带点校本标点。点校本以圆括号标出当删之字、方括号标出所补之字，本书以删前之字为正文，删补都作为校记附注。"
+		}
+	}
+}

@@ -22,3 +22,7 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 sources/cache/
+
+# portraits kept on this machine only (see static/portraits-local/README.md)
+/static/portraits-local/*
+!/static/portraits-local/README.md

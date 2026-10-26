@@ -14,7 +14,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const BBOX = [102, 24, 124, 42.5];
+let BBOX = [102, 24, 124, 42.5];
 const RIVERS = {
 	Huang: '河', 'Chang Jiang': '江', Yangtze: '江', Han: '汉水', Wei: '渭水', Fen: '汾水', Huai: '淮水', Jing: '泾水',
 	Zhang: '漳水', Ying: '颍水', Qin: '沁水', Dan: '丹水', Xiang: '湘水', Gan: '赣水', Jialing: '西汉水', Fuchun: '浙江',
@@ -76,6 +76,56 @@ const MOUNTAINS = [
 	{ name: '会稽山', lon: 120.6, lat: 29.85 },
 	{ name: '恒山', lon: 113.9, lat: 39.65 }
 ];
+
+// The other periods change the 河, the canals, the marshes and the frame; the rest is shared.
+// 东汉: 王景 (AD 69) led the 河 from 濮阳 past 平原 to the sea at 千乘; 曹操 dug 白沟 (204) and
+// the 汴渠 had replaced the 鸿沟 as the way from the 河 to the 泗.
+// 春秋: the 河 left 宿胥口 and ran north along the foot of the 太行 to the sea near 天津; the
+// 鸿沟 was not dug until 360 BC.
+const PERIODS = {
+	qinhan: { bbox: BBOX, he: HAN_HE, canals: CANALS_AND_RIVERS, marshes: MARSHES, mountains: MOUNTAINS },
+	sanguo: {
+		bbox: [100, 21, 124, 42.5],
+		he: [
+			[113.42, 34.95], [113.9, 35.08], [114.4, 35.32], [115.0, 35.7], [115.45, 36.02], [115.9, 36.38], [116.3, 36.78],
+			[116.52, 37.15], [117.0, 37.35], [117.6, 37.42], [118.1, 37.4], [118.5, 37.42]
+		],
+		canals: [
+			{ name: '汴渠', line: [[113.45, 34.9], [113.95, 34.83], [114.35, 34.78], [115.2, 34.65], [116.0, 34.45], [116.6, 34.3], [117.18, 34.28]] },
+			{ name: '白沟', line: [[114.45, 35.62], [114.78, 35.98], [115.1, 36.35], [115.38, 36.72], [115.75, 37.2], [116.1, 37.62], [116.5, 38.1]] },
+			CANALS_AND_RIVERS.find((r) => r.name === '睢水'),
+			CANALS_AND_RIVERS.find((r) => r.name === '泗水')
+		],
+		marshes: [
+			...MARSHES.filter((m) => ['大野泽', '彭蠡泽', '巨鹿泽', '孟诸泽'].includes(m.name)),
+			{ name: '云梦泽', c: [113.1, 30.15], r: [0.5, 0.2], rot: -10 },
+			{ name: '巢湖', c: [117.55, 31.6], r: [0.28, 0.12], rot: 15 }
+		],
+		mountains: [
+			...MOUNTAINS.filter((m) => ['太行山', '南山', '崤山', '华山', '泰山'].includes(m.name)),
+			{ name: '祁山', lon: 105.35, lat: 34.05 },
+			{ name: '定军山', lon: 106.65, lat: 33.15 },
+			{ name: '剑阁', lon: 105.55, lat: 32.2 },
+			{ name: '巫山', lon: 109.9, lat: 31.1 },
+			{ name: '隆中', lon: 112.05, lat: 32.0 }
+		]
+	},
+	chunqiu: {
+		bbox: [104, 26, 123.5, 42.5],
+		he: [
+			[113.42, 34.95], [113.9, 35.15], [114.3, 35.55], [114.58, 35.95], [114.75, 36.4], [115.0, 36.9], [115.22, 37.35],
+			[115.6, 37.9], [116.0, 38.4], [116.5, 38.82], [117.0, 39.02], [117.4, 39.05]
+		],
+		canals: CANALS_AND_RIVERS.filter((r) => ['睢水', '泗水'].includes(r.name)),
+		marshes: [...MARSHES.filter((m) => m.name !== '云梦泽'), { name: '云梦泽', c: [113.25, 30.25], r: [0.95, 0.38], rot: -10 }],
+		mountains: [
+			...MOUNTAINS.filter((m) => ['太行山', '南山', '崤山', '华山', '泰山'].includes(m.name)),
+			{ name: '方城', lon: 113.1, lat: 33.3 },
+			{ name: '首阳山', lon: 112.75, lat: 34.75 },
+			{ name: '桐柏山', lon: 113.4, lat: 32.4 }
+		]
+	}
+};
 
 const inside = ([x, y]) => x >= BBOX[0] && x <= BBOX[2] && y >= BBOX[1] && y <= BBOX[3];
 
@@ -158,13 +208,15 @@ function ellipse({ c, r, rot }) {
 const round = (l) => l.map(([x, y]) => [Math.round(x * 100) / 100, Math.round(y * 100) / 100]);
 const linesOf = (g) => (g.type === 'LineString' ? [g.coordinates] : g.type === 'MultiLineString' ? g.coordinates : g.type === 'Polygon' ? g.coordinates : g.type === 'MultiPolygon' ? g.coordinates.flat() : []);
 
-export async function buildBasemap() {
+export async function buildBasemap(period = 'qinhan') {
+	const P = PERIODS[period];
+	BBOX = P.bbox;
 	const load = async (n) => JSON.parse(await readFile(path.join(ROOT, 'sources/cache', n), 'utf8'));
 	const rivers = await load('ne_10m_rivers_lake_centerlines.geojson');
 	const coast = await load('ne_50m_coastline.geojson');
 	const lakes = await load('ne_50m_lakes.geojson');
 	const land = await load('ne_50m_land.geojson');
-	const out = { bbox: BBOX, land: [], coast: [], lakes: [], rivers: [], hanSea: [], marshes: [], mountains: MOUNTAINS };
+	const out = { bbox: BBOX, land: [], coast: [], lakes: [], rivers: [], hanSea: [], marshes: [], mountains: P.mountains };
 	for (const f of land.features) {
 		const g = f.geometry;
 		const polys = g.type === 'Polygon' ? [g.coordinates] : g.type === 'MultiPolygon' ? g.coordinates : [];
@@ -178,7 +230,7 @@ export async function buildBasemap() {
 		}
 	}
 	for (const h of HAN_SEA) out.hanSea.push({ name: h.name, coast: h.coast, ring: [...h.coast, ...h.sea] });
-	for (const m of MARSHES) out.marshes.push({ name: m.name, c: m.c, ring: round(ellipse(m)) });
+	for (const m of P.marshes) out.marshes.push({ name: m.name, c: m.c, ring: round(ellipse(m)) });
 	for (const f of coast.features) for (const l of linesOf(f.geometry)) for (const c of clip(l)) out.coast.push(round(simplify(c, 0.04)));
 	for (const f of lakes.features) {
 		if (!LAKES.some((n) => (f.properties.name ?? '').includes(n))) continue;
@@ -201,8 +253,8 @@ export async function buildBasemap() {
 			}
 		}
 	}
-	out.rivers.push({ name: '河', major: true, ancient: true, line: HAN_HE });
+	out.rivers.push({ name: '河', major: true, ancient: true, line: P.he });
 	out.rivers.push({ name: '淮水', major: true, ancient: true, line: HAN_HUAI });
-	for (const r of CANALS_AND_RIVERS) out.rivers.push({ name: r.name, ancient: true, line: r.line });
+	for (const r of P.canals) out.rivers.push({ name: r.name, ancient: true, line: r.line });
 	return out;
 }

@@ -5,7 +5,8 @@
 // The transcription writes 缺筆 taboo forms (the last stroke left off, for 康熙 玄燁 and
 // 乾隆 弘曆) and some rare characters as private-use code points.
 export const QUEBI = { '\uea20': '玄', '\uea1f': '弘' };
-export const isPUA = (c) => c >= '\ue000' && c <= '\uf8ff';
+// (and, from the Wikisource 四庫 pages, missing glyphs numbered by the transcribers, kept in plane 15)
+export const isPUA = (c) => (c >= '\ue000' && c <= '\uf8ff') || c.codePointAt(0) >= 0xf0000;
 /** Readable text for notes and headers: 缺筆 forms as the full character, other private-use characters as 〓. */
 export const fixPUA = (s) => [...s].map((c) => QUEBI[c] ?? (isPUA(c) ? '〓' : c)).join('');
 
@@ -97,4 +98,47 @@ export function splitNote(raw, suoyinStarts = []) {
 		p.text = p.text.slice(3);
 	}
 	return parts.filter((p) => p.text);
+}
+
+/**
+ * The 四庫 三國志 from the same corpus: 裴注 in 【】 with no label, the chapter ending at a
+ * 魏志卷N / 蜀志卷N / 吳志卷N line, and the 殿本考證 after it.
+ */
+export function parseSikuSanguo(src) {
+	const lines = src.split('\n').map((l) => l.replace(/^[ \t　]+|[ \t　]+$/g, ''));
+	const END = /^[魏蜀呉吴]志[卷巻][一二三四五六七八九十]+$/;
+	const KZ = /^[魏蜀呉吴]志[卷巻][一二三四五六七八九十]+考证$/;
+	const header = lines.slice(0, 2).map((l) => fixPUA(l.replace(/[ \t　]+/g, '')));
+	const title = fixPUA(lines[2].replace(/【(.*?)】/g, '$1').replace(/[ \t　]+/g, ''));
+	let end = lines.findIndex((l, i) => i > 2 && END.test(l));
+	if (end < 0) end = lines.length;
+	const body = lines.slice(3, end).join('').replace(/[\s　]+/g, '');
+	const tokens = [];
+	let buf = '';
+	for (let k = 0; k < body.length; k++) {
+		const c = body[k];
+		if (c === '【') {
+			const close = body.indexOf('】', k);
+			const inner = body.slice(k + 1, close < 0 ? body.length : close);
+			k = close < 0 ? body.length : close;
+			if (buf) tokens.push({ t: 'text', s: buf });
+			buf = '';
+			tokens.push({ t: 'note', raw: inner });
+		} else buf += c;
+	}
+	if (buf) tokens.push({ t: 'text', s: buf });
+	const kaozheng = [];
+	const kzStart = lines.findIndex((l) => KZ.test(l));
+	if (kzStart >= 0)
+		for (const l of lines.slice(kzStart + 1)) {
+			if (!l || KZ.test(l) || l.startsWith('<')) continue;
+			const cut = l.indexOf('○');
+			if (cut < 0) continue;
+			const cite = l.slice(0, cut).replace(/[【】]/g, '');
+			// the cited words: the main text before 注, or the note's words when only a note is cited
+			const at = cite.indexOf('注');
+			const lemma = at > 0 ? cite.slice(0, at) : cite.replace(/^注/, '');
+			kaozheng.push({ lemma: fixPUA(lemma), cite: fixPUA(cite), text: fixPUA(l.slice(cut + 1).replace(/[【】]/g, '')).replace(/○/g, '　') });
+		}
+	return { header, title, tokens, kaozheng };
 }

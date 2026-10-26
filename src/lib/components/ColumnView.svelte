@@ -1,7 +1,8 @@
 <script lang="ts">
 	// One vertical column of the text: cells are absolutely placed on a row grid.
 	import type { Column } from '#lib/layout.js';
-	import { app, NOTE_LABEL, NOTE_INFO } from '#lib/state.svelte.js';
+	import { app } from '#lib/state.svelte.js';
+	import { reading } from '#lib/reading.svelte.js';
 
 	let {
 		col,
@@ -9,13 +10,16 @@
 		width,
 		x,
 		top = 0,
-		noteStretch = 1
-	}: { col: Column; unit: number; width: number; x: number; top?: number; noteStretch?: number } = $props();
+		noteStretch = 1,
+		noteScale = 0.92
+	}: { col: Column; unit: number; width: number; x: number; top?: number; noteStretch?: number; noteScale?: number } = $props();
 
 	const s = app.settings;
+	const zh = (a: string, b: string) => (s.script === 't' ? b : a);
+	const noteTitle = (k: string) => `${reading.noteLabel(k, s.script)}：${reading.noteDefs.get(k)?.who ?? ''}`;
 </script>
 
-<div class="col" class:title={col.kind === 'title'} style="left:{x}px;top:{top}px;width:{width}px">
+<div class="col" class:title={col.kind === 'title'} class:sub={col.kind === 'sub'} style="left:{x}px;top:{top}px;width:{width}px">
 	{#each col.cells as c, k (k)}
 		<span
 			class="c {c.k}"
@@ -42,8 +46,9 @@
 			data-v={c.v ?? c.vgap}
 			data-note={c.note}
 			data-add={c.add}
-			title={c.add ? `点校本补「${c.add}」` : c.del ? '点校本删去此字' : c.r ? '四库录文缺此字，据金陵本补' : c.qb ? '原刻缺末笔，避清讳' : c.kinds ? `${c.kinds.map((k) => NOTE_LABEL[k]).join('、')}（点击查看）` : c.k === 'l' && c.nk ? `${NOTE_LABEL[c.nk]}：${NOTE_INFO[c.nk].who}` : undefined}
-			style="top:{c.y * unit}px;height:{c.h * unit}px;{c.x === 2 ? `width:${width}px;font-size:${c.k === 'p' ? unit * 0.62 : unit * 0.86}px` : `width:${width / 2}px;left:${c.x === 0 ? width / 2 : 0}px;font-size:${Math.min(width / 2, unit * c.h) * 0.92}px;--stretch:${noteStretch}`}{c.nk ? `;--nc:var(--n-${c.nk})` : ''}"
+			data-k={c.k === 'j' ? c.nk : undefined}
+			title={c.add ? zh(`点校本补「${c.add}」`, `點校本補「${c.add}」`) : c.del ? zh('点校本删去此字', '點校本刪去此字') : c.r ? zh('底本录文缺此字，据另一本补', '底本錄文缺此字，據另一本補') : c.qb ? zh('原刻缺末笔，避清讳', '原刻缺末筆，避清諱') : c.kinds ? `${c.kinds.map((k) => reading.noteLabel(k, s.script)).join('、')}${zh('（点击查看）', '（點擊查看）')}` : c.k === 'j' ? (c.nk === 'jing' ? zh('春秋经文', '春秋經文') : zh('左氏传文', '左氏傳文')) : c.k === 'l' && c.nk ? noteTitle(c.nk) : undefined}
+			style="top:{c.y * unit}px;height:{c.h * unit}px;{c.x === 2 ? `width:${width}px;font-size:${c.k === 'p' ? unit * 0.62 : unit * 0.86}px` : `width:${width / 2}px;left:${c.x === 0 ? width / 2 : 0}px;font-size:${Math.min(width / 2, unit * c.h) * noteScale}px;--stretch:${noteStretch}`}{c.nk ? `;--nc:var(--n-${c.nk})` : ''}"
 			>{c.ch}{#if c.mark}<i class="mark" class:stop={c.mark === '。'}></i>{/if}{#if c.kinds}{#each c.kinds as nk (nk)}<i
 					class="dot"
 					style="background:var(--n-{nk})"
@@ -55,6 +60,8 @@
 <style>
 	.col {
 		position: absolute;
+		/* a change inside one column (the current sentence, a highlighted name) lays out only that column */
+		contain: layout style;
 	}
 	.c {
 		position: absolute;
@@ -100,6 +107,20 @@
 		box-shadow: inset 0 0 0 1px var(--paper);
 		border-radius: 2px;
 		cursor: pointer;
+	}
+	/* 經 and 傳: their names cut in 陰文 at the head of each year's entries */
+	.c.j {
+		color: var(--paper);
+		background: var(--ink);
+		box-shadow: inset 0 0 0 2px var(--paper);
+		border-radius: 2px;
+		font-weight: 600;
+	}
+	.c.j[data-k='zhuan'] {
+		background: var(--ink-note);
+	}
+	.sub .c.h {
+		color: var(--ink-note);
 	}
 	.c.p {
 		color: var(--ink-soft);

@@ -1,8 +1,9 @@
 // What is being read: the loaded data, and what the current position means
 // (which event it belongs to, what date it is, who and where is mentioned nearby).
-import type { Basemap, Catalog, Chapter, HistEvent, Person, Place, Polity } from './types';
+import type { Basemap, Territory, BookInfo, Catalog, Chapter, HistEvent, NoteDef, Person, Place, Polity, Script, Side, EditionInfo } from './types';
 import { app } from './state.svelte';
-import { loadBasemap, loadCatalog, loadChapter, loadEvents, loadPeople, loadPlaces, loadPolities } from './data';
+import { loadBasemap, loadCatalog, loadChapter, loadEvents, loadPeople, loadPlaces, loadPolities, loadTerritory } from './data';
+import { eraLabel, monthLabel, julianYear, yearLong } from './dates';
 
 export interface CurrentDate {
 	ey: number;
@@ -14,16 +15,64 @@ export interface CurrentDate {
 
 class Reading {
 	catalog = $state<Catalog | null>(null);
+	/** the reading book whose people, places and events are loaded */
+	bookId = $state('shiji');
 	chapter = $state<Chapter | null>(null);
 	people = $state<Person[]>([]);
 	places = $state<Place[]>([]);
 	events = $state<HistEvent[]>([]);
 	polities = $state<Record<string, Polity[]>>({});
 	basemap = $state<Basemap | null>(null);
+	territory = $state<Territory | null>(null);
 	error = $state<string | null>(null);
 
 	personById = $derived(new Map(this.people.map((p) => [p.id, p])));
 	placeById = $derived(new Map(this.places.map((p) => [p.id, p])));
+
+	book = $derived<BookInfo | null>(this.catalog?.books[this.bookId] ?? null);
+	/** the book's editions, named in the script being read */
+	editions = $derived.by(() => {
+		const eds = this.book?.editions;
+		if (!eds || app.settings.script === 's') return eds ?? null;
+		const tr = (e: EditionInfo): EditionInfo => ({ ...e, short: e.shortT, full: e.fullT });
+		return { d: tr(eds.d), j: tr(eds.j) };
+	});
+	noteDefs = $derived(new Map<string, NoteDef>((this.book?.notes ?? []).map((n) => [n.k, n])));
+	sideById = $derived(new Map<string, Side>((this.book?.sides ?? []).map((x) => [x.id, x])));
+	/** the chapter's entry in the catalog */
+	info = $derived(this.chapter ? (this.book?.chapters.find((c) => c.id === this.chapter!.id) ?? null) : null);
+
+	/** what the layout needs from the book: the commentaries' names, the printed title, the chapter number */
+	layoutOf(script: Script) {
+		const n = this.info?.n ?? '';
+		const p = this.book?.printed;
+		return {
+			labels: Object.fromEntries((this.book?.notes ?? []).map((x) => [x.k, script === 't' ? x.t : x.s])),
+			bookTitle: p ? (script === 't' ? p.t : p.s) : '',
+			juanZh: this.info?.juanZh ?? '',
+			headingNo: n ? (n.startsWith('第') ? n : `第${n}`) : '',
+			jz: this.book?.jingzhuan ? app.settings.jz : undefined
+		};
+	}
+
+	noteLabel(k: string, script: Script) {
+		const n = this.noteDefs.get(k);
+		return n ? (script === 't' ? n.t : n.s) : k;
+	}
+	sideLabel(id: string, script: Script) {
+		const x = this.sideById.get(id);
+		return x ? (script === 't' ? x.t : x.s) : '';
+	}
+	bookName(id: string, script: Script) {
+		const n = this.catalog?.names[id];
+		return n ? n[script === 't' ? 1 : 0] : id;
+	}
+	/** 建安十三年十二月 · 公元208年 */
+	dateText(ey: number, m: number | null, script: Script, approx = false) {
+		const cal = this.book?.calendar;
+		if (!cal) return '';
+		return `${eraLabel(ey, cal, script, this.info?.court)}${monthLabel(m)}${approx ? (script === 't' ? '前後' : '前后') : ''} · ${yearLong(julianYear(ey, m, cal))}`;
+	}
 
 	/** segment id → position in the chapter */
 	order = $derived(new Map((this.chapter?.segs ?? []).map((s, i) => [s.id, i])));
@@ -98,34 +147,52 @@ class Reading {
 
 	async init() {
 		try {
-			const [catalog, people, places, events, polities, basemap] = await Promise.all([
-				loadCatalog(),
-				loadPeople(),
-				loadPlaces(),
-				loadEvents(),
-				loadPolities(),
-				loadBasemap()
-			]);
-			this.catalog = catalog;
-			this.people = people;
-			this.places = places;
-			this.events = events;
-			this.polities = polities;
-			this.basemap = basemap;
+			this.catalog = await loadCatalog();
 		} catch (e) {
 			this.error = String(e);
 		}
 	}
 
+	/** Load a reading book's people, places, events, states and map. */
+	async loadBook(id: string) {
+		const b = this.catalog?.books[id];
+		if (!b) throw new Error(`no book ${id}`);
+		const [people, places, events, polities, basemap, territory] = await Promise.all([
+			loadPeople(id),
+			loadPlaces(id),
+			loadEvents(id),
+			loadPolities(id),
+			loadBasemap(b.map.period),
+			loadTerritory(id)
+		]);
+		// commentaries never set take the book's defaults
+		for (const n of b.notes) app.settings.notes[n.k] ??= n.on;
+		this.people = people;
+		this.places = places;
+		this.events = events;
+		this.polities = polities;
+		this.basemap = basemap;
+		this.territory = territory;
+		this.bookId = id;
+		app.person = null;
+		app.place = null;
+		app.note = null;
+		app.variant = null;
+	}
+
 	async open(id: string, seg?: string | null) {
 		try {
+			const book = id.split('-')[0];
+			if (!this.catalog?.books[book]?.chapters.some((c) => c.id === id)) throw new Error(`no chapter ${id}`);
 			const ch = await loadChapter(id);
+			if (book !== this.bookId || !this.basemap) await this.loadBook(book);
 			if (this.chapter?.id !== ch.id) {
 				app.event = null;
 				app.seg = seg && ch.segs.some((s) => s.id === seg) ? seg : null;
 				this.chapter = ch;
 			} else if (seg) app.goto(seg);
 			app.settings.chapter = id;
+			app.settings.chapters[book] = id;
 			app.save();
 		} catch (e) {
 			this.error = String(e);
@@ -135,7 +202,7 @@ class Reading {
 
 export const reading = new Reading();
 
-/** Map a 史记 chapter id and segment to its place in the book (for links between chapters). */
+/** The chapter of the current book a segment id belongs to (for links between chapters). */
 export function chapterOfSeg(seg: string): string {
-	return `shiji-${seg.split('.')[0]}`;
+	return `${reading.bookId}-${seg.split('.')[0]}`;
 }

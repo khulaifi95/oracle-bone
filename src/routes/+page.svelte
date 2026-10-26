@@ -11,9 +11,9 @@
 
 	const s = app.settings;
 
-	// Deep links: #shiji-7/7.3.1 opens a chapter at a sentence.
+	// Deep links: #shiji-7/7.3.1 opens a chapter at a sentence; #chunqiu opens a book where it was left.
 	function fromHash() {
-		const m = location.hash.match(/^#(shiji-\d+)(?:\/([\d.]+))?/);
+		const m = location.hash.match(/^#([a-z]+-\d+[a-z]?)(?:\/([\d.]+))?/);
 		return m ? { chapter: m[1], seg: m[2] ?? null } : null;
 	}
 
@@ -46,7 +46,17 @@
 	});
 	$effect(() => {
 		const ch = reading.chapter;
-		if (ch) document.title = `${s.script === 't' ? ch.title.t : ch.title.s} · ${s.script === 't' ? '史讀' : '史读'}`;
+		const b = reading.book;
+		if (ch && b) document.title = `${s.script === 't' ? `${b.t}·${ch.title.t}` : `${b.title}·${ch.title.s}`} · ${s.script === 't' ? '史讀' : '史读'}`;
+	});
+	// each book's own colours: its sides (states, courts) and its commentaries
+	$effect(() => {
+		const b = reading.book;
+		if (!b) return;
+		const root = document.documentElement.style;
+		for (const x of b.sides) root.setProperty(`--${x.id}`, x.color);
+		for (const n of b.notes) root.setProperty(`--n-${n.k}`, n.color);
+		document.documentElement.dataset.book = b.id;
 	});
 </script>
 
@@ -70,6 +80,7 @@
 	.app {
 		display: grid;
 		grid-template-rows: auto 1fr auto;
+		grid-template-columns: minmax(0, 1fr);
 		height: 100vh;
 	}
 	main {

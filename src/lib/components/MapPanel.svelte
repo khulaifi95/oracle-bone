@@ -1,7 +1,7 @@
 <script lang="ts">
-	// 輿圖: the base map with the rivers on their Han courses, the states of the current year
+	// 輿圖: the base map with the rivers on their courses of the period, the states of the current year
 	// at their capitals, and the places named around the current passage.
-	import { app, SIDE_LABEL, eraLabel, bceOf } from '#lib/state.svelte.js';
+	import { app } from '#lib/state.svelte.js';
 	import { reading } from '#lib/reading.svelte.js';
 	import { occurrences } from '#lib/find.js';
 
@@ -20,10 +20,17 @@
 
 	// view box (zoom and pan)
 	let view = $state<[number, number, number, number] | null>(null);
-	// the heartland of the 秦漢之際 wars, from 關中 to the sea
-	const HOME: [number, number, number, number] = [106.5, 28.5, 122.5, 38.8];
+	// where the book's events happen: the view the map opens on
+	const HOME = $derived<[number, number, number, number]>(reading.book?.map.home ?? [106.5, 28.5, 122.5, 38.8]);
+	const mapInfo = $derived(reading.book?.map);
+	const sides = $derived(reading.book?.sides ?? []);
 	const home = $derived<[number, number, number, number]>([px(HOME[0]), py(HOME[3]), px(HOME[2]) - px(HOME[0]), py(HOME[1]) - py(HOME[3])]);
 	const vb = $derived(view ?? home);
+	// another book: back to its home view
+	$effect(() => {
+		void reading.bookId;
+		view = null;
+	});
 	let svg: SVGSVGElement;
 	let drag: { x: number; y: number; v: [number, number, number, number] } | null = null;
 
@@ -62,7 +69,8 @@
 	const ring = (pts: [number, number][]) => path(pts) + 'Z';
 	const mid = (line: [number, number][]) => line[Math.floor(line.length / 2)];
 	// rivers worth a name even when zoomed out
-	const NAMED = new Set(['河', '江', '淮水', '渭水', '汉水', '济水', '鸿沟', '睢水', '泗水', '漳水', '颍水', '汾水']);
+	const NAMED = $derived(new Set(mapInfo?.named ?? []));
+	const MARSH_NAMED = $derived(new Set(mapInfo?.marshNames ?? []));
 	const riverLabels = $derived.by(() => {
 		const seen = new Set<string>();
 		const out: { name: string; t: string; x: number; y: number }[] = [];
@@ -80,9 +88,42 @@
 		if (wide && e.key === 'Escape') app.mapWide = false;
 	}
 
-	const year = $derived(reading.date ? reading.date.ey : -209);
-	const polityYear = $derived(String(Math.max(-209, Math.min(-201, year))));
-	const polities = $derived(year < -209 ? [] : (reading.polities[polityYear] ?? []));
+	// the states as they stood in the latest year listed at or before the one being read
+	const polityYears = $derived(Object.keys(reading.polities).map(Number).sort((a, b) => a - b));
+	const polities = $derived.by(() => {
+		const y = reading.date?.ey ?? polityYears[0];
+		let best: number | null = null;
+		for (const k of polityYears) if (k <= y) best = k;
+		return best == null ? [] : (reading.polities[String(best)] ?? []);
+	});
+	// Territory: the land each state held that year, worked out at build time by letting every held
+	// city spread over the terrain (slopes, heights and rivers slow it) until it meets another's
+	// (pipeline/terrain.mjs). States on one side (the eighteen kingdoms of 前206 are mostly 楚's)
+	// take lighter and darker tints of its colour; a dashed line runs where two holders meet.
+	// place → the colour of the side holding it
+	const heldBy = $derived(new Map(polities.flatMap((pol) => (pol.holds ?? []).map((id) => [id, sideColor(pol.side)] as [string, string]))));
+	const territory = $derived.by(() => {
+		const y = reading.date?.ey ?? polityYears[0];
+		let best: number | null = null;
+		for (const k of polityYears) if (k <= y) best = k;
+		const shape = best == null || !reading.territory ? null : reading.territory.shapes[reading.territory.years[String(best)]];
+		if (!shape) return { areas: [], borders: '' };
+		const line = (f: number[], close: boolean) => {
+			let d = '';
+			for (let i = 0; i < f.length; i += 2) d += `${i ? 'L' : 'M'}${px(f[i]).toFixed(1)},${py(f[i + 1]).toFixed(1)}`;
+			return close ? d + 'Z' : d;
+		};
+		const areas = polities
+			.map((pol, k) => {
+				const rings = shape.areas[pol.name];
+				if (!rings) return null;
+				const n = polities.slice(0, k).filter((x) => x.side === pol.side).length;
+				const fill = `color-mix(in srgb, var(--${pol.side}) ${[100, 62, 82, 45][n % 4]}%, ${n % 2 ? '#fff' : '#000'} )`;
+				return { pol, d: rings.map((r) => line(r, true)).join(''), fill };
+			})
+			.filter((a) => a != null);
+		return { areas, borders: shape.borders.map((b) => line(b, false)).join('') };
+	});
 	const eventPlaces = $derived(new Set(reading.event?.places ?? []));
 	const near = $derived(reading.nearby.places);
 	const place = $derived(app.place ? reading.placeById.get(app.place) : null);
@@ -107,22 +148,79 @@
 	}
 	const sideColor = (side: string) => `var(--${side})`;
 	const name = (p: { name: string; t: string }) => (t ? p.t : p.name);
+
+	// Labels are placed in order of importance; one that would cover a label already placed tries
+	// the other side of its point, then above and below, and is left out if all four are taken.
+	type Label = { key: string; x: number; y: number; text: string; size: number; anchor: 'start' | 'middle' | 'end'; cls: string; c?: string };
+	type Want = { key: string; x: number; y: number; text: string; size: number; cls: string; gap: number; spacing?: number; centred?: boolean; c?: string };
+	const labels = $derived.by(() => {
+		const placed: Label[] = [];
+		const boxes: [number, number, number, number][] = [];
+		const free = (b: [number, number, number, number]) => boxes.every((o) => b[2] <= o[0] || b[0] >= o[2] || b[3] <= o[1] || b[1] >= o[3]);
+		const pad = 2 * u;
+		// keep the capitals' squares clear
+		for (const pol of polities) {
+			const cap = reading.placeById.get(pol.capital);
+			if (cap) boxes.push([px(cap.lon) - 8 * u, py(cap.lat) - 8 * u, px(cap.lon) + 8 * u, py(cap.lat) + 8 * u]);
+		}
+		const put = (w: Want) => {
+			const size = w.size * u;
+			const len = [...w.text].length * size * (1 + (w.spacing ?? 0));
+			const g = w.gap * u;
+			const tries: [number, number, Label['anchor']][] = w.centred
+				? [
+						[w.x, w.y - g, 'middle'],
+						[w.x, w.y + g + size * 0.85, 'middle']
+					]
+				: [
+						[w.x + g, w.y + size * 0.36, 'start'],
+						[w.x - g, w.y + size * 0.36, 'end'],
+						[w.x, w.y - g, 'middle'],
+						[w.x, w.y + g + size * 0.85, 'middle']
+					];
+			for (const [x, y, anchor] of tries) {
+				const x0 = anchor === 'start' ? x : anchor === 'end' ? x - len : x - len / 2;
+				const box: [number, number, number, number] = [x0 - pad, y - size * 0.9 - pad, x0 + len + pad, y + size * 0.15 + pad];
+				if (!free(box)) continue;
+				boxes.push(box);
+				placed.push({ key: w.key, x, y, text: w.text, size, anchor, cls: w.cls, c: w.c });
+				return;
+			}
+		};
+		const sel = app.place ? reading.placeById.get(app.place) : null;
+		if (sel) put({ key: 'p:' + sel.id, x: px(sel.lon), y: py(sel.lat), text: name(sel), size: 16, gap: 7, cls: 'place-l sel' });
+		const ranked = reading.places
+			.filter((p) => p.id !== app.place)
+			.map((p) => ({ p, rank: eventPlaces.has(p.id) ? 3 : near.has(p.id) ? 2 : detail ? (mentionsInChapter[p.id] ? 1 : 0) : -1 }))
+			.filter((x) => x.rank >= 0)
+			.sort((a, b) => b.rank - a.rank || (mentionsInChapter[b.p.id] ?? 0) - (mentionsInChapter[a.p.id] ?? 0));
+		// the event's places first, then the states, then the places named nearby
+		for (const { p } of ranked.filter((x) => x.rank === 3)) put({ key: 'p:' + p.id, x: px(p.lon), y: py(p.lat), text: name(p), size: 16, gap: 7, cls: 'place-l hot ev' });
+		for (const pol of polities) {
+			const cap = reading.placeById.get(pol.capital);
+			if (cap) put({ key: 'pol:' + pol.name, x: px(cap.lon), y: py(cap.lat), text: t ? (pol.t ?? pol.name) : pol.name, size: 19, gap: 11, cls: 'pol-l', centred: true, c: sideColor(pol.side) });
+		}
+		for (const { p } of ranked.filter((x) => x.rank === 2))
+			put({ key: 'p:' + p.id, x: px(p.lon), y: py(p.lat), text: name(p), size: 16, gap: 7, cls: 'place-l hot' });
+		for (const m of reading.basemap?.mountains ?? []) put({ key: 'm:' + m.name, x: px(m.lon), y: py(m.lat), text: t ? m.t : m.name, size: 12.5, gap: 7, spacing: 0.1, cls: 'mount-l' });
+		for (const l of riverLabels) put({ key: 'r:' + l.name, x: l.x, y: l.y, text: t ? l.t : l.name, size: 12.5, gap: 0, spacing: 0.15, cls: 'river-l' });
+		for (const m of reading.basemap?.marshes ?? [])
+			if (detail || MARSH_NAMED.has(m.name)) put({ key: 'w:' + m.name, x: px(m.c[0]), y: py(m.c[1]), text: t ? m.t : m.name, size: 12, gap: 0, spacing: 0.15, cls: 'river-l', centred: true });
+		for (const { p } of ranked.filter((x) => x.rank < 2)) put({ key: 'p:' + p.id, x: px(p.lon), y: py(p.lat), text: name(p), size: 13, gap: 6, cls: 'place-l' });
+		return placed;
+	});
 </script>
 
 <svelte:window onkeydown={onKey} />
 
 <div class="map" class:wide>
 	<div class="head">
-		<span class="year">{reading.date ? `${eraLabel(reading.date.ey)} · 前${bceOf(reading.date.ey, reading.date.m)}年` : ''}</span>
+		<span class="year">{reading.date ? reading.dateText(reading.date.ey, null, s.script) : ''}</span>
 		<span class="hint">{t ? '滾輪縮放，拖動平移' : '滚轮缩放，拖动平移'}</span>
 		<button class="btn" onclick={() => (view = view ? null : [0, 0, W, H])}>{view ? (t ? '復原' : '复原') : t ? '全圖' : '全图'}</button>
 		<button class="btn" onclick={() => (app.mapWide = !app.mapWide)} title={wide ? 'Esc' : ''}>{wide ? (t ? '收起' : '收起') : t ? '放大' : '放大'}</button>
 	</div>
-	<p class="purpose">
-		{t
-			? '此圖隨所讀之處而變：方框是當年諸侯的國都，顏色分秦、楚、漢與其他諸侯；藍點是本段前後提到的地方，紅點是本事發生之地。山川、海岸依秦漢之際的形勢。點地名看詳情。'
-			: '此图随所读之处而变：方框是当年诸侯的国都，颜色分秦、楚、汉与其他诸侯；蓝点是本段前后提到的地方，红点是本事发生之地。山川、海岸依秦汉之际的形势。点地名看详情。'}
-	</p>
+	<p class="purpose">{mapInfo ? (t ? mapInfo.purpose.t : mapInfo.purpose.s) : ''}</p>
 	<div class="frame" bind:clientWidth={cw} bind:clientHeight={ch}>
 		<svg
 			bind:this={svg}
@@ -133,17 +231,13 @@
 			onpointermove={onMove}
 			onpointerup={() => (drag = null)}
 			role="img"
-			aria-label="秦汉之际形势图"
+			aria-label={t ? '形勢圖' : '形势图'}
 		>
 			<defs>
-				{#each ['qin', 'chu', 'han', 'other'] as side (side)}
-					<radialGradient id="halo-{side}">
-						<stop offset="0" style="stop-color:var(--{side});stop-opacity:0.42" />
-						<stop offset="0.6" style="stop-color:var(--{side});stop-opacity:0.16" />
-						<stop offset="1" style="stop-color:var(--{side});stop-opacity:0" />
-					</radialGradient>
-				{/each}
 				{#if reading.basemap}
+					<clipPath id="land-clip">
+						{#each reading.basemap.land as l, i (i)}<path d={ring(l)} />{/each}
+					</clipPath>
 					<clipPath id="han-sea">
 						{#each reading.basemap.hanSea as h (h.name)}<path d={ring(h.ring)} />{/each}
 					</clipPath>
@@ -173,7 +267,7 @@
 					{/each}
 				</g>
 				{#each reading.basemap.hanSea as h (h.name)}
-					<path d={path(h.coast)} class="coast" style="stroke-width:{1.3 * u}"><title>{t ? '秦漢之際海岸（約略）' : '秦汉之际海岸（约略）'}</title></path>
+					<path d={path(h.coast)} class="coast" style="stroke-width:{1.3 * u}"><title>{t ? '古海岸（約略）' : '古海岸（约略）'}</title></path>
 				{/each}
 				{#each reading.basemap.lakes as line, i (i)}
 					<path d={ring(line)} class="lake" style="stroke-width:{0.7 * u}" />
@@ -183,30 +277,25 @@
 				{/each}
 			{/if}
 
-			{#each polities as pol (pol.name)}
-				{@const cap = reading.placeById.get(pol.capital)}
-				{#if cap}
-					<circle cx={px(cap.lon)} cy={py(cap.lat)} r={K * 1.1} fill="url(#halo-{pol.side})" class="halo" />
-				{/if}
-			{/each}
+			{#if reading.basemap && territory.areas.length}
+				<g clip-path="url(#land-clip)">
+					<g mask="url(#not-han-sea)">
+						<g class="territory">
+							<g class="areas">
+								{#each territory.areas as a (a.pol.name)}<path d={a.d} style="fill:{a.fill}" />{/each}
+							</g>
+							<path d={territory.borders} class="border" style="stroke-width:{1.4 * u};stroke-dasharray:{5 * u} {2.5 * u}" />
+						</g>
+					</g>
+				</g>
+			{/if}
 
 			{#if reading.basemap}
 				{#each reading.basemap.rivers as r, i (i)}
 					<path d={path(r.line)} class="river" class:major={r.major} style="stroke-width:{(r.major ? 2.1 : 1.2) * u}"><title>{r.name}</title></path>
 				{/each}
-				{#each riverLabels as l (l.name)}
-					<text x={l.x} y={l.y} class="rlabel" style="font-size:{12.5 * u}px;stroke-width:{3 * u}">{t ? l.t : l.name}</text>
-				{/each}
-				{#each reading.basemap.marshes as m (m.name)}
-					{#if detail || m.name === '大野泽' || m.name === '云梦泽'}
-						<text x={px(m.c[0])} y={py(m.c[1]) + 4 * u} class="mlabel" style="font-size:{12 * u}px;stroke-width:{3 * u}">{t ? m.t : m.name}</text>
-					{/if}
-				{/each}
 				{#each reading.basemap.mountains as m (m.name)}
-					<g class="mount">
-						<path d="M{px(m.lon) - 5 * u},{py(m.lat) + 4 * u}L{px(m.lon)},{py(m.lat) - 5 * u}L{px(m.lon) + 5 * u},{py(m.lat) + 4 * u}Z" />
-						<text x={px(m.lon) + 7 * u} y={py(m.lat) + 4 * u} style="font-size:{12.5 * u}px;stroke-width:{3 * u}">{t ? m.t : m.name}</text>
-					</g>
+					<path class="mount" d="M{px(m.lon) - 5 * u},{py(m.lat) + 4 * u}L{px(m.lon)},{py(m.lat) - 5 * u}L{px(m.lon) + 5 * u},{py(m.lat) + 4 * u}Z" />
 				{/each}
 			{/if}
 
@@ -225,10 +314,7 @@
 					tabindex="-1"
 					onkeydown={() => {}}
 				>
-					<circle cx={x} cy={y} r={(hot ? 4.6 : 2.6) * u} style="stroke-width:{1.2 * u}" />
-					{#if hot || detail}
-						<text x={x + 6 * u} y={y + 5 * u} style="font-size:{(hot ? 16 : 13) * u}px;stroke-width:{3.5 * u}">{name(p)}</text>
-					{/if}
+					<circle cx={x} cy={y} r={(hot ? 4.6 : 2.6) * u} style="stroke-width:{1.2 * u}{heldBy.has(p.id) && !hot ? `;fill:${heldBy.get(p.id)}` : ''}" />
 				</g>
 			{/each}
 
@@ -237,9 +323,22 @@
 				{#if cap}
 					<g class="polity" style="--c:{sideColor(pol.side)}">
 						<rect x={px(cap.lon) - 7 * u} y={py(cap.lat) - 7 * u} width={14 * u} height={14 * u} style="stroke-width:{2 * u}" />
-						<text x={px(cap.lon)} y={py(cap.lat) - 11 * u} style="font-size:{19 * u}px;stroke-width:{4 * u}">{pol.name}</text>
 					</g>
 				{/if}
+			{/each}
+
+			{#each labels as l (l.key)}
+				<text
+					x={l.x}
+					y={l.y}
+					class={l.cls}
+					text-anchor={l.anchor}
+					style="font-size:{l.size}px;stroke-width:{l.size * 0.24}px{l.c ? `;--c:${l.c}` : ''}"
+					onclick={() => l.key.startsWith('p:') && (app.place = l.key.slice(2))}
+					role="button"
+					tabindex="-1"
+					onkeydown={() => {}}>{l.text}</text
+				>
 			{/each}
 		</svg>
 	</div>
@@ -248,13 +347,13 @@
 			<div class="pols">
 				{#each polities as pol (pol.name)}
 					{@const ruler = reading.personById.get(pol.ruler)}
-					<button class="pol" style="--c:{sideColor(pol.side)}" onclick={() => ruler && ((app.person = ruler.id), (s.panel = 'people'))}>
-						<b>{pol.name}</b>{ruler ? name(ruler) : ''}
+					<button class="pol" style="--c:{sideColor(pol.side)}" disabled={!ruler} onclick={() => ruler && ((app.person = ruler.id), (s.panel = 'people'))}>
+						<b>{t ? (pol.t ?? pol.name) : pol.name}</b>{ruler ? name(ruler) : ((t ? pol.whoT : null) ?? pol.who ?? '')}
 					</button>
 				{/each}
 			</div>
 		{:else}
-			<div class="note">{t ? '秦統一天下，郡縣治之。' : '秦统一天下，郡县治之。'}</div>
+			{#if mapInfo && mapInfo.empty.s}<div class="note">{t ? mapInfo.empty.t : mapInfo.empty.s}</div>{/if}
 		{/if}
 	</div>
 
@@ -273,10 +372,10 @@
 		</div>
 	{/if}
 	<div class="key">
-		<span class="side" style="--c:var(--qin)">{SIDE_LABEL.qin}</span><span class="side" style="--c:var(--chu)">{SIDE_LABEL.chu}</span><span class="side" style="--c:var(--han)">{SIDE_LABEL.han}</span><span class="side" style="--c:var(--other)">{SIDE_LABEL.other}</span>
+		{#each sides as x (x.id)}<span class="side" style="--c:var(--{x.id})">{t ? x.t : x.s}</span>{/each}
 		<span class="dot" style="--c:var(--accent)">{t ? '本事' : '本事'}</span><span class="dot" style="--c:var(--place-line)">{t ? '本段' : '本段'}</span>
 		<span class="dash">{t ? '今海岸' : '今海岸'}</span>
-		<i>{t ? '河、淮、泗、睢、鴻溝與海岸依秦漢故道，約略' : '河、淮、泗、睢、鸿沟与海岸依秦汉故道，约略'}</i>
+		<i>{mapInfo ? (t ? mapInfo.key.t : mapInfo.key.s) : ''}</i>
 	</div>
 </div>
 
@@ -363,8 +462,17 @@
 		fill: var(--map-marsh);
 		stroke: var(--map-river);
 	}
-	.halo {
+	.territory {
 		pointer-events: none;
+	}
+	.areas {
+		opacity: 0.3;
+	}
+	.border {
+		fill: none;
+		stroke: var(--ink-soft);
+		stroke-linecap: round;
+		opacity: 0.75;
 	}
 	.river {
 		fill: none;
@@ -372,28 +480,41 @@
 		stroke-linecap: round;
 		stroke-linejoin: round;
 	}
-	.rlabel,
-	.mlabel {
+	text {
+		paint-order: stroke;
+		stroke: var(--map-land);
+		stroke-linejoin: round;
+	}
+	.river-l {
 		fill: var(--map-river-ink);
 		font-style: italic;
 		letter-spacing: 0.15em;
-		paint-order: stroke;
-		stroke: var(--map-land);
 		pointer-events: none;
 	}
-	.mlabel {
-		text-anchor: middle;
-	}
-	.mount path {
-		fill: var(--map-mount);
-	}
-	.mount text {
-		fill: var(--map-mount);
-		paint-order: stroke;
-		stroke: var(--map-land);
-		letter-spacing: 0.1em;
-	}
 	.mount {
+		fill: var(--map-mount);
+		pointer-events: none;
+	}
+	.mount-l {
+		fill: var(--map-mount);
+		letter-spacing: 0.1em;
+		pointer-events: none;
+	}
+	.place-l {
+		fill: var(--ink);
+		cursor: pointer;
+	}
+	.place-l.hot {
+		font-weight: 600;
+	}
+	.place-l.sel {
+		fill: var(--accent);
+		font-weight: 600;
+	}
+	.pol-l {
+		fill: var(--c);
+		font-weight: 700;
+		font-family: var(--font-kai);
 		pointer-events: none;
 	}
 	.place {
@@ -403,19 +524,11 @@
 		fill: var(--ink-soft);
 		stroke: var(--map-land);
 	}
-	.place text {
-		fill: var(--ink);
-		paint-order: stroke;
-		stroke: var(--map-land);
-	}
 	.place.dim circle {
 		opacity: 0.45;
 	}
 	.place.hot circle {
 		fill: var(--place-line);
-	}
-	.place.hot text {
-		font-weight: 600;
 	}
 	.place.ev circle {
 		fill: var(--accent);
@@ -424,21 +537,9 @@
 		fill: var(--accent);
 		stroke: #fff;
 	}
-	.place.sel text {
-		fill: var(--accent);
-	}
 	.polity rect {
 		fill: var(--map-land);
 		stroke: var(--c);
-	}
-	.polity text {
-		fill: var(--c);
-		font-weight: 700;
-		font-family: var(--font-kai);
-		text-anchor: middle;
-		paint-order: stroke;
-		stroke: var(--map-land);
-		pointer-events: none;
 	}
 	.legend {
 		padding: 8px 10px 2px;

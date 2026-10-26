@@ -1,8 +1,9 @@
 <script lang="ts">
 	// 時間軸: read right to left like the text. Events of the period, the current date,
 	// and the life spans of the people around the current passage with their ages.
-	import { app, timeOf, eraLabel, monthLabel, bceOf, ageAt, zhNumber } from '#lib/state.svelte.js';
+	import { app } from '#lib/state.svelte.js';
 	import { reading } from '#lib/reading.svelte.js';
+	import { ageAt, eraLabel, eraOf, julianYear, monthLabel, timeOf as timeIn, yearLong, yearShort } from '#lib/dates.js';
 	import type { HistEvent, Person } from '#lib/types.js';
 
 	const s = app.settings;
@@ -10,18 +11,17 @@
 	let W = $state(1000);
 	const PAD = 24;
 
-	// piecewise scale: the years before 二世 and after 垓下 are compressed
-	const BREAKS: [number, number][] = [
-		[-219, 0],
-		[-210.2, 0.07],
-		[-201, 0.9],
-		[-194.5, 1]
-	];
+	const cal = $derived(reading.book?.calendar);
+	const tl = $derived(reading.book?.timeline);
+	const timeOf = (ey: number, m: number | null) => (cal ? timeIn(ey, m, cal) : ey);
+
+	// piecewise scale: the years around the chapters' events get most of the width
 	function frac(time: number) {
-		const x = Math.max(BREAKS[0][0], Math.min(BREAKS[BREAKS.length - 1][0], time));
-		for (let i = 1; i < BREAKS.length; i++) {
-			const [t0, f0] = BREAKS[i - 1];
-			const [t1, f1] = BREAKS[i];
+		const B = tl?.breaks ?? [[0, 0], [1, 1]];
+		const x = Math.max(B[0][0], Math.min(B[B.length - 1][0], time));
+		for (let i = 1; i < B.length; i++) {
+			const [t0, f0] = B[i - 1];
+			const [t1, f1] = B[i];
 			if (x <= t1) return f0 + ((x - t0) / (t1 - t0)) * (f1 - f0);
 		}
 		return 1;
@@ -30,41 +30,53 @@
 
 	const years = $derived.by(() => {
 		const out: { y: number; x: number; label: string; major: boolean }[] = [];
-		for (let y = -218; y <= -195; y++) {
-			const major = y >= -210 && y <= -201;
-			if (!major && y !== -218 && y !== -214 && y !== -198 && y !== -195) continue;
-			out.push({ y, x: X(y), label: `前${-y}`, major });
+		if (!tl) return out;
+		const minor = new Set(tl.minor);
+		for (let y = tl.from; y <= tl.to; y++) {
+			const major = y >= tl.major[0] && y <= tl.major[1];
+			if (!major && !minor.has(y)) continue;
+			out.push({ y, x: X(y), label: yearShort(y), major });
 		}
 		return out;
 	});
-	const eras = [
-		{ ey: -209, label: '二世' },
-		{ ey: -206, label: '汉' },
-		{ ey: -202, label: '汉五年 称帝' }
-	];
+	const eras = $derived((tl?.marks ?? []).map((m) => ({ ey: m.ey, label: t ? m.t : m.s })));
+	/** where an era year begins on the axis */
+	const yearStart = (ey: number) => timeOf(ey, cal?.start ?? 1) - 0.5 / 12;
 
 	const inChapter = $derived(new Set(reading.chapterEvents.map((c) => c.e.id)));
 	const current = $derived(reading.event?.id ?? null);
 
-	// labels for this chapter's events, laid in lanes so they do not overlap
+	// labels for this chapter's events, in three rows above the axis. Each label sits just left of
+	// its leader line, which runs from the row down to the event's dot. A label is placed only where
+	// it covers no other label in its row and no leader line coming down from a row above, and where
+	// its own leader crosses no label in a row below; the current event is placed first.
+	const LANES = 3;
 	const labelled = $derived.by(() => {
 		const evs = reading.events.filter((e) => inChapter.has(e.id)).map((e) => ({ e, x: X(timeOf(e.ey, e.m)) }));
-		evs.sort((a, b) => b.x - a.x);
-		const laneEnd = [Infinity, Infinity, Infinity];
+		evs.sort((a, b) => (b.e.id === current ? 1 : 0) - (a.e.id === current ? 1 : 0) || b.x - a.x);
+		const spans: [number, number][][] = Array.from({ length: LANES }, () => []);
+		const leaders: [number, number][] = []; // [x, lane]
 		const out: { e: HistEvent; x: number; lane: number }[] = [];
 		for (const v of evs) {
 			const title = t ? v.e.t : v.e.title;
-			const w = title.length * 12 + 8;
-			const lane = laneEnd.findIndex((end) => v.x + 4 <= end);
-			if (lane < 0) continue;
-			laneEnd[lane] = v.x - w;
+			const span: [number, number] = [v.x - 3 - title.length * 12.5 - 4, v.x + 3];
+			const fits = (lane: number) =>
+				spans[lane].every(([a, b]) => span[1] <= a || span[0] >= b) &&
+				leaders.every(([x, l]) => l >= lane || x < span[0] || x > span[1]) &&
+				spans.every((row, l) => l <= lane || row.every(([a, b]) => v.x < a || v.x > b));
+			// the row nearest the axis first, so leaders stay short
+			const lane = [2, 1, 0].find(fits);
+			if (lane == null) continue;
+			spans[lane].push(span);
+			leaders.push([v.x, lane]);
 			out.push({ ...v, lane });
 		}
 		return out;
 	});
 
 	const nowT = $derived(reading.date ? timeOf(reading.date.ey, reading.date.m) : null);
-	const bce = $derived(reading.date ? bceOf(reading.date.ey, reading.date.m) : null);
+	/** the Julian year being read */
+	const year = $derived(reading.date && cal ? julianYear(reading.date.ey, reading.date.m, cal) : null);
 
 	const lives = $derived.by(() => {
 		const ids = [...reading.nearby.people.entries()].sort((a, b) => b[1] - a[1]).map(([id]) => id);
@@ -77,9 +89,9 @@
 
 	function lifeLabel(p: Person) {
 		const n = t ? p.t : p.name;
-		if (bce == null) return n;
-		if (p.died != null && bce < -p.died) return `${n} 卒`;
-		const a = ageAt(p.born, bce);
+		if (year == null) return n;
+		if (p.died != null && year > p.died) return `${n} 卒`;
+		const a = ageAt(p.born, year);
 		return a != null && a > 0 ? `${n} ${a}${t ? '歲' : '岁'}` : n;
 	}
 
@@ -87,11 +99,27 @@
 		app.event = e.id;
 		const here = e.accounts.find((a) => a.ref === reading.chapter?.id && a.segs);
 		if (here?.segs) return app.goto(here.segs[0]);
-		const other = e.accounts.find((a) => a.ref.startsWith('shiji') && a.segs);
+		const other = e.accounts.find((a) => a.ref.startsWith(`${reading.bookId}-`) && a.segs);
 		if (other?.segs) reading.open(other.ref, other.segs[0]);
 	}
+	/** the year as the other courts (三國) or the states of the people on stage (春秋) count it */
+	const otherYears = $derived.by(() => {
+		const d = reading.date;
+		if (!d || !cal?.mode || !cal.courts) return [];
+		// the court whose years name the date: the chapter's, or 漢 before that court has eras of its own
+		const main = eraOf(d.ey, cal, reading.info?.court)?.court ?? reading.info?.court;
+		const want =
+			cal.mode === 'courts'
+				? cal.courts.map((c) => c.id)
+				: [...new Set([...reading.nearby.people.keys()].map((id) => reading.personById.get(id)?.side ?? ''))];
+		return want
+			.filter((c) => c !== main && cal.eras.some((e) => e.court === c && e.from <= d.ey && (e.to == null || d.ey <= e.to)))
+			.map((c) => eraLabel(d.ey, cal, s.script, c, true));
+	});
 	const dateText = $derived(
-		reading.date ? `${eraLabel(reading.date.ey)}${monthLabel(reading.date.m)} · ${t ? '公元前' : '公元前'}${bce}${t ? '年' : '年'}` : ''
+		reading.date && cal
+			? `${eraLabel(reading.date.ey, cal, s.script, reading.info?.court)}${monthLabel(reading.date.m)}${otherYears.map((x) => ` · ${x}`).join('')} · ${yearLong(year!)}`
+			: ''
 	);
 </script>
 
@@ -103,7 +131,7 @@
 			<text x={y.x} y="92" class="year" class:minor={!y.major}>{y.label}</text>
 		{/each}
 		{#each eras as e (e.ey)}
-			{@const x = X(timeOf(e.ey, 10) - 1 / 12)}
+			{@const x = X(yearStart(e.ey))}
 			<line x1={x} x2={x} y1="66" y2="86" class="era" />
 			<text x={x - 3} y="104" class="era-label">{e.label}</text>
 		{/each}
@@ -112,7 +140,7 @@
 			{@const x = X(timeOf(e.ey, e.m))}
 			<g class="ev" class:here={inChapter.has(e.id)} class:cur={e.id === current} onclick={() => go(e)} role="button" tabindex="-1" onkeydown={() => {}}>
 				<circle cx={x} cy="76" r={e.id === current ? 5 : inChapter.has(e.id) ? 3.6 : 2.4} />
-				<title>{t ? e.t : e.title} · {e.era}{monthLabel(e.m)}</title>
+				<title>{t ? e.t : e.title} · {reading.dateText(e.ey, e.m, s.script, e.approx)}</title>
 			</g>
 		{/each}
 		{#each labelled as { e, x, lane } (e.id)}
@@ -138,7 +166,7 @@
 	<div class="lives">
 		{#each lives as p (p.id)}
 			<button class="life-chip" style="--c:var(--{p.side})" onclick={() => ((app.person = p.id), (s.panel = 'people'))}>
-				{lifeLabel(p)}{#if p.born != null}<small>前{-p.born}–{p.died != null ? `前${-p.died}` : ''}</small>{/if}
+				{lifeLabel(p)}{#if p.born != null}<small>{yearShort(p.born)}–{p.died != null ? yearShort(p.died) : ''}</small>{/if}
 			</button>
 		{/each}
 	</div>
@@ -203,8 +231,18 @@
 	.lab {
 		cursor: pointer;
 	}
+	/* each title hangs like a flag to the left of its own leader, which runs down to the event's dot */
 	.lab line {
-		stroke: var(--chrome-edge);
+		stroke: var(--ink-note);
+		opacity: 0.55;
+	}
+	.lab.cur line {
+		stroke: #ff8a6a;
+		opacity: 0.9;
+	}
+	.lab:hover line {
+		stroke: var(--gold);
+		opacity: 1;
 	}
 	.lab text {
 		font-size: 13.5px;
